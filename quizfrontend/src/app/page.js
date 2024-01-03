@@ -11,7 +11,7 @@ function App (){
           <Link href="" class='no-decoration'> Create Quiz </Link>
           </div>
         <div class='col center'>
-          <Link href="solve_quiz" class='no-decoration'> Solve Quiz </Link>
+          <Link href="quiz_settings" class='no-decoration'> Solve Quiz </Link>
         </div>
         </div>
         </div>
