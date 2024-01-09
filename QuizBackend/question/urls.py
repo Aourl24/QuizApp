@@ -3,5 +3,5 @@ from .views import *
 
 
 urlpatterns = [
-	path('questionapi',questionApi)
+	path('questionapi/<str:gameType>/<str:level>',questionApi)
 ]
