@@ -8,7 +8,7 @@ class Level(models.Model):
 		return self.name
 
 class Question(models.Model):
-	level = model.ForeignKey(Level,related_name='question',on_delete=models.CASCADE)
+	level = models.ForeignKey(Level,related_name='question',on_delete=models.CASCADE)
 	body = models.TextField()
 
 	def __str__(self):

@@ -2,7 +2,9 @@
 import React from 'react'
 
 function QuizBox(props){
-	const data = [{body:'what is my name',options:['boy','girl','albino','white'],answer:'girl'},{body:'who are you',options:['awwal','yusuf','itachi','kakashi'],answer:'itachi'},{body:'who place is this',options:['ibadan','osogbo','lagos','oyo'],answer:'oyo'}]
+	//const data = [{body:'what is my name',options:['boy','girl','albino','white'],answer:'girl'},{body:'who are you',options:['awwal','yusuf','itachi','kakashi'],answer:'itachi'},{body:'who place is this',options:['ibadan','osogbo','lagos','oyo'],answer:'oyo'}]
+	const data = props.items
+	
 	const time = props.time
 	const [active , setActive] =  React.useState(0)
 	const [message, setMessage] = React.useState(null)

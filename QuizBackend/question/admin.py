@@ -2,7 +2,7 @@ from django.contrib import admin
 from  .models import *
 
 class OptionAdmin(admin.StackedInline):
-	model = Otion
+	model = Option
 	min_num = 4
 	max_num = 4
 	extra = 4
