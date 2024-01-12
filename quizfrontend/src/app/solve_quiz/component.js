@@ -2,7 +2,7 @@
 import React from 'react'
 
 function QuizBox(props){
-	//const data = [{body:'what is my name',options:['boy','girl','albino','white'],answer:'girl'},{body:'who are you',options:['awwal','yusuf','itachi','kakashi'],answer:'itachi'},{body:'who place is this',options:['ibadan','osogbo','lagos','oyo'],answer:'oyo'}]
+	
 	const data = props.items
 	
 	const time = props.time
@@ -14,18 +14,40 @@ function QuizBox(props){
 	const [correct, setCorrect] = React.useState([])
 	const [wrong , setWrong] = React.useState([])
 	const [optionChoose , setOptionChoose] = React.useState()
+	const [showRestart,setShowRestart] = React.useState(null)
 	options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
 
 	const changeActive = ()=> {
-		if(active+1 >= data.length){
+		if(active > data.length){
+			//setActive(active)
+			//setMessage('Game Over')
+			gameOver()
+		}
+		else if(active+1 == data.length){
 			setActive(active)
-			setMessage('No more Questions Available')
+			gameOver()
 		}
 		else{
 			setActive(active+1)
 			setMessage(null)
 			setCountDown(time)
 		}
+	}
+
+	const threeMissedOut = () =>{
+		if(wrong.length >= 3){
+			gameOver()
+		}
+	}
+
+	const limitedQuiz = () =>{
+
+	}
+
+	const gameOver = () =>{
+		//setActive(active)
+		setMessage('Quiz Ended')
+		setShowRestart(true)
 	}
 
 	const markChoose = (x)=>{
@@ -35,9 +57,12 @@ function QuizBox(props){
 		optionBlock.classList.toggle('color-p')
 	}
 
-	const restart = () =>{
+	const restartQuiz = () =>{
 		setActive(0)
 		setCountDown(time)
+		setWrong([])
+		setCorrect([])
+		setScore(0)
 	}
 
 	const checkAnswer = () =>{
@@ -65,8 +90,8 @@ function QuizBox(props){
 			setWrong((prevArray)=>[...prevArray,data[active]])
 			clearInterval(timer)
 		}
-		if(message == 'No more Questions Available'){
-			setCountDown(0)
+		if(message){
+			//setCountDown(0)
 			clearInterval(timer)
 		}
 		return () => clearInterval(timer)
@@ -81,7 +106,8 @@ function QuizBox(props){
 	return(
 		<div class="">
 		<br />
-		<br />
+		<div class="" style={{textAlign:'right'}}><i class="fas fa-arrow-left" ></i></div>
+		<div class="row" my-2><div class="col">{props.gameType}</div></div>
 			<div class="row justify-content-center">
 			<div class="col-12">
 				<p class='w-100 center' style={{textAlig:'right'}}><div class='rounded sz-20  color-bg-p color-white p-2 color-bd-p' style={{display:'inline-block'}}>00 : {countDown}</div> </p>
@@ -93,7 +119,7 @@ function QuizBox(props){
 				</div>
 				<p class="my-5"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>checkAnswer()}>Select </button></p>
 				<p class="sz-18"> <b>Score</b> :{score} </p>
-				{message && <Message body={message} changeActive={changeActive} score={score} restart={active+1 >= data.length ? restart : null} /> }
+				{message && <Message body={message} changeActive={changeActive} score={score} restartQuiz={restartQuiz} restart={showRestart} /> }
 			</div>
 			</div>
 		</div>
@@ -113,8 +139,9 @@ function Message(props){
 			</div>
 
 		<div class="sz-24 color-black row"> <div class="col center"><b class="sz-20">Score </b> <br />{props.score}</div> </div>
-		<p class="my-5"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.changeActive()}>Next </button></p>
-		{props.restart && <p class="my-5"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.restart()}>Restart </button></p>}
+		{!props.restart && <p class="my-5"> <button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.changeActive()}>Next </button></p>}
+
+		{props.restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.restartQuiz()}>Restart </button></p>}
 		</div>
 		</div>
 		</div>
