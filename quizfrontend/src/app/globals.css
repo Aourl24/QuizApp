@@ -1,5 +1,10 @@
 :root {
- --primary-color:#254117;
- --secondary-color:#437C17;
- --tertiary-color:#F0F0F0;
+ --primary-color:purple;
+ --secondary-color:orange;
+ --tertiary-color:lightyellow;
+}
+
+.select{
+  background-color: lightgreen;
+  color:green;
 }

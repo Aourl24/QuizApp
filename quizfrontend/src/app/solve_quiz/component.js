@@ -15,6 +15,8 @@ function QuizBox(props){
 	const [wrong , setWrong] = React.useState([])
 	const [optionChoose , setOptionChoose] = React.useState()
 	const [showRestart,setShowRestart] = React.useState(null)
+	const [showSelect,setShowSelect] = React.useState(null)
+	const [chance,setChance] = React.useState([1,2,3])
 	options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
 
 	const changeActive = ()=> {
@@ -32,16 +34,18 @@ function QuizBox(props){
 			setMessage(null)
 			setCountDown(time)
 		}
+	
 	}
 
 	const threeMissedOut = () =>{
-		if(wrong.length >= 3){
+		if(chance.length == 0){
 			gameOver()
 		}
 	}
 
-	const limitedQuiz = () =>{
-
+	const calculateScore = () =>{
+	  let scoreCalculate = 30/(+props.time)
+	  setScore((scoreCalculate*10)+score)	
 	}
 
 	const gameOver = () =>{
@@ -52,9 +56,10 @@ function QuizBox(props){
 
 	const markChoose = (x)=>{
 		let optionBlock = options.current[x].current
-		let otherOption = options.current.map((element)=>{element.current.classList.remove('color-bg-t');element.current.classList.remove('color-p')})
-				optionBlock.classList.toggle('color-bg-t')
-		optionBlock.classList.toggle('color-p')
+		let otherOption = options.current.map((element)=>{element.current.classList.remove('select')})//element.current.classList.remove('color-p')
+				optionBlock.classList.toggle('select')
+		//optionBlock.classList.toggle('color-p')
+		setShowSelect(true)
 	}
 
 	const restartQuiz = () =>{
@@ -70,18 +75,28 @@ function QuizBox(props){
 		if(optionChoose == data[active].answer){
 			setMessage('Correct Answer')
 			setCorrect((prevArray)=>[...prevArray,data[active]])
+			calculateScore()
 		}
 		else{
 			setMessage('Wrong Answer')
 			setWrong((prevArray)=>[...prevArray,data[active]])
+			let gChance = chance
+			gChance.pop()
+			setChance(gChance)
 		}
+		threeMissedOut()
 		
 	}
 
+
 	React.useEffect(()=>{
-	options.current.map((element)=>{element.current.classList.remove('color-bg-t');element.current.classList.remove('color-p')})
+	options.current.map((element)=>{element.current.classList.remove('select');element.current.classList.remove('color-p')})
 	setMessage(null)
+	setShowSelect(null)
 	},[active])
+
+//React.useEffect(()=>{
+//	},[wrong])
 
 	React.useEffect(()=>{
 		const timer = setInterval(()=>{setCountDown(()=>countDown-1)},1000);
@@ -100,24 +115,27 @@ function QuizBox(props){
 
 	React.useEffect(()=>{
 		let doneQuestions = correct.length + wrong.length
-		setScore(correct.length + '/ ' + doneQuestions)
+		//setScore(correct.length + '/' + doneQuestions)
+
 	},[wrong,correct])
 
 	return(
 		<div class="">
-		<br />
-		<div class="" style={{textAlign:'right'}}><i class="fas fa-arrow-left" ></i></div>
-		<div class="row" my-2><div class="col">{props.gameType}</div></div>
+		<div class="" style={{textAlign:'right'}}>
+			{chance.map(()=> <i class="fas fa-heart p-1 text-danger" ></i> )}</div>
+		<div class="row mb-1"><div class="col color-p">Question {active+1} </div></div>
 			<div class="row justify-content-center">
+			<div class='sz-24 bold rounded p-3 col-12'>{data[active].body}</div>
 			<div class="col-12">
-				<p class='w-100 center' style={{textAlig:'right'}}><div class='rounded sz-20  color-bg-p color-white p-2 color-bd-p' style={{display:'inline-block'}}>00 : {countDown}</div> </p>
-				<p class='sz-24 bold'>{data[active].body}</p>
+				<div class='w-100 center' style={{textAlig:'right'}}><div class='rounded sz-18  color-s  p-2 color-bd-p' style={{display:'inline-block'}}>0 : {countDown}</div> </div>
+				
 			</div>
 			<div class="col-12">
 				<div class="row">
-				{data[active].options.map((x,i)=><div class='col-md-6 my-2 p-3' key={i} ><div id={active+x} ref={options.current[i]}  class='border rounded sz-16 p-3 color-p-hover option' style={{cursor:'pointer'}} onClick={()=>{markChoose(i);setOptionChoose(x)}}>{x}</div></div>)}
+				{data[active].options.map((x,i)=><div class='col-md-6 my-1 p-3 p-sm-2 my-sm-1' key={i} ><div id={active+x} ref={options.current[i]}  class='border rounded sz-16 p-3 color-p-hover option' style={{cursor:'pointer'}} onClick={()=>{markChoose(i);setOptionChoose(x)}}>{x}</div></div>)}
 				</div>
-				<p class="my-5"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>checkAnswer()}>Select </button></p>
+				{showSelect && <div class="my-4"><button class="btn color-bg-p color-white w-100 sz-20 color-bg-s-hover p-3" onClick={()=>checkAnswer()}>Select </button></div>}
+
 				<p class="sz-18"> <b>Score</b> :{score} </p>
 				{message && <Message body={message} changeActive={changeActive} score={score} restartQuiz={restartQuiz} restart={showRestart} /> }
 			</div>
@@ -129,16 +147,17 @@ function QuizBox(props){
 
 function Message(props){
 	return(
-		<div class='sz-24 text-danger modal d-flex align-items-center' style={{transition:"all 0.5 ease",backgroundColor:"rgba(100,100,100,0.5)"}}>
-		<div class="color-bg-white shadow modal-dialog modal-dialog-centered w-25 h-25 p-3">
+		<div class='sz-24 text-danger modal d-flex align-items-center color-bg-white' style={{transition:"all 0.5 ease",backgroundColor:"rgba(100,100,100,0.8)"}}>
+		<div class="modal-dialog modal-dialog-centered w-100 h-100 p-3" styl={{transition:"all 0.5 ease",backgroundColor:"rgba(200,200,200,0.5)"}}>
 		<div class="modal-content p-2">
 			<div class="row my-2">
+			<p class='sz-30 animate__animated animate__bounce'>{props.body == 'Correct Answer' ? <i class="fas fa-check color-green"></i> : <i class="fas fa-times color-red"></i>} </p>
 			<div class="col">
 			{props.body}
 			</div>
 			</div>
 
-		<div class="sz-24 color-black row"> <div class="col center"><b class="sz-20">Score </b> <br />{props.score}</div> </div>
+		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-p sz-18">Your Score </span> <br /><b>{props.score}</b></div> </div>
 		{!props.restart && <p class="my-5"> <button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.changeActive()}>Next </button></p>}
 
 		{props.restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.restartQuiz()}>Restart </button></p>}

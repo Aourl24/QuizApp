@@ -17,8 +17,8 @@ function QuizSetting(){
 	}
 
 	return(
-		<div class="container col-6">
-		<div class="row my-3">
+		<div class="container col-md-6 col-sm-12">
+		<div class="row my-3 align-items-center">
 			<div class="col-2">Game type</div>
 			<div class="col">
 			<select ref={gameT} class="form-control" onChange={()=>setType(gameT.current.value)}>
@@ -29,8 +29,17 @@ function QuizSetting(){
 			</div>
 		</div>
 
-			<div class="row my-3"> <div class="col-2"> Time </div> <div class="col"><input ref={time} type="number" class="form-control" onChange={getData} /> </div> </div>
-			<div class="row my-3"> <div class="col-2"> Difficulty </div> 
+			<div class="row my-3 align-items-center"> <div class="col-2"> Time </div> <div class="col"> 
+				<select class="form-control" ref={time} onChange={()=>getData()}>
+				<option>5</option>
+				<option>10</option>
+				<option>15</option>
+				<option>20</option>
+				<option>25</option>
+				<option>30</option>
+			</select>
+			</div> </div>
+			<div class="row my-3 align-items-center"> <div class="col-2"> Difficulty </div> 
 			<div class="col">
 			<select class="form-control" ref={levelT} onChange={()=>setLevel(levelT.current.value)}>
 				<option>Easy</option>
