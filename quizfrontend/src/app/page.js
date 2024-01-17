@@ -8,10 +8,13 @@ function App (){
         <br />
         <div class="row sz-24">
         <div class='col center'>
-          <Link href="" class='no-decoration'> Create Quiz </Link>
+          <Link href={{pathname:"quiz_settings",query:{data:'create'}}} class='no-decoration'> Create Quiz </Link>
           </div>
         <div class='col center'>
-          <Link href="quiz_settings" class='no-decoration'> Solve Quiz </Link>
+          <Link href={{pathname:"quiz_settings",query:{data:'solve'}}} class='no-decoration'> Solve Quiz </Link>
+        </div>
+        <div class='col center'>
+          <Link href={{pathname:"quiz_settings",query:{data:'versus'}}} class='no-decoration'> Versus </Link>
         </div>
         </div>
         </div>

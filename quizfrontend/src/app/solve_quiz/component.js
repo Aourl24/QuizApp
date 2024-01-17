@@ -1,15 +1,22 @@
 'use client'
 import React from 'react'
+import clapsound from './sounds/clapping.wav'
+import boosound from './sounds/booing.wav'
+import gameoversound from './sounds/gameover.wav'
+
 
 function QuizBox(props){
 	
 	const data = props.items
-	
 	const time = props.time
+	const options = React.useRef([])
+	const clap = React.useRef()
+	const boo = React.useRef()
+	const gameover = React.useRef()
+
 	const [active , setActive] =  React.useState(0)
 	const [message, setMessage] = React.useState(null)
 	const [countDown , setCountDown] = React.useState(time)
-	const options = React.useRef([])
 	const [score,setScore] = React.useState(0)
 	const [correct, setCorrect] = React.useState([])
 	const [wrong , setWrong] = React.useState([])
@@ -34,6 +41,12 @@ function QuizBox(props){
 			setMessage(null)
 			setCountDown(time)
 		}
+		clap.current.currentTime = 0
+		boo.current.currentTime = 0
+		gameover.current.currentTime = 0
+		clap.current.pause()
+		boo.current.pause()
+		gameover.current.pause()
 	
 	}
 
@@ -51,6 +64,7 @@ function QuizBox(props){
 	const gameOver = () =>{
 		//setActive(active)
 		setMessage('Quiz Ended')
+		gameover.current.play()
 		setShowRestart(true)
 	}
 
@@ -75,11 +89,13 @@ function QuizBox(props){
 		if(optionChoose == data[active].answer){
 			setMessage('Correct Answer')
 			setCorrect((prevArray)=>[...prevArray,data[active]])
+			clap.current.play()
 			calculateScore()
 		}
 		else{
 			setMessage('Wrong Answer')
 			setWrong((prevArray)=>[...prevArray,data[active]])
+			boo.current.play()
 			let gChance = chance
 			gChance.pop()
 			setChance(gChance)
@@ -101,8 +117,12 @@ function QuizBox(props){
 	React.useEffect(()=>{
 		const timer = setInterval(()=>{setCountDown(()=>countDown-1)},1000);
 		if (countDown <= 0){
+			gameover.current.play()
 			setMessage('Time Out')
 			setWrong((prevArray)=>[...prevArray,data[active]])
+			let gChance = chance
+			gChance.pop()
+			setChance(gChance)
 			clearInterval(timer)
 		}
 		if(message){
@@ -140,6 +160,9 @@ function QuizBox(props){
 				{message && <Message body={message} changeActive={changeActive} score={score} restartQuiz={restartQuiz} restart={showRestart} /> }
 			</div>
 			</div>
+			<audio src={clapsound} ref={clap} ></audio>
+			<audio src={boosound} ref={boo}></audio>
+			<audio src={gameoversound} ref={gameover} ></audio>
 		</div>
 		)
 }
@@ -151,13 +174,13 @@ function Message(props){
 		<div class="modal-dialog modal-dialog-centered w-100 h-100 p-3" styl={{transition:"all 0.5 ease",backgroundColor:"rgba(200,200,200,0.5)"}}>
 		<div class="modal-content p-2">
 			<div class="row my-2">
-			<p class='sz-30 animate__animated animate__bounce'>{props.body == 'Correct Answer' ? <i class="fas fa-check color-green"></i> : <i class="fas fa-times color-red"></i>} </p>
+			{!props.restart  && <p class='sz-30 animate__animated animate__bounce'>{props.body == 'Correct Answer' ? <i class="fas fa-check color-green"></i> : <i class="fas fa-times color-red"></i>} </p> }
 			<div class="col">
 			{props.body}
 			</div>
 			</div>
 
-		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-p sz-18">Your Score </span> <br /><b>{props.score}</b></div> </div>
+		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-p sz-18">{props.restart ? 'Final Score':'Your Score' } </span> <br /><b>{props.score}</b></div> </div>
 		{!props.restart && <p class="my-5"> <button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.changeActive()}>Next </button></p>}
 
 		{props.restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.restartQuiz()}>Restart </button></p>}
