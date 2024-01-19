@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import {useSearchParams} from 'next/navigation'
+import axios from 'axios';
 
 function QuizSetting(){
 	const router = useSearchParams()
@@ -77,24 +78,42 @@ function SolveQuizSettings(){
 function VersusQuizSettings(){
 	const time = React.useRef()
 	const levelT = React.useRef()
+	const playerName = React.useRef()
 	const [ready,setReady] = React.useState(false)
 	const [data,setData] = React.useState(10)
 	const [type,setType] = React.useState('versus')
 	const [level,setLevel] = React.useState('easy')
-	const [link,setLink] = React.useState(null)
+	const [link,setLink] = React.useState('')
+	const [game,setGame] = React.useState()
 
 	const getData = () =>{
 		setData(time.current.value)
 	}
 
-	const createLink = () => {
+	const createLink = async () => {
+		if(playerName.current.value == ""){
+
+		}
+		else{
+		let resp = await axios.get(`http://localhost:8000/creategame/${playerName.current.value}`)
+		setGame(resp.data.id)
 		setReady(true)
-		setLink(`http://localhost:3000/solve_quiz?data=${data}&gameType=versus&level=${level}`)
+	}
+		//setLink(`http://localhost:3000/solve_quiz?data=${data}&gameType=versus&level=${level}`)
 	}
 
 	return(
 			<div>
 				Versus Mode
+			<div class='row my-3'>
+				<div class="col">
+					Player Name
+				</div>
+				<div class='col'>
+					<input ref={playerName} class="form-control" />
+				</div>
+			</div>
+
 			<div class="row my-3 align-items-center"> <div class="col-2"> Time </div> <div class="col"> 
 				<select class="form-control" ref={time} onChange={()=>getData()}>
 				<option>5</option>
@@ -120,10 +139,10 @@ function VersusQuizSettings(){
 			</button>
 			</p>
 
-			<p><Link href={link}> Versus Link </Link> </p>
+			{ready && <p><Link href={link}> Versus Link </Link> </p>}
 
 			{ready && <p class='w-100 color-bg-p color-white center p-2 rounded'> 
-			<Link href={{pathname:'solve_quiz', query:{data:data,gameType:type,level:level}}} class='color-white no-decoration'> Start </Link></p>}
+			<Link href={{pathname:'solve_quiz', query:{data:data,gameType:type,level:level,game:game}}} class='color-white no-decoration'> Start </Link></p>}
 		</div>
 		)
 }

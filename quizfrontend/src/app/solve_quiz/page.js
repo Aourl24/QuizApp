@@ -12,11 +12,12 @@ function App(){
 	const data = router.get('data')
 	const gameType = router.get('gameType')
 	const level = router.get('level')
+	const game = router.get('game')
 	const [items,setItems] = React.useState([...dummy,...addition])
 
 	const fetchData = async () =>{
 		//console.log('now getting data')
-		const res = await axios.get(endpoint + '/' + gameType + '/' + level)
+		const res = await axios.get(endpoint + '/' + game + '/' + level)
 		//console.log(res.data)
 		setItems(res.data)
 	}

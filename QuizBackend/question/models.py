@@ -1,6 +1,20 @@
 from django.db import models
 
 
+class Player(models.Model):
+	name = models.CharField(max_length=100000)
+
+	def __str__(self):
+		return self.name
+
+class Game(models.Model):
+	players = models.ManyToManyField(Player,related_name='game')
+	question = models.ManyToManyField('Question',related_name='game')
+
+	def __str__(self):
+		return f'Game {self.id}'
+
+
 class Level(models.Model):
 	name = models.CharField(max_length=1000)
 
