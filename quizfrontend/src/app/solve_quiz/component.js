@@ -10,7 +10,6 @@ const endpoint = 'http://127.0.0.1:8000/'
 function QuizBox(props){
 	
 	const data = props.items
-	const time = props.time
 	const options = React.useRef([])
 	const clap = React.useRef()
 	const boo = React.useRef()
@@ -18,7 +17,7 @@ function QuizBox(props){
 
 	const [active , setActive] =  React.useState(0)
 	const [message, setMessage] = React.useState(null)
-	const [countDown , setCountDown] = React.useState(time)
+	const [countDown , setCountDown] = React.useState(props.time)
 	const [score,setScore] = React.useState(0)
 	const [correct, setCorrect] = React.useState([])
 	const [wrong , setWrong] = React.useState([])
@@ -74,7 +73,7 @@ function QuizBox(props){
 	}
 
 	const saveScore = async ()=>{
-		const res = await axios.get(endpoint + 'save/' + props.player +'/'+ score)
+		const res = await axios.get(endpoint + 'save/' + props.player.id +'/'+ score)
 		console.log(res.data)
 	}
 
@@ -159,7 +158,7 @@ function QuizBox(props){
 
 	return(
 		<div class="">
-		<p> Player: {props.player && getPlayer()}</p>
+		<p> Player: {props.player && props.player.name}</p>
 		<p> Players : {props.players && props.players.length}</p>
 		<div class="" style={{textAlign:'right'}}>
 
@@ -223,7 +222,10 @@ function PlayerRanking(props){
 		let res =await axios.get(endpoint + 'game/' + props.game + '/players')
 		setPlayers(res.data)
 	}
-	getPlayersScore()
+	React.useEffect(()=>{
+		getPlayersScore()
+	},[])
+	
 
 	return(
 		<>

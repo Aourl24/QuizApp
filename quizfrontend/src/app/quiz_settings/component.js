@@ -105,11 +105,15 @@ function VersusQuizSettings(){
 	}
 
 	const createLink = async () => {
+		let postData = {time:time.current.value,type:type,level:level,name:playerName.current.value}
 		if(playerName.current.value == ""){
 
 		}
 		else{
-		let resp = await axios.get(`http://localhost:8000/creategame/${playerName.current.value}`)
+		//let resp = await axios.get(`http://localhost:8000/creategame/${playerName.current.value}`)
+		let resp =await axios.post(`http://localhost:8000/creategame`,postData,{headers:{
+			'Content-Type':'application/json'
+		}})
 		setGame(resp.data.id)
 		setCurrentPlayer(resp.data.player.id)
 		console.log(resp.data.player)
@@ -158,7 +162,7 @@ function VersusQuizSettings(){
 			{ready && <p><Link href={link}> Versus Link </Link> </p>}
 
 			{ready && <p class='w-100 color-bg-p color-white center p-2 rounded'> 
-			<Link href={{pathname:'solve_quiz', query:{data:data,gameType:type,level:level,game:game,currentPlayer:currentPlayer}}} class='color-white no-decoration'> Start </Link></p>}
+			<Link href={{pathname:'solve_quiz', query:{game:game}}} class='color-white no-decoration'> Start </Link></p>}
 		</div>
 		)
 }

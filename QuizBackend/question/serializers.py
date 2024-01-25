@@ -5,7 +5,7 @@ class PlayerSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Player
 		fields = '__all__'
-		
+
 class LevelSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Level
@@ -32,3 +32,12 @@ class QuestionSerializer(serializers.ModelSerializer):
 		answer_in_list = list(filter(condition,representation['answer']))
 		representation['answer'] = answer_in_list[0]['body']
 		return representation
+
+class GameSerializer(serializers.ModelSerializer):
+	host = PlayerSerializer()
+	players = PlayerSerializer(many=True)
+	question =QuestionSerializer(many=True)
+
+	class Meta:
+		model = Game
+		fields = '__all__'

@@ -9,6 +9,7 @@ class Player(models.Model):
 		return self.name
 
 class Game(models.Model):
+	host = models.ForeignKey(Player,related_name='game_host',on_delete=models.CASCADE,null=True,blank=True)
 	players = models.ManyToManyField(Player,related_name='game')
 	question = models.ManyToManyField('Question',related_name='game')
 	time = models.IntegerField(default=10)
