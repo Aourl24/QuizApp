@@ -26,10 +26,23 @@ def questionApi(request,gameType,level='easy'):
 @api_view(['GET'])
 def createGame(request,playerName):
 	player = Player.objects.create(name=playerName)
+	serializer = PlayerSerializer(player)
 	game = Game.objects.create()
 	game.players.add(player)
 	game.save()
-	data = dict(id=game.id)
+	data = dict(id=game.id,player=serializer.data)
 	return Response(data)
 
+@api_view(['GET'])
+def getPlayers(request,id):
+	game = Game.objects.get(id=id)
+	players = game.players.all()
+	serializer = PlayerSerializer(players,many=True)
+	return Response(serializer.data)
 
+@api_view(['GET'])
+def saveScores(request,id,score):
+	player = Player.objects.get(id=id)
+	player.score = int(score)
+	player.save()
+	return Response({'message':'score is saved succesfully'})

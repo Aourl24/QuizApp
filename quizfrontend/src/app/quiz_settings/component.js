@@ -85,6 +85,7 @@ function VersusQuizSettings(){
 	const [level,setLevel] = React.useState('easy')
 	const [link,setLink] = React.useState('')
 	const [game,setGame] = React.useState()
+	const [currentPlayer,setCurrentPlayer] = React.useState({name:'mmm'})
 
 	const getData = () =>{
 		setData(time.current.value)
@@ -97,6 +98,8 @@ function VersusQuizSettings(){
 		else{
 		let resp = await axios.get(`http://localhost:8000/creategame/${playerName.current.value}`)
 		setGame(resp.data.id)
+		setCurrentPlayer(resp.data.player.id)
+		console.log(resp.data.player)
 		setReady(true)
 	}
 		//setLink(`http://localhost:3000/solve_quiz?data=${data}&gameType=versus&level=${level}`)
@@ -142,7 +145,7 @@ function VersusQuizSettings(){
 			{ready && <p><Link href={link}> Versus Link </Link> </p>}
 
 			{ready && <p class='w-100 color-bg-p color-white center p-2 rounded'> 
-			<Link href={{pathname:'solve_quiz', query:{data:data,gameType:type,level:level,game:game}}} class='color-white no-decoration'> Start </Link></p>}
+			<Link href={{pathname:'solve_quiz', query:{data:data,gameType:type,level:level,game:game,currentPlayer:currentPlayer}}} class='color-white no-decoration'> Start </Link></p>}
 		</div>
 		)
 }

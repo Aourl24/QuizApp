@@ -4,6 +4,7 @@ import clapsound from './sounds/clapping.wav'
 import boosound from './sounds/booing.wav'
 import gameoversound from './sounds/gameover.wav'
 
+const endpoint = 'http://127.0.0.1:8000/'
 
 function QuizBox(props){
 	
@@ -25,6 +26,18 @@ function QuizBox(props){
 	const [showSelect,setShowSelect] = React.useState(null)
 	const [chance,setChance] = React.useState([1,2,3])
 	options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
+
+	const getPlayer = ()=>{
+		let player = ''
+		console.log(props.players)
+		console.log(props.player)
+		props.players.map((x)=>{
+			if(x.id == props.player){
+				player = x
+			}
+		})
+		return player.name
+	}
 
 	const changeActive = ()=> {
 		if(active > data.length){
@@ -59,6 +72,10 @@ function QuizBox(props){
 	const calculateScore = () =>{
 	  let scoreCalculate = 30/(+props.time)
 	  setScore((scoreCalculate*10)+score)	
+	}
+
+	const saveScore = async ()=>{
+		const res = async.get(endpoint + 'save/' + player)
 	}
 
 	const gameOver = () =>{
@@ -141,8 +158,12 @@ function QuizBox(props){
 
 	return(
 		<div class="">
+		<p> Player: {props.player && getPlayer()}</p>
+		<p> Players : {props.players && props.players.length}</p>
 		<div class="" style={{textAlign:'right'}}>
+
 			{chance.map(()=> <i class="fas fa-heart p-1 text-danger" ></i> )}</div>
+		
 		<div class="row mb-1"><div class="col color-p">Question {active+1} </div></div>
 			<div class="row justify-content-center">
 			<div class='sz-24 bold rounded p-3 col-12'>{data[active].body}</div>
@@ -169,6 +190,8 @@ function QuizBox(props){
 
 
 function Message(props){
+
+
 	return(
 		<div class='sz-24 text-danger modal d-flex align-items-center color-bg-white' style={{transition:"all 0.5 ease",backgroundColor:"rgba(100,100,100,0.8)"}}>
 		<div class="modal-dialog modal-dialog-centered w-100 h-100 p-3" styl={{transition:"all 0.5 ease",backgroundColor:"rgba(200,200,200,0.5)"}}>
