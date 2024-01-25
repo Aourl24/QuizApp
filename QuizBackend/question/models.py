@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.shortcuts import reverse,redirect
 
 class Player(models.Model):
 	name = models.CharField(max_length=100000)
@@ -11,9 +11,17 @@ class Player(models.Model):
 class Game(models.Model):
 	players = models.ManyToManyField(Player,related_name='game')
 	question = models.ManyToManyField('Question',related_name='game')
+	time = models.IntegerField(default=10)
+	difficulty = models.CharField(default='easy',max_length=20000)
+	privacy = models.CharField(default='public',max_length=20000)
+
 
 	def __str__(self):
 		return f'Game {self.id}'
+
+	def get_absolute_url(self):
+		pass
+
 
 
 class Level(models.Model):

@@ -8,17 +8,6 @@ from rest_framework.decorators import api_view
 @api_view(['GET'])
 def questionApi(request,gameType,level='easy'):
 	game = Game.objects.get(id=int(gameType))
-
-	try:
-		levelModel = Level.objects.get(name=level)
-		queryset = Question.objects.filter(level=levelModel)
-
-	except:
-		queryset = Question.objects.all()
-	for question in queryset:
-		game.question.add(question)
-		game.save()
-
 	query = game.question.all()
 	serializer = QuestionSerializer(query,many=True)
 	return Response(serializer.data)
@@ -29,7 +18,15 @@ def createGame(request,playerName):
 	serializer = PlayerSerializer(player)
 	game = Game.objects.create()
 	game.players.add(player)
-	game.save()
+	try:
+		levelModel = Level.objects.get(name=level)
+		queryset = Question.objects.filter(level=levelModel)
+
+	except:
+		queryset = Question.objects.all()
+	for question in queryset:
+		game.question.add(question)
+		game.save()
 	data = dict(id=game.id,player=serializer.data)
 	return Response(data)
 
@@ -46,3 +43,10 @@ def saveScores(request,id,score):
 	player.score = int(score)
 	player.save()
 	return Response({'message':'score is saved succesfully'})
+
+@api_view(['GET'])
+def joinGame(request,id,player):
+	player = Player.objects.create(name=player)
+	game = Game.objects.get(id=id)
+	game.players.add(player)
+	return Response({'message':True})

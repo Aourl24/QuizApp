@@ -3,6 +3,7 @@ import React from 'react'
 import clapsound from './sounds/clapping.wav'
 import boosound from './sounds/booing.wav'
 import gameoversound from './sounds/gameover.wav'
+import axios from 'axios'
 
 const endpoint = 'http://127.0.0.1:8000/'
 
@@ -29,8 +30,6 @@ function QuizBox(props){
 
 	const getPlayer = ()=>{
 		let player = ''
-		console.log(props.players)
-		console.log(props.player)
 		props.players.map((x)=>{
 			if(x.id == props.player){
 				player = x
@@ -75,13 +74,15 @@ function QuizBox(props){
 	}
 
 	const saveScore = async ()=>{
-		const res = async.get(endpoint + 'save/' + player)
+		const res = await axios.get(endpoint + 'save/' + props.player +'/'+ score)
+		console.log(res.data)
 	}
 
 	const gameOver = () =>{
 		//setActive(active)
 		setMessage('Quiz Ended')
 		gameover.current.play()
+		saveScore()
 		setShowRestart(true)
 	}
 
@@ -178,7 +179,7 @@ function QuizBox(props){
 				{showSelect && <div class="my-4"><button class="btn color-bg-p color-white w-100 sz-20 color-bg-s-hover p-3" onClick={()=>checkAnswer()}>Select </button></div>}
 
 				<p class="sz-18"> <b>Score</b> :{score} </p>
-				{message && <Message body={message} changeActive={changeActive} score={score} restartQuiz={restartQuiz} restart={showRestart} /> }
+				{message && <Message body={message} changeActive={changeActive} score={score} restartQuiz={restartQuiz} restart={showRestart} game={props.game} players={props.players}/> }
 			</div>
 			</div>
 			<audio src={clapsound} ref={clap} ></audio>
@@ -207,9 +208,40 @@ function Message(props){
 		{!props.restart && <p class="my-5"> <button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.changeActive()}>Next </button></p>}
 
 		{props.restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.restartQuiz()}>Restart </button></p>}
+		{props.restart && <PlayerRanking game={props.game} /> }
 		</div>
 		</div>
+		
 		</div>
+		)
+}
+
+function PlayerRanking(props){
+	const [players,setPlayers] = React.useState([])
+
+	const getPlayersScore = async ()=>{
+		let res =await axios.get(endpoint + 'game/' + props.game + '/players')
+		setPlayers(res.data)
+	}
+	getPlayersScore()
+
+	return(
+		<>
+		<p> Players Score </p>
+
+		{players.map((x)=>{
+			return(
+			<div class="row">
+				<div class="col">
+					{x.name}
+				</div>
+				<div class="col">
+					{x.score}
+				</div>
+			</div>
+			)			
+		})}
+		</>
 		)
 }
 

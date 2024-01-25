@@ -50,7 +50,7 @@ getPlayers()
 			<div> 
 				<h1 class='sz-36 center'> My Quiz App </h1>
 			<div class='center'>
-				{items && <QuizBox level={level} gameType={gameType} time={data} items={items} player={player} players={players} />}
+				{items && <QuizBox level={level} gameType={gameType} time={data} items={items} player={player} players={players} game={game} />}
 			</div>
 			</div>
 		)

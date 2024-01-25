@@ -22,8 +22,21 @@ function QuizSetting(){
 		)
 }
 else{
-	return(<div>Hello</div>)
+	return(<div><JoinQuizSettings /> </div>)
 }
+}
+
+function JoinQuizSettings(props){
+	const [ready,setReady] = React.useState()
+
+	return(
+		<div>
+			<input placeholder='Enter your name' />
+			<input placeholder='Enter your link' />
+			<p> <button > Proceed </button> </p>
+			<p> <Link /> </p>
+		</div>
+		)
 }
 
 
