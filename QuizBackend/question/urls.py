@@ -8,5 +8,5 @@ urlpatterns = [
 	path('creategame/<int:id>',createGame),
 	path('game/<int:id>/players',getPlayers),
 	path('save/<int:id>/<int:score>',saveScores),
-	path('join/<int:id>/<str:player>',joinGame),
+	path('join/<str:id>/<str:player>',joinGame),
 ]

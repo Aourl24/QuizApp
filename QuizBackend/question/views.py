@@ -5,6 +5,14 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import json
+import string
+from random import choice
+
+def getCode():
+	length = 8
+	characters = string.ascii_letters + string.digits
+	code = ('').join([choice(characters) for i in range(length)])
+	return code
 
 @api_view(['GET'])
 def questionApi(request,gameType,level='easy'):
@@ -23,6 +31,7 @@ def createGame(request,id=None):
 		serializer = PlayerSerializer(player)
 		game.host = player
 		game.players.add(player)
+		game.code = f'{getCode()}{game.id}G'
 		game.time = data.get('time')
 		game.difficulty = data.get('level')
 
@@ -35,7 +44,7 @@ def createGame(request,id=None):
 		for question in queryset:
 			game.question.add(question)
 			game.save()
-		data = dict(id=game.id,player=serializer.data)
+		data = dict(id=game.id,player=serializer.data,code=game.code)
 		return Response(data)
 	else:
 		game = Game.objects.get(id=id)
@@ -61,6 +70,8 @@ def saveScores(request,id,score):
 @api_view(['GET'])
 def joinGame(request,id,player):
 	player = Player.objects.create(name=player)
-	game = Game.objects.get(id=id)
+	game = Game.objects.get(code=id)
 	game.players.add(player)
-	return Response({'message':True})
+	game.save()
+	return Response({'id':game.id})
+

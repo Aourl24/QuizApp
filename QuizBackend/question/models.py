@@ -15,6 +15,7 @@ class Game(models.Model):
 	time = models.IntegerField(default=10)
 	difficulty = models.CharField(default='easy',max_length=20000)
 	privacy = models.CharField(default='public',max_length=20000)
+	code = models.CharField(max_length=2000000,null=True,blank=True,unique=True,editable=False)
 
 
 	def __str__(self):
