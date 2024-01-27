@@ -3,7 +3,8 @@ import QuizBox from './component.js'
 import { useRouter ,useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import React from 'react'
-const endpoint = 'http://127.0.0.1:8000/'
+//const endpoint = 'http://127.0.0.1:8000/'
+import endpoint from '../endpoints.js'
 
 function App(){
 	//const dummy = [{body:'what is my name',options:['boy','girl','albino','white'],answer:'girl'},{body:'who are you',options:['awwal','yusuf','itachi','kakashi'],answer:'itachi'},{body:'who place is this',options:['ibadan','osogbo','lagos','oyo'],answer:'oyo'}]
@@ -37,6 +38,8 @@ function App(){
 			const res = await axios.get(endpoint + 'game/' + game + '/players')
 			setPlayers(res.data)
 		}
+
+
 
 
 React.useEffect(()=>{

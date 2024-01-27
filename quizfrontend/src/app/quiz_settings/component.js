@@ -4,7 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import {useSearchParams} from 'next/navigation'
 import axios from 'axios';
-const endpoint = 'http://127.0.0.1:8000/'
+import endpoint from '../endpoints.js'
 
 function QuizSetting(){
 	const router = useSearchParams()
@@ -160,7 +160,7 @@ function VersusQuizSettings(){
 			<div>
 				Versus Mode
 			<div class='row my-3'>
-				<div class="col-2">
+				<div class="col-md-2 col-sm-12">
 					Host Name
 				</div>
 				<div class='col'>
@@ -168,8 +168,8 @@ function VersusQuizSettings(){
 				</div>
 			</div>
 
-			<div class="row">
-			<div class="col-2">category </div> 
+			<div class="row my-3">
+			<div class="col-md-2 col-sm-12">category </div> 
 			<div class="col">
 				<select ref={cat} class="form-control" >
 					{category.map((x)=><option> {x.name} </option>)} 
@@ -177,7 +177,7 @@ function VersusQuizSettings(){
 			 </div>
 			</div> 
 
-			<div class="row my-3 align-items-center"> <div class="col-2"> Time </div> <div class="col"> 
+			<div class="row my-3 align-items-center"> <div class="col-md-2 col-sm-12"> Time </div> <div class="col"> 
 				<select class="form-control" ref={time} onChange={()=>getData()}>
 				<option>5</option>
 				<option>10</option>
@@ -187,7 +187,7 @@ function VersusQuizSettings(){
 				<option>30</option>
 			</select>
 			</div> </div>
-			<div class="row my-3 align-items-center"> <div class="col-2"> Difficulty </div> 
+			<div class="row my-3 align-items-center"> <div class="-md-2 col-sm-12"> Difficulty </div> 
 			<div class="col">
 			<select class="form-control" ref={levelT} onChange={()=>setLevel(levelT.current.value)}>
 				<option>Easy</option>
@@ -196,8 +196,8 @@ function VersusQuizSettings(){
 			</select>
 			</div></div>
 
-			<div class="row">
-			<div class="col-2"> Number of Question </div>
+			<div class="row my-2">
+			<div class="-md-2 col-sm-12"> Number of Question </div>
 			<div class="col"> <input ref={nOfQ} type="number" class="form-control" /> </div>
 			</div>
 

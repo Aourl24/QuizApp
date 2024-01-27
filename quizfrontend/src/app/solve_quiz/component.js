@@ -4,8 +4,8 @@ import clapsound from './sounds/clapping.wav'
 import boosound from './sounds/booing.wav'
 import gameoversound from './sounds/gameover.wav'
 import axios from 'axios'
-
-const endpoint = 'http://127.0.0.1:8000/'
+import endpoint from '../endpoints.js'
+//const endpoint = 'http://127.0.0.1:8000/'
 
 function QuizBox(props){
 	
@@ -14,7 +14,7 @@ function QuizBox(props){
 	const clap = React.useRef()
 	const boo = React.useRef()
 	const gameover = React.useRef()
-
+	const [details ,showDetails] = React.useState(false)
 	const [active , setActive] =  React.useState(0)
 	const [message, setMessage] = React.useState(null)
 	const [countDown , setCountDown] = React.useState(props.time)
@@ -25,6 +25,8 @@ function QuizBox(props){
 	const [showRestart,setShowRestart] = React.useState(null)
 	const [showSelect,setShowSelect] = React.useState(null)
 	const [chance,setChance] = React.useState([1,2,3])
+	const [currentPlayer,setCurrentPlayer] = React.useState({active:true})
+	const [gameStatus , setGameStatus] = React.useState(true)
 	options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
 
 	const getPlayer = ()=>{
@@ -34,7 +36,7 @@ function QuizBox(props){
 				player = x
 			}
 		})
-		return player.id
+		setCurrentPlayer(player)
 	}
 
 	const changeActive = ()=> {
@@ -73,7 +75,7 @@ function QuizBox(props){
 	}
 
 	const saveScore = async ()=>{
-		const res = await axios.get(endpoint + 'save/' + getPlayer() +'/'+ score)
+		const res = await axios.get(endpoint + 'save/' + currentPlayer.id +'/'+ score)
 		console.log(res.data)
 	}
 
@@ -121,6 +123,9 @@ function QuizBox(props){
 		
 	}
 
+	React.useEffect(()=>{
+		getPlayer()
+	},[props.players])
 
 	React.useEffect(()=>{
 	options.current.map((element)=>{element.current.classList.remove('select');element.current.classList.remove('color-p')})
@@ -133,6 +138,11 @@ function QuizBox(props){
 
 	React.useEffect(()=>{
 		const timer = setInterval(()=>{setCountDown(()=>countDown-1)},1000);
+		
+		if(currentPlayer.active == false){
+			clearInterval(timer)
+		}
+
 		if (countDown <= 0){
 			gameover.current.play()
 			setMessage('Time Out')
@@ -156,12 +166,22 @@ function QuizBox(props){
 
 	},[wrong,correct])
 
+	if(currentPlayer.active == false){
+		
+		return (<div> <PlayerRanking game={props.game} code={props.code} /></div>)
+	}
+
 	return(
 		<div class="">
-		<p> Host: {props.player && props.player.name}</p>
-		<p> Player: {props.currentPlayer && props.currentPlayer}</p>
-		<p> Number of Players : {props.players && props.players.length}</p>
-		<p> Game Code : {props.code} </p>
+		<p> <button class='btn normal no-background' onClick={()=>showDetails(true)}>Show Game details </button> </p>
+		
+		{details && <div class="row sz-12">
+		<div class="col-6"> Host: {props.player && props.player.name}</div>
+		<div class="col-6"> Player: {currentPlayer && currentPlayer.name}</div>
+		<div class="col-6"> Number of Players : {props.players && props.players.length}</div>
+		<div class="col-6"> Game Code : {props.code} </div>
+		</div>}
+
 		<div class="" style={{textAlign:'right'}}>
 
 			{chance.map(()=> <i class="fas fa-heart p-1 text-danger" ></i> )}</div>

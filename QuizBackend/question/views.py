@@ -28,6 +28,7 @@ def createGame(request,id=None):
 		data = json.loads(request.body.decode())
 		playerName = data.get('name')
 		player = Player.objects.create(name=playerName)
+
 		serializer = PlayerSerializer(player)
 		game.host = player
 		game.players.add(player)
@@ -53,7 +54,7 @@ def createGame(request,id=None):
 @api_view(['GET'])
 def getPlayers(request,id):
 	game = Game.objects.get(id=id)
-	players = game.players.all()
+	players = game.players.all().order_by('-score')
 	serializer = PlayerSerializer(players,many=True)
 	return Response(serializer.data)
 
@@ -61,6 +62,7 @@ def getPlayers(request,id):
 def saveScores(request,id,score):
 	player = Player.objects.get(id=id)
 	player.score = int(score)
+	player.active = False
 	player.save()
 	return Response({'message':'score is saved succesfully'})
 
