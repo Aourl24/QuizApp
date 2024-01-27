@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import Link from 'next/link'
 import clapsound from './sounds/clapping.wav'
 import boosound from './sounds/booing.wav'
 import gameoversound from './sounds/gameover.wav'
@@ -173,7 +174,7 @@ function QuizBox(props){
 
 	return(
 		<div class="">
-		<p> <button class='btn normal no-background' onClick={()=>showDetails(true)}>Show Game details </button> </p>
+		<p> <button class='btn normal no-background' onClick={()=>showDetails(details == true ? false:true)}>Show Game details </button> </p>
 		
 		{details && <div class="row sz-12">
 		<div class="col-6"> Host: {props.player && props.player.name}</div>
@@ -181,12 +182,11 @@ function QuizBox(props){
 		<div class="col-6"> Number of Players : {props.players && props.players.length}</div>
 		<div class="col-6"> Game Code : {props.code} </div>
 		</div>}
-
-		<div class="" style={{textAlign:'right'}}>
-
-			{chance.map(()=> <i class="fas fa-heart p-1 text-danger" ></i> )}</div>
 		
 		<div class="row mb-1"><div class="col color-p">Question {active+1} </div></div>
+		<div class="" style={{textAlig:'right'}}>
+
+			{chance.map(()=> <i class="fas fa-heart p-1 text-danger" ></i> )}</div>
 			<div class="row justify-content-center">
 			<div class='sz-24 bold rounded p-3 col-12'>{data[active].body}</div>
 			<div class="col-12">
@@ -225,10 +225,11 @@ function Message(props){
 			</div>
 			</div>
 
-		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-p sz-18">{props.restart ? 'Final Score':'Your Score' } </span> <br /><b>{props.score}</b></div> </div>
+		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-p sz-18">{props.restart ? 'Total Score':'Your Score' } </span> <br /><b>{props.score}</b></div> </div>
 		{!props.restart && <p class="my-5"> <button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.changeActive()}>Next </button></p>}
 
 		{props.restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.restartQuiz()}>Restart </button></p>}
+		<hr />
 		{props.restart && <PlayerRanking game={props.game} code={props.code} /> }
 		</div>
 		</div>
@@ -251,23 +252,28 @@ function PlayerRanking(props){
 
 	return(
 		<>
-		<p> Players Score </p>
+		<p class="color-black"> Players Score </p>
 
 		{players.map((x)=>{
 			return(
-			<div class="row">
-				<div class="col">
+			<div class="row sz-18">
+				<div class="col color-p">
 					{x.name}
 				</div>
-				<div class="col">
+				<div class="col color-black sz-16">
 					{x.score}
 				</div>
 			</div>
 			)			
 		})}
-		<br />
-		<p> Enjoying the Game, share the code with your Friend </p>
-		<div>{props.code}</div>
+		<hr />
+
+		<p class="sz-16 color-black">Share this code with your Friend, to also play the game </p>
+		<div clas="bold">{props.code}</div>
+		
+		<div class="row">
+			<div class="col sz- 14"><Link href="/" >Go back Home </Link> </div>
+		</div>
 		</>
 		)
 }

@@ -7,14 +7,14 @@ function App (){
         <div>
         <br />
         <div class="row sz-24">
-        <div class='col center'>
+        <div class='col-12 p-3 center'>
           <Link href={{pathname:"quiz_settings",query:{data:'create'}}} class='no-decoration'> Join Quiz </Link>
           </div>
-        <div class='col center'>
+        <div class='col-12 center p-3 hide'>
           <Link href={{pathname:"quiz_settings",query:{data:'solve'}}} class='no-decoration'> Solve Quiz </Link>
         </div>
-        <div class='col center'>
-          <Link href={{pathname:"quiz_settings",query:{data:'versus'}}} class='no-decoration'> Create Quiz </Link>
+        <div class='col-12 center p-3 order-first'>
+          <Link href={{pathname:"quiz_settings",query:{data:'versus'}}} class='no-decoration'> Start Quiz </Link>
         </div>
         </div>
         </div>

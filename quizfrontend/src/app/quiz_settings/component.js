@@ -41,6 +41,8 @@ function JoinQuizSettings(props){
 
 	return(
 		<div>
+		{!ready && <div>
+
 			<div class="row my-2">
 			<div class="col"> 
 			<input ref={player} class="form-control" placeholder='Enter your name' />
@@ -53,8 +55,9 @@ function JoinQuizSettings(props){
 			</div>
 
 			<p> <button class="btn w-100 color-bg-p color-white sz-16" onClick={()=>getGame()}> Proceed </button> </p>
-			{ready && <p class='w-100 color-bg-p color-white center p-2 rounded'> 
-			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:player.current.value}}} class='color-white no-decoration'> Start </Link></p>}
+			</div>}
+			{ready && <div> Already joined Game, Click to start Game <p class='w-100 color-bg-p color-white center p-2 rounded'> 
+			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:player.current.value}}} class='color-white no-decoration'> Start </Link></p></div>}
 		</div>
 		)
 }
@@ -142,7 +145,7 @@ function VersusQuizSettings(){
 		}
 		else{
 		//let resp = await axios.get(`http://localhost:8000/creategame/${playerName.current.value}`)
-		let resp =await axios.post(`http://localhost:8000/creategame`,postData,{headers:{
+		let resp =await axios.post(`${endpoint}creategame`,postData,{headers:{
 			'Content-Type':'application/json'
 		}})
 		setGame(resp.data.id)
@@ -158,27 +161,28 @@ function VersusQuizSettings(){
 
 	return(
 			<div>
-				Versus Mode
+			<br />
+			{!ready && <div>
 			<div class='row my-3'>
-				<div class="col-md-2 col-sm-12">
+				<div class="col-md-2 col-sm-12 sz-16">
 					Host Name
 				</div>
 				<div class='col'>
-					<input ref={playerName} class="form-control" />
+					<input ref={playerName} class="form-control sz-14" />
 				</div>
 			</div>
 
 			<div class="row my-3">
-			<div class="col-md-2 col-sm-12">category </div> 
+			<div class="col-md-2 col-sm-12 sz-16">Category </div> 
 			<div class="col">
-				<select ref={cat} class="form-control" >
+				<select ref={cat} class="form-control sz-14" >
 					{category.map((x)=><option> {x.name} </option>)} 
 				</select>
 			 </div>
 			</div> 
 
-			<div class="row my-3 align-items-center"> <div class="col-md-2 col-sm-12"> Time </div> <div class="col"> 
-				<select class="form-control" ref={time} onChange={()=>getData()}>
+			<div class="row my-3 align-items-center "> <div class="col-md-2 col-sm-12 sz-16"> Time </div> <div class="col"> 
+				<select class="form-control sz-14" ref={time} onChange={()=>getData()}>
 				<option>5</option>
 				<option>10</option>
 				<option>15</option>
@@ -187,9 +191,9 @@ function VersusQuizSettings(){
 				<option>30</option>
 			</select>
 			</div> </div>
-			<div class="row my-3 align-items-center"> <div class="-md-2 col-sm-12"> Difficulty </div> 
+			<div class="row my-3 align-items-center"> <div class="-md-2 col-sm-12 sz-16"> Difficulty </div> 
 			<div class="col">
-			<select class="form-control" ref={levelT} onChange={()=>setLevel(levelT.current.value)}>
+			<select class="form-control sz-14" ref={levelT} onChange={()=>setLevel(levelT.current.value)}>
 				<option>Easy</option>
 				<option>Normal</option>
 				<option>Hard</option>
@@ -197,20 +201,20 @@ function VersusQuizSettings(){
 			</div></div>
 
 			<div class="row my-2">
-			<div class="-md-2 col-sm-12"> Number of Question </div>
-			<div class="col"> <input ref={nOfQ} type="number" class="form-control" /> </div>
+			<div class="-md-2 col-sm-12 sz-16"> Number of Question </div>
+			<div class="col"> <input ref={nOfQ} type="number" class="form-control sz-14" /> </div>
 			</div>
 
-			<p>
-			<button class='btn w-100 color-bg-s color-white center p-2 rounded' onClick={()=>createLink()} >
-			Click to create Link
-			</button>
-			</p>
+			<br />
+			 <button class='btn w-100 color-bg-s color-white center p-2 rounded' onClick={()=>createLink()} >
+			Create Game
+			</button></div>}
+			
 
-			{ready && <p>{gameCode} </p>}
+			{ready && <p class="rounded center border p-2"> your friends can join with this code <br /> <span class="bold sz-16">{gameCode} </span></p>}
 
 			{ready && <p class='w-100 color-bg-p color-white center p-2 rounded'> 
-			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:playerName.current.value}}} class='color-white no-decoration'> Start </Link></p>}
+			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:playerName.current.value}}} class='color-white no-decoration'> Start Game </Link></p>}
 		</div>
 		)
 }
