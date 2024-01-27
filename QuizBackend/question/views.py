@@ -34,13 +34,10 @@ def createGame(request,id=None):
 		game.code = f'{getCode()}{game.id}G'
 		game.time = data.get('time')
 		game.difficulty = data.get('level')
+		questionNumber = int(data.get('questionNumber'))
+		category = data.get('category')
+		queryset = Question.objects.filter(level__name=game.difficulty,category__name=category)[:questionNumber]
 
-		try:
-			levelModel = Level.objects.get(name=level)
-			queryset = Question.objects.filter(level=levelModel)
-
-		except:
-			queryset = Question.objects.all()
 		for question in queryset:
 			game.question.add(question)
 			game.save()
@@ -75,3 +72,9 @@ def joinGame(request,id,player):
 	game.save()
 	return Response({'id':game.id})
 
+
+@api_view(['GET'])
+def getCategory(request):
+	category = Category.objects.all()
+	serializer = CategorySerializer(category,many=True)
+	return Response(serializer.data)

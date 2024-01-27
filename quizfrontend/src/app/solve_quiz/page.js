@@ -10,6 +10,7 @@ function App(){
 	//const addition = [{body:'where is cotonou',options:['benue','congo','yobe','river'],answer:'yobe'},{body:'where are we',options:['pes','yese','rona','pata'],answer:'pes'},{body:'hw far',options:['taraba','sokoto','ilesha','jos'],answer:'oyo'}]
 	const router = useSearchParams()
 	const game = router.get('game')
+	const allow = router.get('allow')
 	const [players,setPlayers] = React.useState([])
 	const [time,setTime] = React.useState()
 	//const [] = router.get('gameType')
@@ -40,6 +41,9 @@ fetchData()
 //getPlayers()
 },[])
 
+if(!allow){
+	return(<div> You are not allowed to view this game </div>)
+}
 
 	return(
 			<div> 

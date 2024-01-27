@@ -14,8 +14,10 @@ class Game(models.Model):
 	question = models.ManyToManyField('Question',related_name='game')
 	time = models.IntegerField(default=10)
 	difficulty = models.CharField(default='easy',max_length=20000)
-	privacy = models.CharField(default='public',max_length=20000)
+	public = models.BooleanField(default=True)
 	code = models.CharField(max_length=2000000,null=True,blank=True,unique=True,editable=False)
+	status = models.BooleanField(default=True)
+
 
 
 	def __str__(self):
@@ -32,7 +34,14 @@ class Level(models.Model):
 	def __str__(self):
 		return self.name
 
+class Category(models.Model):
+	name =  models.CharField(max_length=200000)
+
+	def __str__(self):
+		return self.name
+
 class Question(models.Model):
+	category = models.ForeignKey(Category,related_name='category',on_delete=models.CASCADE,null=True,blank=True)
 	level = models.ForeignKey(Level,related_name='question',on_delete=models.CASCADE)
 	body = models.TextField()
 
