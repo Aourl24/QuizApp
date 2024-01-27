@@ -11,12 +11,14 @@ function App(){
 	const router = useSearchParams()
 	const game = router.get('game')
 	const allow = router.get('allow')
+	const currentPlayer = router.get('currentPlayer')
 	const [players,setPlayers] = React.useState([])
 	const [time,setTime] = React.useState()
 	//const [] = router.get('gameType')
 	const [level,setLevel] = React.useState()
 	const [player,setPlayer] = React.useState() 
 	const [items,setItems] = React.useState()
+	const [code,setCode] = React.useState()
 
 	const fetchData = async () =>{
 		//console.log('now getting data')
@@ -27,6 +29,7 @@ function App(){
 		setTime(res.data.time)
 		setLevel(res.data.difficulty)
 		setPlayer(res.data.host)
+		setCode(res.data.code)
 	}
 
 
@@ -49,7 +52,7 @@ if(!allow){
 			<div> 
 				<h1 class='sz-36 center'> My Quiz App </h1>
 			<div class='center'>
-				{items && <QuizBox level={level} time={time} items={items} player={player} players={players} game={game} />}
+				{items && <QuizBox level={level} time={time} items={items} player={player} players={players} game={game} currentPlayer={currentPlayer} code={code} />}
 			</div>
 			</div>
 		)

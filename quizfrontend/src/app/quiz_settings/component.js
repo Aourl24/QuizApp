@@ -54,7 +54,7 @@ function JoinQuizSettings(props){
 
 			<p> <button class="btn w-100 color-bg-p color-white sz-16" onClick={()=>getGame()}> Proceed </button> </p>
 			{ready && <p class='w-100 color-bg-p color-white center p-2 rounded'> 
-			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true}}} class='color-white no-decoration'> Start </Link></p>}
+			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:player.current.value}}} class='color-white no-decoration'> Start </Link></p>}
 		</div>
 		)
 }
@@ -210,7 +210,7 @@ function VersusQuizSettings(){
 			{ready && <p>{gameCode} </p>}
 
 			{ready && <p class='w-100 color-bg-p color-white center p-2 rounded'> 
-			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true}}} class='color-white no-decoration'> Start </Link></p>}
+			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:playerName.current.value}}} class='color-white no-decoration'> Start </Link></p>}
 		</div>
 		)
 }

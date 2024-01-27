@@ -30,11 +30,11 @@ function QuizBox(props){
 	const getPlayer = ()=>{
 		let player = ''
 		props.players.map((x)=>{
-			if(x.id == props.player){
+			if(x.name == props.currentPlayer){
 				player = x
 			}
 		})
-		return player.name
+		return player.id
 	}
 
 	const changeActive = ()=> {
@@ -50,7 +50,7 @@ function QuizBox(props){
 		else{
 			setActive(active+1)
 			setMessage(null)
-			setCountDown(time)
+			setCountDown(props.time)
 		}
 		clap.current.currentTime = 0
 		boo.current.currentTime = 0
@@ -73,7 +73,7 @@ function QuizBox(props){
 	}
 
 	const saveScore = async ()=>{
-		const res = await axios.get(endpoint + 'save/' + props.player.id +'/'+ score)
+		const res = await axios.get(endpoint + 'save/' + getPlayer() +'/'+ score)
 		console.log(res.data)
 	}
 
@@ -158,8 +158,10 @@ function QuizBox(props){
 
 	return(
 		<div class="">
-		<p> Player: {props.player && props.player.name}</p>
-		<p> Players : {props.players && props.players.length}</p>
+		<p> Host: {props.player && props.player.name}</p>
+		<p> Player: {props.currentPlayer && props.currentPlayer}</p>
+		<p> Number of Players : {props.players && props.players.length}</p>
+		<p> Game Code : {props.code} </p>
 		<div class="" style={{textAlign:'right'}}>
 
 			{chance.map(()=> <i class="fas fa-heart p-1 text-danger" ></i> )}</div>
@@ -178,7 +180,7 @@ function QuizBox(props){
 				{showSelect && <div class="my-4"><button class="btn color-bg-p color-white w-100 sz-20 color-bg-s-hover p-3" onClick={()=>checkAnswer()}>Select </button></div>}
 
 				<p class="sz-18"> <b>Score</b> :{score} </p>
-				{message && <Message body={message} changeActive={changeActive} score={score} restartQuiz={restartQuiz} restart={showRestart} game={props.game} players={props.players}/> }
+				{message && <Message body={message} changeActive={changeActive} score={score} restartQuiz={restartQuiz} restart={showRestart} game={props.game} players={props.players} code={props.code} /> }
 			</div>
 			</div>
 			<audio src={clapsound} ref={clap} ></audio>
@@ -207,7 +209,7 @@ function Message(props){
 		{!props.restart && <p class="my-5"> <button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.changeActive()}>Next </button></p>}
 
 		{props.restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.restartQuiz()}>Restart </button></p>}
-		{props.restart && <PlayerRanking game={props.game} /> }
+		{props.restart && <PlayerRanking game={props.game} code={props.code} /> }
 		</div>
 		</div>
 		
@@ -243,6 +245,9 @@ function PlayerRanking(props){
 			</div>
 			)			
 		})}
+		<br />
+		<p> Enjoying the Game, share the code with your Friend </p>
+		<div>{props.code}</div>
 		</>
 		)
 }
