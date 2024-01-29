@@ -30,13 +30,33 @@ else{
 function JoinQuizSettings(props){
 	const [ready,setReady] = React.useState()
 	const [game,setGame] = React.useState()
+	const [message, setMessage] = React.useState('')
 	const code = React.useRef()
 	const player = React.useRef()
 
 	const getGame = async ()=>{
-		const resp = await axios.get(endpoint  + 'join/' + code.current.value + '/' + player.current.value)
+		if (player.current.value === ""){
+			setMessage("Please enter your Name")
+			return
+		}
+
+		try{
+			const resp = await axios.get(endpoint  + 'join/' + code.current.value + '/' + player.current.value)
+			
+			if (resp.data.message){
+				setMessage(resp.data.message)
+				return 
+			}
+			if (resp.status === 500){
+				setMessage("Error Loading Quiz Code")
+				return
+			}
+			
 		setGame(resp.data.id)
-		setReady(true)
+		setReady(true)}
+		catch(error){
+			setMessage("Error Loading Quiz Code")
+		}
 	}
 
 	return(
@@ -53,11 +73,12 @@ function JoinQuizSettings(props){
 			<input ref={code} class="form-control" placeholder='Enter Game Code' />
 			</div>
 			</div>
-
+				<p class="text-danger">{message}</p>
 			<p> <button class="btn w-100 color-bg-p color-white sz-16" onClick={()=>getGame()}> Proceed </button> </p>
 			</div>}
 			{ready && <div> Already joined Game, Click to start Game <p class='w-100 color-bg-p color-white center p-2 rounded'> 
 			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:player.current.value}}} class='color-white no-decoration'> Start </Link></p></div>}
+			
 		</div>
 		)
 }
@@ -144,7 +165,7 @@ function VersusQuizSettings(){
 
 		}
 		else{
-		//let resp = await axios.get(`http://localhost:8000/creategame/${playerName.current.value}`)
+		
 		let resp =await axios.post(`${endpoint}creategame`,postData,{headers:{
 			'Content-Type':'application/json'
 		}})
@@ -160,10 +181,11 @@ function VersusQuizSettings(){
 	React.useEffect(()=>{getCategory()},[])
 
 	return(
-			<div>
-			<br />
+			
+			<div class="">
+			
 			{!ready && <div>
-			<div class='row my-3'>
+			<div class='row my-3  align-items-center'>
 				<div class="col-md-2 col-sm-12 sz-16">
 					Host Name
 				</div>
@@ -172,8 +194,8 @@ function VersusQuizSettings(){
 				</div>
 			</div>
 
-			<div class="row my-3">
-			<div class="col-md-2 col-sm-12 sz-16">Category </div> 
+			<div class="row my-3 align-items-center">
+			<div class="col-md-2 col-sm-12 sz-16 align-items-center">Category </div> 
 			<div class="col">
 				<select ref={cat} class="form-control sz-14" >
 					{category.map((x)=><option> {x.name} </option>)} 
@@ -181,7 +203,7 @@ function VersusQuizSettings(){
 			 </div>
 			</div> 
 
-			<div class="row my-3 align-items-center "> <div class="col-md-2 col-sm-12 sz-16"> Time </div> <div class="col"> 
+			<div class="row my-3 align-items-center"> <div class="col-md-2 col-sm-12 sz-16"> Time </div> <div class="col"> 
 				<select class="form-control sz-14" ref={time} onChange={()=>getData()}>
 				<option>5</option>
 				<option>10</option>
@@ -191,7 +213,7 @@ function VersusQuizSettings(){
 				<option>30</option>
 			</select>
 			</div> </div>
-			<div class="row my-3 align-items-center"> <div class="-md-2 col-sm-12 sz-16"> Difficulty </div> 
+			<div class="row my-3 align-items-center"> <div class="col-md-2 col-sm-12 sz-16"> Difficulty </div> 
 			<div class="col">
 			<select class="form-control sz-14" ref={levelT} onChange={()=>setLevel(levelT.current.value)}>
 				<option>Easy</option>
@@ -200,13 +222,22 @@ function VersusQuizSettings(){
 			</select>
 			</div></div>
 
-			<div class="row my-2">
-			<div class="-md-2 col-sm-12 sz-16"> Number of Question </div>
-			<div class="col"> <input ref={nOfQ} type="number" class="form-control sz-14" /> </div>
+			<div class="row my-2 align-items-center">
+			<div class="col-md-2 col-sm-12 sz-16"> Number of Question </div>
+			<div class="col"> 
+			<select ref={nOfQ} type="number" class="form-control sz-14">
+				<option>5</option>
+				<option>10</option>
+				<option>15</option>
+				<option>20</option>
+				<option>25</option>
+				<option>30</option>
+			</select>
+			 </div>
 			</div>
 
 			<br />
-			 <button class='btn w-100 color-bg-s color-white center p-2 rounded' onClick={()=>createLink()} >
+			 <button class='btn w-100 color-bg-s color-white center p-2 rounded sz-16' onClick={()=>createLink()} >
 			Create Game
 			</button></div>}
 			

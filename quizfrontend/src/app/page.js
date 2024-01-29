@@ -1,22 +1,31 @@
 import Link from 'next/link'
+import image from './quizImage.jpg'
+import Image from 'next/image'
 
 function App (){
   return(
       <div>
-        <h1 class="sz-36 center">My Quiz App </h1>
+        <h1 class="sz-36 center"> Quizzify </h1>
         <div>
         <br />
         <div class="row sz-24">
         <div class='col-12 p-3 center'>
-          <Link href={{pathname:"quiz_settings",query:{data:'create'}}} class='no-decoration'> Join Quiz </Link>
-          </div>
+        <div class="color-bg-p color-white p-2 rounded w-100">
+          <Link href={{pathname:"quiz_settings",query:{data:'create'}}} class='no-decoration color-white'> Join Quiz </Link>
+        </div>
+        </div>
         <div class='col-12 center p-3 hide'>
-          <Link href={{pathname:"quiz_settings",query:{data:'solve'}}} class='no-decoration'> Solve Quiz </Link>
+        <div class="color-bg-p color-white p-2 rounded w-100 color-white">
+          <Link href={{pathname:"quiz_settings",query:{data:'solve'}}} class='no-decoration color-white'> Solve Quiz </Link>
+        </div>
         </div>
         <div class='col-12 center p-3 order-first'>
-          <Link href={{pathname:"quiz_settings",query:{data:'versus'}}} class='no-decoration'> Start Quiz </Link>
+        <div class="color-bg-p color-white p-2 rounded w-100">
+          <Link href={{pathname:"quiz_settings",query:{data:'versus'}}} class='no-decoration color-white'> Start Quiz </Link>
         </div>
         </div>
+        </div>
+        <div class="container center my-3"><Image class="img-fluid rounded" src={image} /> </div>
         </div>
       </div>
     )

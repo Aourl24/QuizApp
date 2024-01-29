@@ -183,11 +183,12 @@ function QuizBox(props){
 		<div class="col-6"> Game Code : {props.code} </div>
 		</div>}
 		
-		<div class="row mb-1"><div class="col color-p">Question {active+1} </div></div>
-		<div class="" style={{textAlig:'right'}}>
+		<div class="row mb-1"><div class="col color-p">Question {active+1} </div>
+		<div class="col" style={{textAlign:'right'}}>
 
 			{chance.map(()=> <i class="fas fa-heart p-1 text-danger" ></i> )}</div>
-			<div class="row justify-content-center">
+		</div>
+			<div class="row center justify-content-center">
 			<div class='sz-24 bold rounded p-3 col-12'>{data[active].body}</div>
 			<div class="col-12">
 				<div class='w-100 center' style={{textAlig:'right'}}><div class='rounded sz-18  color-s  p-2 color-bd-p' style={{display:'inline-block'}}>0 : {countDown}</div> </div>
@@ -197,7 +198,9 @@ function QuizBox(props){
 				<div class="row">
 				{data[active].options.map((x,i)=><div class='col-md-6 my-1 p-3 p-sm-2 my-sm-1' key={i} ><div id={active+x} ref={options.current[i]}  class='border rounded sz-16 p-3 color-p-hover option' style={{cursor:'pointer'}} onClick={()=>{markChoose(i);setOptionChoose(x)}}>{x}</div></div>)}
 				</div>
-				{showSelect && <div class="my-4"><button class="btn color-bg-p color-white w-100 sz-20 color-bg-s-hover p-3" onClick={()=>checkAnswer()}>Select </button></div>}
+				{showSelect && <div class="my-4 display-sm-none"><button class="btn color-bg-p color-white w-100 sz-20 color-bg-s-hover p-3" onClick={()=>checkAnswer()}>Select </button></div>}
+
+				{showSelect && <div class="fixed-bottom mb-3 d-flex justify-content-end rounded p-3 display-md-none"><button class="btn color-bg-p color-white sz-20 color-bg-s-hover p-3" onClick={()=>checkAnswer()}>Select </button></div>}
 
 				<p class="sz-18"> <b>Score</b> :{score} </p>
 				{message && <Message body={message} changeActive={changeActive} score={score} restartQuiz={restartQuiz} restart={showRestart} game={props.game} players={props.players} code={props.code} /> }
@@ -272,7 +275,7 @@ function PlayerRanking(props){
 		<div clas="bold">{props.code}</div>
 		
 		<div class="row">
-			<div class="col sz- 14"><Link href="/" >Go back Home </Link> </div>
+			<div class="col sz- 14"><Link class="no-decoration sz-14" href="/" >Go back Home </Link> </div>
 		</div>
 		</>
 		)

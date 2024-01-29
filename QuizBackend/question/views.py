@@ -6,7 +6,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import json
 import string
+from django.http import HttpResponse, JsonResponse
 from random import choice
+from rest_framework import status
 
 def getCode():
 	length = 8
@@ -68,8 +70,10 @@ def saveScores(request,id,score):
 
 @api_view(['GET'])
 def joinGame(request,id,player):
-	player = Player.objects.create(name=player)
 	game = Game.objects.get(code=id)
+	if game.players.filter(name=player).exists():
+		return Response({"message":"Name Already Exists"})
+	player = Player.objects.create(name=player)
 	game.players.add(player)
 	game.save()
 	return Response({'id':game.id})

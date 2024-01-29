@@ -53,8 +53,7 @@ if(!allow){
 
 	return(
 			<div> 
-				<h3 class='sz-36 center'> My Quiz App </h3>
-			<div class='center'>
+			<div class=''>
 				{items && <QuizBox level={level} time={time} items={items} player={player} players={players} game={game} currentPlayer={currentPlayer} code={code} />}
 			</div>
 			</div>

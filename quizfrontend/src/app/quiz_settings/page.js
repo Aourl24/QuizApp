@@ -4,7 +4,7 @@ import React from 'react'
 function App(){
 	return(
 		<React.Fragment>
-		<h1> Quiz Settings </h1>
+		<h2 class="color-p bold mb-3"> Quiz Settings </h2>
 		<QuizSetting />
 		</React.Fragment>
 	)
