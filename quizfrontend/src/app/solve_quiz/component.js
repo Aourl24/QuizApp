@@ -28,6 +28,7 @@ function QuizBox(props){
 	const [chance,setChance] = React.useState([1,2,3])
 	const [currentPlayer,setCurrentPlayer] = React.useState({active:true})
 	const [gameStatus , setGameStatus] = React.useState(true)
+
 	options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
 
 	const getPlayer = ()=>{
@@ -120,7 +121,7 @@ function QuizBox(props){
 			gChance.pop()
 			setChance(gChance)
 		}
-		threeMissedOut()
+		if(props.threeMissedOut){threeMissedOut()}
 		
 	}
 
@@ -194,7 +195,7 @@ function QuizBox(props){
 
 				{showSelect && <div class="fixed-bottom mb-3 d-flex justify-content-end rounded p-3 display-md-none"><button class="btn color-bg-p color-white sz-20 color-bg-s-hover p-3" onClick={()=>checkAnswer()}>Select </button></div>}
 
-				<p class="sz-18"> <b>Score</b> :{score} </p>
+				<p class="sz-18"> <b>Scdcore</b> :{score} </p>
 				{message && <Message body={message} changeActive={changeActive} score={score} restartQuiz={restartQuiz} restart={showRestart} game={props.game} players={props.players} code={props.code} /> }
 			</div>
 			</div>

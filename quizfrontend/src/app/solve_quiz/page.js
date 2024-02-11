@@ -54,7 +54,7 @@ if(!allow){
 	return(
 			<div> 
 			<div class=''>
-				{items && <QuizBox level={level} time={time} items={items} player={player} players={players} game={game} currentPlayer={currentPlayer} code={code} />}
+				{items && <QuizBox level={level} time={time} items={items} player={player} players={players} game={game} currentPlayer={currentPlayer} code={code} threeMissedOut={true} />}
 			</div>
 			</div>
 		)

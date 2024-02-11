@@ -1,10 +1,15 @@
 from django.db import models
 from django.shortcuts import reverse,redirect
+from django.contrib.auth.models import User
+
+
 
 class Player(models.Model):
+	user = models.OneToOneField(User, on_delete=models.CASCADE,null=True,blank=True)
 	name = models.CharField(max_length=100000)
 	score = models.IntegerField(default=0)
 	active = models.BooleanField(default=True)
+	
 
 	def __str__(self):
 		return self.name
