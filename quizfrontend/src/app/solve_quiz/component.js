@@ -174,14 +174,6 @@ function QuizBox(props){
 
 	return(
 		<div class="">
-		<p> <button class='btn normal no-background' onClick={()=>showDetails(details == true ? false:true)}>Show Game details </button> </p>
-		
-		{details && <div class="row sz-12">
-		<div class="col-6"> Host: {props.player && props.player.name}</div>
-		<div class="col-6"> Player: {currentPlayer && currentPlayer.name}</div>
-		<div class="col-6"> Number of Players : {props.players && props.players.length}</div>
-		<div class="col-6"> Game Code : {props.code} </div>
-		</div>}
 		
 		<div class="row mb-1"><div class="col color-p">Question {active+1} </div>
 		<div class="col" style={{textAlign:'right'}}>
@@ -206,6 +198,13 @@ function QuizBox(props){
 				{message && <Message body={message} changeActive={changeActive} score={score} restartQuiz={restartQuiz} restart={showRestart} game={props.game} players={props.players} code={props.code} /> }
 			</div>
 			</div>
+			<p> <button class='btn normal no-background' onClick={()=>showDetails(details == true ? false:true)}>Show Game details </button> </p>
+			{details && <div class="row sz-12">
+		<div class="col-6"> Host: {props.player && props.player.name}</div>
+		<div class="col-6"> Player: {currentPlayer && currentPlayer.name}</div>
+		<div class="col-6"> Number of Players : {props.players && props.players.length}</div>
+		<div class="col-6"> Game Code : {props.code} </div>
+		</div>}
 			<audio src={clapsound} ref={clap} ></audio>
 			<audio src={boosound} ref={boo}></audio>
 			<audio src={gameoversound} ref={gameover} ></audio>
@@ -264,7 +263,7 @@ function PlayerRanking(props){
 					{x.name}
 				</div>
 				<div class="col color-black sz-16">
-					{x.score}
+					{x.active ? 'waiting' : x.score}
 				</div>
 			</div>
 			)			

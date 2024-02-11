@@ -83,4 +83,5 @@ def joinGame(request,id,player):
 def getCategory(request):
 	category = Category.objects.all()
 	serializer = CategorySerializer(category,many=True)
+	print('category fetched')
 	return Response(serializer.data)
