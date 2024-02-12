@@ -8,3 +8,8 @@
   background-color: lightgreen;
   color:green;
 }
+
+.button{
+  border:none;
+  border:no-border;
+}

@@ -8,6 +8,8 @@ import axios from 'axios'
 import endpoint from '../endpoints.js'
 //const endpoint = 'http://127.0.0.1:8000/'
 
+const QuizBoxContext = React.createContext()
+
 function QuizBox(props){
 	
 	const data = props.items
@@ -65,11 +67,11 @@ function QuizBox(props){
 	
 	}
 
-	const threeMissedOut = () =>{
-		if(chance.length == 0){
-			gameOver()
-		}
-	}
+	// const threeMissedOut = () =>{
+	// 	if(chance.length == 0){
+	// 		gameOver()
+	// 	}
+	// }
 
 	const calculateScore = () =>{
 	  let scoreCalculate = 30/(+props.time)
@@ -174,13 +176,14 @@ function QuizBox(props){
 	}
 
 	return(
-		<div class="">
+		<QuizBoxContext.Provider>
+		<div class="py-4">
 		
 		<div class="row mb-1"><div class="col color-p">Question {active+1} </div>
-		<div class="col" style={{textAlign:'right'}}>
-
-			{chance.map(()=> <i class="fas fa-heart p-1 text-danger" ></i> )}</div>
+				
 		</div>
+
+	
 			<div class="row center justify-content-center">
 			<div class='sz-24 bold rounded p-3 col-12'>{data[active].body}</div>
 			<div class="col-12">
@@ -210,9 +213,20 @@ function QuizBox(props){
 			<audio src={boosound} ref={boo}></audio>
 			<audio src={gameoversound} ref={gameover} ></audio>
 		</div>
+		</QuizBoxContext.Provider>
 		)
 }
 
+
+function MissedOut(props){
+	return(
+			<div class="col" style={{textAlign:'right'}}>
+
+				{props.chance.map(()=> <i class="fas fa-heart p-1 text-danger" ></i> )}
+			</div>
+
+		)
+}
 
 function Message(props){
 

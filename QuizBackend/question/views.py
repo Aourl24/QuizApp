@@ -30,17 +30,17 @@ def createGame(request,id=None):
 		data = json.loads(request.body.decode())
 		playerName = data.get('name')
 		player = Player.objects.create(name=playerName)
-
 		serializer = PlayerSerializer(player)
 		game.host = player
 		game.players.add(player)
 		game.code = f'{getCode()}{game.id}G'
 		game.time = data.get('time')
 		game.difficulty = data.get('level')
+		
 		questionNumber = int(data.get('questionNumber'))
 		category = data.get('category')
 		queryset = Question.objects.filter(level__name=game.difficulty,category__name=category)[:questionNumber]
-
+		
 		for question in queryset:
 			game.question.add(question)
 			game.save()
