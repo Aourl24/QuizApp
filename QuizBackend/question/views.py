@@ -51,7 +51,16 @@ def createGame(request,id=None):
 		serializer = GameSerializer(game)
 		return Response(serializer.data)
 
+@api_view(['GET'])
+def nextLevel(request,game,level):
+	game = Game.objects.get(id=game)
+	queryset = Question.objects.filter(level__name=level)
+	for question in queryset:
+		game.question.add(question)
+		game.save()
 
+	serializer = GameSerializer(game)
+	return Response(serializer.data) 
 
 @api_view(['GET'])
 def getPlayers(request,id):

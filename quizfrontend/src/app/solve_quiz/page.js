@@ -1,5 +1,5 @@
 'use client'
-import QuizBox from './component.js'
+import Quiz from './component.js'
 import { useRouter ,useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import React from 'react'
@@ -52,11 +52,9 @@ if(!allow){
 }
 
 	return(
-			<div> 
-			<div class=''>
-				{items && <QuizBox level={level} time={time} items={items} player={player} players={players} game={game} currentPlayer={currentPlayer} code={code} threeMissedOut={true} />}
-			</div>
-			</div>
+			<React.Fragment>
+				{items && <Quiz level={level} time={time} items={items} player={player} players={players} game={game} currentPlayer={currentPlayer} code={code} threeMissedOut={true} />}
+			</React.Fragment>
 		)
 }
 

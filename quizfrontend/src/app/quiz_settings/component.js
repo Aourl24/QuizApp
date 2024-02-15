@@ -31,7 +31,7 @@ function QuizSetting(){
 	const [time,setTime] = React.useState(15)
 	const [ready,setReady] = React.useState(false)
 	const [type,setType] = React.useState('versus')
-	const [level,setLevel] = React.useState('easy')
+	const [level,setLevel] = React.useState(1)
 	const [link,setLink] = React.useState('')
 	const [game,setGame] = React.useState()
 	const [player,setPlayer] = React.useState() //host
@@ -123,12 +123,13 @@ function SingleMode(props){
 	const name = React.useRef()
 	const cat = React.useRef()
 
-	const {setPlayer,category, createLink,setChoosenCategory,setCurrentPlayer} = React.useContext(QuizContext)
+	const {setPlayer,category, createLink,setChoosenCategory,setCurrentPlayer,setLevel} = React.useContext(QuizContext)
 
 	const createGame = ()=>{
 		setCurrentPlayer(name.current.value);
 		setPlayer(name.current.value);
 		setChoosenCategory(cat.current.value)
+		setLevel(1)
 		createLink()
 	}
 
