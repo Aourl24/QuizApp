@@ -12,7 +12,7 @@ const QuizBoxContext = React.createContext()
 
 
 function Quiz(props){
-	const [data,setData] = React.useState(props.items)
+	const [data,setData] = React.useState(props.items.filter((x)=>x.level.name === '1'))
 	const options = React.useRef([])
 	const clap = React.useRef()
 	const boo = React.useRef()
@@ -31,6 +31,8 @@ function Quiz(props){
 	const [gameStatus , setGameStatus] = React.useState(true)
 	const [questions ,setQuestions] = React.useState(true)
 	const [level,setlevel] = React.useState(props.level ? props.level : 1)
+	const [nextLevel,setNextLevel] = React.useState(false)
+	const [restart,setRestart] = React.useState(false)
 
 	if(data[active]){
 		options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
@@ -46,6 +48,11 @@ function Quiz(props){
 		setCurrentPlayer(player)
 	}
 
+	const gameOver = ()=>{
+		saveScore()
+		setShowRestart(true)
+		setGameStatus(false)		
+	}
 
 	const changeActive = ()=> {
 		if(active > data.length){
@@ -123,9 +130,10 @@ function Quiz(props){
 	},[props.players])
 
 	React.useEffect(()=>{
-	options.current.map((element)=>{element.current.classList.remove('select');element.current.classList.remove('color-p')})
-	setMessage(null)
-	setShowSelect(null)
+			options.current.map((element)=>{element.current.classList.remove('select');element.current.classList.remove('color-p')})
+
+	//setMessage(null)
+	//setShowSelect(null)
 	},[active])
 
 	React.useEffect(()=>{
@@ -172,17 +180,17 @@ function Quiz(props){
 
 
 	return(
-			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore}} >
+			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver}} >
 			<div>
-			<p> Level : {level} </p>
+			
 				<div class="col-12">
 				<div class='w-100 center' style={{textAlig:'right'}}><div class='rounded sz-18  color-s  p-2 color-bd-p' style={{display:'inline-block'}}>0 : {countDown}</div> </div>				
 			</div>
-				<LevelQuiz countDown={countDown} game={props.game} />
-						
+				{props.gameMode === 'level' && <LevelQuiz countDown={countDown} game={props.game} />}
+				{props.gameMode === 'versus' && <Multiplayer />}						
 
-				<p class="sz-18"> <b>Score</b> :{score} </p>
-				{message && <Message body={message} changeActive={changeActive} score={score} restartQuiz={restartQuiz} restart={showRestart} game={props.game} players={props.players} code={props.code} /> }
+				<p class="sz-18 center"> <b>Score</b> :{score} </p>
+				{message && <Message game={props.game} players={props.players} code={props.code} /> }
 
 				<audio src={clapsound} ref={clap} ></audio>
 				<audio src={boosound} ref={boo}></audio>
@@ -193,40 +201,78 @@ function Quiz(props){
 }
 
 
+function Multiplayer(props){
+
+	React.useEffect(()=>{
+		const socket = new WebSocket('ws://127.0.0.1:8000/quizroom')
+		
+		socket.onopen = ()=>{
+			console.log('Websocket has opend')
+		}
+		
+		return () =>{
+			socket.close()
+		}
+
+	},[])
+
+	return(
+			<div>
+				Waiting for players to join
+
+				<QuizBox />
+			</div>
+		)
+}
 
 function LevelQuiz(props){
 
-		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore} = React.useContext(QuizBoxContext)
+		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore,nextLevel,setNextLevel,setRestart,gameOver} = React.useContext(QuizBoxContext)
 		
 
 		React.useEffect(()=>{
 			if(!questions){
-			if(score > == 70){
-			setMessage("Next Level")
-
+			if(score/parseInt(level) >= 70){
+			setNextLevel(true)
+			setMessage("Good Job!!!, Proceed to Next Level")
+			getNextLevel()
 			}
 
 			else{
 				setMessage('You did not have enough score to proceed to Next Level')
-				setShowRestart(true)
+
+				gameOver()
 			}
 		}
 		},[questions])
 
-		const getNextLevel = async ()=> { 
-			const res = await axios.get(endpoint + 'nextlevel/' + props.game + '/' + parseInt(level+1) )
-			let next = level + 1
+		const getNextLevel = async ()=> {
+			let next = parseInt(level) + 1
+			const res = await axios.get(endpoint + 'nextlevel/' + props.game + '/' + next)
 			let newQuestion = res.data.question.filter((x)=>x.level.name === next.toString())
+			console.log(res.data.question)
 			console.log(level)
+			console.log(newQuestion)
+			if(newQuestion.length > 1){
+			setActive(0)
+			setQuestions(true)
 			setData(newQuestion)
-			console.log(data[active])
+			//console.log(data[active])
 			setlevel(next)
+		}
+		else{
+			setMessage('You have reach maximum level')
+			
+			gameOver()
+		}
+
 		}
 
 		return(
 			<div>
-			score : {score}
 			<div class='w-100 center' style={{textAlig:'right'}}>
+			<p> <b class='color-p'>Level</b> : {level} </p>
+
 			<QuizBox />
 			</div>
 
@@ -246,7 +292,7 @@ function QuizBox(props){
 		{data[active] &&
 			<div class="row center justify-content-center">
 			<div class='sz-24 bold rounded p-3 col-12'>{data[active].body}</div>
-	
+			{data[active].level.name}
 			<div class="col-12">
 				<div class="row">
 				{data[active].options.map((x,i)=><div class='col-md-6 my-1 p-3 p-sm-2 my-sm-1' key={i} ><div id={active+x} ref={options.current[i]}  class='border rounded sz-16 p-3 color-p-hover option' style={{cursor:'pointer'}} onClick={()=>{markChoose(i);setOptionChoose(x)}}>{x}</div></div>)}
@@ -484,24 +530,31 @@ function MissedOut(props){
 
 function Message(props){
 
+	const {message, changeActive,score,restartQuiz,showRestart,nextLevel,setNextLevel,restart, questions,setShowRestart} = React.useContext(QuizBoxContext)
+
+
+React.useEffect(()=>{
+
+},[nextLevel])
 
 	return(
 		<div class='sz-24 text-danger modal d-flex align-items-center color-bg-white' style={{transition:"all 0.5 ease",backgroundColor:"rgba(100,100,100,0.8)"}}>
 		<div class="modal-dialog modal-dialog-centered w-100 h-100 p-3" styl={{transition:"all 0.5 ease",backgroundColor:"rgba(200,200,200,0.5)"}}>
-		<div class="modal-content p-2 center">
-			<div class="row my-2">
-			{!props.restart  && <p class='sz-30 animate__animated animate__bounce'>{props.body == 'Correct Answer' ? <i class="fas fa-check color-green"></i> : <i class="fas fa-times color-red"></i>} </p> }
+		<div class="modal-content p-2 center animate__animated animate__slideInUp">
+			{nextLevel && <div> </div>}
+			<div class="row my-2 color-p">
+			{!showRestart  && <p class='sz-30 animate__animated animate__bounce hide'>{props.body == 'Correct Answer' ? <i class="fas fa-check color-green"></i> : <i class="fas fa-times color-red"></i>} </p> }
 			<div class="col">
-			{props.body}
+			{message}
 			</div>
 			</div>
 
-		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-p sz-18">{props.restart ? 'Total Score':'Your Score' } </span> <br /><b>{props.score}</b></div> </div>
-		{!props.restart && <p class="my-5"> <button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.changeActive()}>Next </button></p>}
+		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-black sz-18 black">{restartQuiz ? 'Total Score':'Your Score' } </span> <br /><b>{score}</b></div> </div>
+		{questions && <p class="my-5"> <button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>changeActive()}> Next </button></p>}
 
-		{props.restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>props.restartQuiz()}>Restart </button></p>}
+		{restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>restartQuiz()}>Restart </button></p>}
 		<hr />
-		{props.restart && <PlayerRanking game={props.game} code={props.code} /> }
+		{showRestart && <PlayerRanking game={props.game} code={props.code} /> }
 		</div>
 		</div>
 		

@@ -43,7 +43,7 @@ def createGame(request,id=None):
 		
 		for question in queryset:
 			game.question.add(question)
-			game.save()
+		game.save()
 		data = dict(id=game.id,player=serializer.data,code=game.code)
 		return Response(data)
 	else:

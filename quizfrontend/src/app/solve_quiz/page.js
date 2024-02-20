@@ -13,6 +13,7 @@ function App(){
 	const game = router.get('game')
 	const allow = router.get('allow')
 	const currentPlayer = router.get('currentPlayer')
+	const gameMode = router.get('gameMode')
 	const [players,setPlayers] = React.useState([])
 	const [time,setTime] = React.useState()
 	//const [] = router.get('gameType')
@@ -53,7 +54,7 @@ if(!allow){
 
 	return(
 			<React.Fragment>
-				{items && <Quiz level={level} time={time} items={items} player={player} players={players} game={game} currentPlayer={currentPlayer} code={code} threeMissedOut={true} />}
+				{items && <Quiz level={level} time={time} items={items} player={player} players={players} game={game} currentPlayer={currentPlayer} code={code} gameMode={gameMode} threeMissedOut={false} />}
 			</React.Fragment>
 		)
 }
