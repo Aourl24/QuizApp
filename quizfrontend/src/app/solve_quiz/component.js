@@ -12,7 +12,7 @@ const QuizBoxContext = React.createContext()
 
 
 function Quiz(props){
-	const [data,setData] = React.useState(props.items.filter((x)=>x.level.name === '1'))
+	const [data,setData] = React.useState(props.items)
 	const options = React.useRef([])
 	const clap = React.useRef()
 	const boo = React.useRef()
@@ -33,10 +33,11 @@ function Quiz(props){
 	const [level,setlevel] = React.useState(props.level ? props.level : 1)
 	const [nextLevel,setNextLevel] = React.useState(false)
 	const [restart,setRestart] = React.useState(false)
+	const [players,setPlayers] = React.useState(props.players)
 
-	if(data[active]){
-		options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
-	}
+	// if(data[active]){
+	// 	options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
+	// }
 
 	const getPlayer = ()=>{
 		let player = ''
@@ -126,22 +127,27 @@ function Quiz(props){
 	}
 
 	React.useEffect(()=>{
+		//console.log(props.items)
+		//setData(props.items)//.filter((x)=>x.level.name === '1'))
+		console.log(data)
+	},[])
+
+	React.useEffect(()=>{
+		options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
+	},[data])
+
+	React.useEffect(()=>{
 		getPlayer()
 	},[props.players])
 
 	React.useEffect(()=>{
+		if(active != 0 ){
 			options.current.map((element)=>{element.current.classList.remove('select');element.current.classList.remove('color-p')})
+		}
 
-	//setMessage(null)
-	//setShowSelect(null)
 	},[active])
 
-	React.useEffect(()=>{
-		if(data[active]){
-		options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())}
-	},[data])
-//React.useEffect(()=>{
-//	},[wrong])
+
 
 	React.useEffect(()=>{
 		const timer = setInterval(()=>{setCountDown(()=>countDown-1)},1000);
@@ -173,21 +179,24 @@ function Quiz(props){
 
 	},[wrong,correct])
 
+	if(!data){
+		return(<div class="spinner-border sz-24 center">loading</div>)
+	}
+
 	if(currentPlayer.active == false){
 		
 		return (<div> <PlayerRanking game={props.game} code={props.code} /></div>)
 	}
 
-
 	return(
-			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver}} >
+			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer}} >
 			<div>
 			
 				<div class="col-12">
 				<div class='w-100 center' style={{textAlig:'right'}}><div class='rounded sz-18  color-s  p-2 color-bd-p' style={{display:'inline-block'}}>0 : {countDown}</div> </div>				
 			</div>
 				{props.gameMode === 'level' && <LevelQuiz countDown={countDown} game={props.game} />}
-				{props.gameMode === 'versus' && <Multiplayer />}						
+				{props.gameMode === 'versus' && <Multiplayer currentPlayer={props.currentPlayer} game={props.game} />}						
 
 				<p class="sz-18 center"> <b>Score</b> :{score} </p>
 				{message && <Message game={props.game} players={props.players} code={props.code} /> }
@@ -202,25 +211,70 @@ function Quiz(props){
 
 
 function Multiplayer(props){
+	const [secondUser,setSecondUser] = React.useState(false)
+	const [info , setInfo] = React.useState()
+	const [trackPlayer,setTrackPlayer] = React.useState()
+	const {gameStatus,setGameStatus,setMessage,players,checkAnswer,questions,setQuestions,active,currentPlayer} = React.useContext(QuizBoxContext)
+	const socket = React.useRef()
+	setMessage('waiting for second User') 
+
+	const sendMessage = (e) =>{
+		const msg = JSON.stringify({data:e})
+		console.log(msg)
+	if(socket.current && socket.current.readyState === WebSocket.OPEN) 
+			{ socket.current.send(msg);console.log('i just send message')
+	}
+	}
 
 	React.useEffect(()=>{
-		const socket = new WebSocket('ws://127.0.0.1:8000/quizroom')
+		if(active >0){
+		setMessage('waiting for other players answer')
+		//setQuestions(false)
+	}
+	sendMessage(props.currentPlayer)
+	},[checkAnswer])
+
+	React.useEffect(()=>{
+		socket.current = new WebSocket('ws://127.0.0.1:8000/quizroom/' + props.game + '/' + props.currentPlayer)
 		
-		socket.onopen = ()=>{
+		socket.current.onopen = ()=>{
 			console.log('Websocket has opend')
+		}
+
+		socket.current.onmessage = (message) =>{
+			const data = JSON.parse(message.data)
+			console.log(data)
+			setInfo(data.message)
+			if (data.message === 'user_join'){
+				setSecondUser(true)
+				setMessage(false)
+			}
+			else if (data.message === 'answered'){
+				setMessage(null)
+				setQuestions(true)
+			}
+
+			else{
+				setMessage("waiting for second user")
+			}
+
+		}
+
+		socket.current.onclose = () => {
+			setMessage("You are disconnected")
 		}
 		
 		return () =>{
-			socket.close()
+			socket.current.close()
 		}
 
 	},[])
 
 	return(
 			<div>
-				Waiting for players to join
 
-				<QuizBox />
+				<p>{info}</p>
+				<div class={secondUser ? 'd-block' : 'hide'}> <QuizBox /> </div>
 			</div>
 		)
 }

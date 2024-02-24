@@ -125,7 +125,7 @@ function SingleMode(props){
 	const name = React.useRef()
 	const cat = React.useRef()
 
-	const {setPlayer,category, createLink,setChoosenCategory,setCurrentPlayer,setLevel} = React.useContext(QuizContext)
+	const {setPlayer,category, createLink,setChoosenCategory,setCurrentPlayer,setLevel,gameMode,setGameMode} = React.useContext(QuizContext)
 
 	const createGame = ()=>{
 		setCurrentPlayer(name.current.value);
@@ -133,6 +133,7 @@ function SingleMode(props){
 		setChoosenCategory(cat.current.value)
 		setLevel(1)
 		createLink()
+		setGameMode('level')
 	}
 
 	return(

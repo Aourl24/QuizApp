@@ -16,6 +16,7 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from question.routing import websocket_urlpatterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'QuizBackend.settings')
+#os.environ['DJANGO_ALLOw_ASYNC_UNSAFE'] = "true"
 
 django_asgi_app = get_asgi_application()
 
