@@ -14,6 +14,7 @@ function QuizSetting(){
 		{
 			id: 1, title:'Single Mode',info:'Allows one player to answer questions and accumulate points or progress through levels'},
 			{id: 2 ,title:'Multiplayer Mode',info:'Enables multiple players to compete against each other simultaneously'},
+			{id: 3 ,title:'Join Quiz',info:'Join Quiz and Play with friends'},
 			//{id : 3,title:'Challenge Mode',info:'Players compete in head-to-head matches'},
 			//{id:4,title:'Team Mode',info:'Players form teams to collaborate and answer questions collectively'},
 			//{id:5,title:'Survival Mode',info:'players strive to answer questions correctly to avoid elimination, with each incorrect answers resulting in a loss of life or points'}, 
@@ -84,6 +85,7 @@ function QuizSetting(){
 			<div>
 			{choice.id === 1 && <SingleMode />}
 			{choice.id === 2 && <VersusQuizSettings />}
+			{choice.id === 3 && <JoinQuizSettings />}
 			{choice.id === 0 && <GameModeList gameModes={gameModes} clickChoice={clickChoice} />}
 			
 			{message && <div class="text-danger sz-16"> <i>{message}</i> </div>}

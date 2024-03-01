@@ -7,7 +7,7 @@ urlpatterns = [
 	path('creategame',createGame),
 	path('creategame/<int:id>',createGame),
 	path('game/<int:id>/players',getPlayers),
-	path('save/<int:id>/<int:score>',saveScores),
+	path('save/<int:id>/<int:score>',saveScores,name='SaveUrl'),
 	path('join/<str:id>/<str:player>',joinGame),
 	path('category',getCategory),
 	path('nextlevel/<int:game>/<str:level>',nextLevel),
