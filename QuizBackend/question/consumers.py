@@ -5,9 +5,11 @@ from .models import Game,Player
 from asgiref.sync import sync_to_async
 from django.urls import reverse
 import requests
+import time
 
 class QuizConsumer(AsyncWebsocketConsumer):
 	player_status = None
+	count = 10
 
 	async def connect(self):
 		self.room_id = self.scope['url_route']['kwargs']['game']
@@ -16,6 +18,7 @@ class QuizConsumer(AsyncWebsocketConsumer):
 		#check = await self.getGame()
 		await self.accept()
 		await self.channel_layer.group_add(self.group_name,self.channel_name)
+		await self.channel_layer.group_send(self.group_name,{'type':'group.message','payload':'joined'})
 		#await self.wait_for_second_user()
 		
 
@@ -44,8 +47,8 @@ class QuizConsumer(AsyncWebsocketConsumer):
 		
 	@sync_to_async
 	def saveScore(self,data):
-		player = Player.objects.get(id=data['e']['id'])
-		player.score = int(data['e']['score'])
+		player = Player.objects.get(id=data['id'])
+		player.score = int(data['score'])
 		player.active = False
 		player.save()
 		print('score saved')
@@ -53,15 +56,23 @@ class QuizConsumer(AsyncWebsocketConsumer):
 
 	async def receive(self,text_data):
 		data = json.loads(text_data)
-		await self.saveScore(data)
+		print(data)
+		check = data['time']
+		if data['type'] == 'time':
+			msg = {'body':self.count,'type':'time'}
+			self.count-=1
+		else:
+			await self.saveScore(data)
+			msg = dict(body='saved',type='saved')
 
+		if self.count 
 		#url = reverse('SaveUrl',kwargs={'score':data['e']['score'],'id':data['e']['id']})
 		#res = requests.get('http://127.0.0.1:8000' +url)
 		#print(res.json())
 		#print('request seen')
-		msg = 'answered'
-
-		await self.channel_layer.group_send(self.group_name,{'type':'group.message','payload':'saved'})
+		
+		#self.count += 1
+		await self.channel_layer.group_send(self.group_name,{'type':'group.message','payload':msg})
 
 
 	# async def wait_for_second_user(self):

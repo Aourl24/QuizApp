@@ -4,7 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import {useSearchParams} from 'next/navigation'
 import axios from 'axios';
-import endpoint from '../endpoints.js'
+import {endpoint} from '../endpoints.js'
 
 const QuizContext = React.createContext()
 
@@ -176,6 +176,7 @@ function JoinQuizSettings(props){
 	const [message, setMessage] = React.useState('')
 	const code = React.useRef()
 	const player = React.useRef()
+	const {setGameMode} = React.useContext(QuizContext)
 
 	const getGame = async ()=>{
 		if (player.current.value === ""){
@@ -196,6 +197,7 @@ function JoinQuizSettings(props){
 			}
 			
 		setGame(resp.data.id)
+		setGameMode('versus')
 		setReady(true)}
 		catch(error){
 			setMessage("Error Loading Quiz Code")
@@ -220,7 +222,7 @@ function JoinQuizSettings(props){
 			<p> <button class="btn w-100 color-bg-p color-white sz-16" onClick={()=>getGame()}> Proceed </button> </p>
 			</div>}
 			{ready && <div class="mb-2"> Already joined Game, Click to start Game <p class='w-100 color-bg-p color-white center p-2 rounded'> 
-			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:player.current.value}}} class='color-white no-decoration'> Start </Link></p></div>}
+			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:player.current.value,gameMode:'versus'}}} class='color-white no-decoration'> Start </Link></p></div>}
 			
 		</div>
 		)

@@ -5,8 +5,7 @@ import clapsound from './sounds/clapping.wav'
 import boosound from './sounds/booing.wav'
 import gameoversound from './sounds/gameover.wav'
 import axios from 'axios'
-import endpoint from '../endpoints.js'
-
+import {endpoint, wsEndpoint} from '../endpoints.js'
 
 const QuizBoxContext = React.createContext()
 
@@ -149,31 +148,6 @@ function Quiz(props){
 	},[active])
 
 
-
-	React.useEffect(()=>{
-		const timer = setInterval(()=>{setCountDown(()=>countDown-1)},1000);
-		
-		if(currentPlayer.active == false){
-			clearInterval(timer)
-		}
-
-		if (countDown <= 0){
-			gameover.current.play()
-			setMessage('Time Out')
-			setWrong((prevArray)=>[...prevArray,data[active]])
-			//let gChance = chance
-			//gChance.pop()
-			//setChance(gChance)
-			clearInterval(timer)
-		}
-		if(message){
-			//setCountDown(0)
-			clearInterval(timer)
-		}
-		return () => clearInterval(timer)
-		}
-	,[countDown])
-
 	React.useEffect(()=>{
 		let doneQuestions = correct.length + wrong.length
 		//setScore(correct.length + '/' + doneQuestions)
@@ -190,7 +164,7 @@ function Quiz(props){
 	// }
 
 	return(
-			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage}} >
+			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown}} >
 			<div>
 			
 				<div class="col-12">
@@ -213,33 +187,55 @@ function Quiz(props){
 
 function Multiplayer(props){
 	const [startGame,setStartGame] = React.useState(false)
-	const [info , setInfo] = React.useState()
+	const [info , setInfo] = React.useState(20)
 	const [trackPlayer,setTrackPlayer] = React.useState()
-	const {gameStatus,setGameStatus,setMessage,players,checkAnswer,questions,setQuestions,active,currentPlayer,showRestart,setShowRestart,score,setPlayers} = React.useContext(QuizBoxContext)
+	const {gameStatus,setGameStatus,setMessage,players,checkAnswer,questions,setQuestions,active,currentPlayer,showRestart,setShowRestart,score,setPlayers,game,countDown,setCountDown,message} = React.useContext(QuizBoxContext)
 	const socket = React.useRef()
+	const [mounted,setMounted] = React.useState(false)
+
 	//setMessage('waiting for second User') 
 
-	const sendMessage = (e) =>{
-		const msg = JSON.stringify({e})
-		//console.log(msg)
+	const sendMessage = (e,i='main') =>{
+		const body = {...e,type:i}
+		const msg = JSON.stringify(body)
+		console.log(msg)
 	if(socket.current && socket.current.readyState === WebSocket.OPEN) 
 			{ socket.current.send(msg);console.log('i just send message')
 	}
 	}
 
-
-	if(players.length < 2){
+const checkPlayers = async () =>{
+		const res = await axios.get(endpoint + 'game/' + game + '/players')
+			setPlayers(res.data)
+		//console.log(res.data)
+	if(res.data.length < 2){
 		setMessage('Wating for other Players')
 	}
+	else{
+		setMessage()
+	}
+}
+
+React.useEffect(()=>{
+const timer = setInterval(()=>{setCountDown(()=>countDown-1)},1000)
+sendMessage({'time':countDown},'time')
+		// if(message){
+		// 	//setCountDown(0)
+		// 	clearInterval(timer)
+		// }
+ return () => clearInterval(timer)
+},[countDown])
+
+	// React.useEffect(()=>{
+	// setShowRestart(true)
+	// if (mounted){
+	// sendMessage({id:currentPlayer.id,score:score})}
+	// },[checkAnswer])
 
 	React.useEffect(()=>{
-	setShowRestart(true)
-	sendMessage({id:currentPlayer.id,score:score})
-	},[checkAnswer])
 
-	React.useEffect(()=>{
 		//'ws://127.0.0.1:8000
-		socket.current = new WebSocket('ws://192.168.84.92:8000/quizroom/' + props.game + '/' + props.currentPlayer)
+		socket.current = new WebSocket(wsEndpoint + props.game + '/' + props.currentPlayer)
 		
 		socket.current.onopen = ()=>{
 			console.log('Websocket has opend')
@@ -249,7 +245,16 @@ function Multiplayer(props){
 
 		socket.current.onmessage = (message) =>{
 			const data = JSON.parse(message.data)
-			console.log(data)
+			console.log(data.message)
+			if (data.message === 'joined'){
+				checkPlayers()
+			}
+			else if(data.message.type === 'time'){
+				setCountDown(data.message.body)
+			}
+			else if(data.message.type === 'endTime'){
+				setMessage('Time Out')
+			}
 			//setInfo(data.message)
 
 		}
@@ -257,7 +262,7 @@ function Multiplayer(props){
 		socket.current.onclose = () => {
 			setMessage("You are disconnected")
 		}
-		
+		setMounted(true)
 		return () =>{
 			socket.current.close()
 		}
@@ -267,7 +272,7 @@ function Multiplayer(props){
 	return(
 			<div>
 
-				<p>{info}</p>
+				<p>{countDown}</p>
 				<div class={startGame ? 'd-block' : 'hide'}> <QuizBox /> </div>
 			</div>
 		)
@@ -275,7 +280,7 @@ function Multiplayer(props){
 
 function LevelQuiz(props){
 
-		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore,nextLevel,setNextLevel,setRestart,gameOver} = React.useContext(QuizBoxContext)
+		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore,nextLevel,setNextLevel,setRestart,gameOver,countDown,setCountDown} = React.useContext(QuizBoxContext)
 		
 
 		React.useEffect(()=>{
@@ -315,6 +320,34 @@ function LevelQuiz(props){
 		}
 
 		}
+
+
+	React.useEffect(()=>{
+		const timer = setInterval(()=>{setCountDown(()=>countDown-1)},1000);
+
+		
+		if(currentPlayer.active == false){
+			clearInterval(timer)
+		}
+
+		if (countDown <= 0){
+			gameover.current.play()
+			setMessage('Time Out')
+			setWrong((prevArray)=>[...prevArray,data[active]])
+			//let gChance = chance
+			//gChance.pop()
+			//setChance(gChance)
+			clearInterval(timer)
+		}
+		if(message){
+			//setCountDown(0)
+			clearInterval(timer)
+		}
+		return () => clearInterval(timer)
+	}
+		
+	,[countDown])
+
 
 		return(
 			<div>
