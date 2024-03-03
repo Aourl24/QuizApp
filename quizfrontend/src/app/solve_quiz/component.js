@@ -34,7 +34,7 @@ function Quiz(props){
 	const [restart,setRestart] = React.useState(false)
 	const [players,setPlayers] = React.useState(props.players)
 	const [buttonMessage,setButtonMessage] = React.useState()
-
+	const hasMount = React.useRef(false)
 	// if(data[active]){
 	// 	options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
 	// }
@@ -164,7 +164,7 @@ function Quiz(props){
 	// }
 
 	return(
-			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown}} >
+			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown,gameover,setWrong,hasMount}} >
 			<div>
 			
 				<div class="col-12">
@@ -189,9 +189,9 @@ function Multiplayer(props){
 	const [startGame,setStartGame] = React.useState(false)
 	const [info , setInfo] = React.useState(20)
 	const [trackPlayer,setTrackPlayer] = React.useState()
-	const {gameStatus,setGameStatus,setMessage,players,checkAnswer,questions,setQuestions,active,currentPlayer,showRestart,setShowRestart,score,setPlayers,game,countDown,setCountDown,message} = React.useContext(QuizBoxContext)
+	const {gameStatus,setGameStatus,setMessage,players,checkAnswer,questions,setQuestions,active,currentPlayer,showRestart,setShowRestart,score,setPlayers,game,changeActive,countDown,setCountDown,message,hasMount} = React.useContext(QuizBoxContext)
 	const socket = React.useRef()
-	const [mounted,setMounted] = React.useState(false)
+	const mounted = React.useRef(false)
 
 	//setMessage('waiting for second User') 
 
@@ -217,20 +217,28 @@ const checkPlayers = async () =>{
 }
 
 React.useEffect(()=>{
-const timer = setInterval(()=>{setCountDown(()=>countDown-1)},1000)
-sendMessage({'time':countDown},'time')
-		// if(message){
-		// 	//setCountDown(0)
-		// 	clearInterval(timer)
-		// }
- return () => clearInterval(timer)
-},[countDown])
+	console.log('i send a message')
+	sendMessage({body:countDown},'start')
+},[active,countDown])
 
-	// React.useEffect(()=>{
-	// setShowRestart(true)
-	// if (mounted){
-	// sendMessage({id:currentPlayer.id,score:score})}
-	// },[checkAnswer])
+React.useEffect(()=>{
+sendMessage({body:players.length},'answer')
+},[checkAnswer])
+
+React.useEffect(()=>{
+if(hasMount.current){sendMessage({body:players.length},'waiting')}
+	else{hasMount.current = true}
+},[changeActive])
+
+// React.useEffect(()=>{
+// const timer = setInterval(()=>{setCountDown(()=>countDown-1)},1000)
+// sendMessage({'time':countDown},'time')
+// 		// if(message){
+// 		// 	//setCountDown(0)
+// 		// 	clearInterval(timer)
+// 		// }
+//  return () => clearInterval(timer)
+// },[countDown])
 
 	React.useEffect(()=>{
 
@@ -250,10 +258,18 @@ sendMessage({'time':countDown},'time')
 				checkPlayers()
 			}
 			else if(data.message.type === 'time'){
+				console.log('message from time')
 				setCountDown(data.message.body)
 			}
 			else if(data.message.type === 'endTime'){
 				setMessage('Time Out')
+			}
+			else if(data.message.type ==='waiting'){
+				if(data.message.body ==='failed'){
+					setMessage('waiting for other players to play')
+				}
+				
+
 			}
 			//setInfo(data.message)
 
@@ -262,10 +278,12 @@ sendMessage({'time':countDown},'time')
 		socket.current.onclose = () => {
 			setMessage("You are disconnected")
 		}
-		setMounted(true)
+
 		return () =>{
 			socket.current.close()
 		}
+		
+		//sendMessage({data:'success'},'start')
 
 	},[])
 
@@ -280,7 +298,7 @@ sendMessage({'time':countDown},'time')
 
 function LevelQuiz(props){
 
-		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore,nextLevel,setNextLevel,setRestart,gameOver,countDown,setCountDown} = React.useContext(QuizBoxContext)
+		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore,nextLevel,setNextLevel,setRestart,gameOver,countDown,setCountDown,currentPlayer,gameover,setWrong} = React.useContext(QuizBoxContext)
 		
 
 		React.useEffect(()=>{
@@ -334,9 +352,6 @@ function LevelQuiz(props){
 			gameover.current.play()
 			setMessage('Time Out')
 			setWrong((prevArray)=>[...prevArray,data[active]])
-			//let gChance = chance
-			//gChance.pop()
-			//setChance(gChance)
 			clearInterval(timer)
 		}
 		if(message){

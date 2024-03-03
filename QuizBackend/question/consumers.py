@@ -10,6 +10,7 @@ import time
 class QuizConsumer(AsyncWebsocketConsumer):
 	player_status = None
 	count = 10
+	connected_users = set()
 
 	async def connect(self):
 		self.room_id = self.scope['url_route']['kwargs']['game']
@@ -32,12 +33,23 @@ class QuizConsumer(AsyncWebsocketConsumer):
 	# 	else:
 	# 		return False
 
-	# @sync_to_async
-	# def identifyPlayer(self):
-	# 	player = Player.objects.get(name=self.player)
-	# 	player.connected = True
-	# 	return player.save()
+	 # @sync_to_async
+	 # def identifyPlayer(self):
+	 # 	player = Player.objects.get(name=self.player)
+	 # 	player.channel = self.channel_name
+	 # 	player.connected = True
+	 # 	player.save()
 	
+	async def countDown(self,x):
+		x -= 1
+		if x <= 0:
+			msg = dict(body=x,type='endTime')
+		else:
+			msg = dict(body=x,type='time')
+
+		return msg
+		#await self.channel_layer.group_send(self.group_name,{'type':'group.message','payload':msg})
+
 	@sync_to_async
 	def disconnectPlayer(self):
 		player = Player.objects.get(name=self.player)
@@ -54,18 +66,37 @@ class QuizConsumer(AsyncWebsocketConsumer):
 		print('score saved')
 
 
+	@sync_to_async
+	def checkUsers(self,players):
+		if len(self.connected_users) == players:
+			msg = dict(body='success',type='waiting')
+		else:
+			msg = dict(body='failed',type='waiting')
+		return msg
+
 	async def receive(self,text_data):
 		data = json.loads(text_data)
 		print(data)
-		check = data['time']
-		if data['type'] == 'time':
-			msg = {'body':self.count,'type':'time'}
-			self.count-=1
+		print('data received')
+		if data['type'] == 'start':
+			msg = await self.countDown(data['body'])
+			await asyncio.sleep(2)
+		elif data['type'] == 'waiting':
+			players = data['body']
+			print(players)
+			print(len(self.connected_users))
+			msg = await self.checkUsers(players)
+
+		elif data['type'] == 'answer':
+			self.connected_users.add(self.channel_name)
+			msg = await self.checkUsers(data['body'])
+					
 		else:
 			await self.saveScore(data)
 			msg = dict(body='saved',type='saved')
-
-		if self.count 
+			self.connected_users.add(self.channel_name)
+		#if self.count == 0:
+		#	msg = {'body':self.count,'type':'endTime'}
 		#url = reverse('SaveUrl',kwargs={'score':data['e']['score'],'id':data['e']['id']})
 		#res = requests.get('http://127.0.0.1:8000' +url)
 		#print(res.json())
