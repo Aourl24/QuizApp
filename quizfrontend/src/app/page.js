@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 function App (){
   return(
-      <div>
+      <div class="container" syle={{}}>
         <h1 class="sz-36 center mt-2"> Qui<span class="text-danger">zz</span>ify </h1>
         <div>
         <br />

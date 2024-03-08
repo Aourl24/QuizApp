@@ -13,7 +13,7 @@ function QuizSetting(){
 		const gameModes = [
 		{
 			id: 1, title:'Single Mode',info:'Allows one player to answer questions and accumulate points or progress through levels'},
-			{id: 2 ,title:'Multiplayer Mode',info:'Enables multiple players to compete against each other simultaneously'},
+			//{id: 2 ,title:'Multiplayer Mode',info:'Enables multiple players to compete against each other simultaneously'},
 			{id: 3 ,title:'Join Quiz',info:'Join Quiz and Play with friends'},
 			//{id : 3,title:'Challenge Mode',info:'Players compete in head-to-head matches'},
 			//{id:4,title:'Team Mode',info:'Players form teams to collaborate and answer questions collectively'},
@@ -40,8 +40,9 @@ function QuizSetting(){
 	const [message,setMessage] = React.useState()
 	const [choosenCategory,setChoosenCategory] = React.useState()
 	const [questionNumber,setQuestionNumber] = React.useState(10)
-	const [currentPlayer,setCurrentPlayer] = React.useState() //currentplayer
+	const [currentPlayer,setCurrentPlayer] = React.useState()
 	const [gameMode,setGameMode] = React.useState()
+	const [create,setCreate] = React.useState(false)
 
 	const getCategory = async () => {
 		const resp = await axios.get(endpoint + 'category')
@@ -69,23 +70,40 @@ function QuizSetting(){
 		setGame(resp.data.id)
 		setGameCode(resp.data.code)
 		setPlayer(resp.data.player.id)
-		console.log(resp.data.player)
+		//console.log(resp.data.player)
 		setReady(true)
 		setMessage('')
 	}
 	}
 
 	React.useEffect(()=>{
+		if(create)createLink()
+	},[create])
+
+	React.useEffect(()=>{
 		getCategory()
 	},[])
+	
+	if(ready){
+		return(
+		<div>
+			<p class='w-100 color-white center my-3 p-2 rounded sz-16 color-bg-s'> 
+			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:currentPlayer,gameMode:gameMode}}} class='color-white no-decoration '>Click to Start Game </Link>
+			</p>
+			<p class="center"> Share Game Code with friends to play <b class="sz-20">
+			<hr /> {gameCode}</b></p>
+		</div>
+		)
+	}
 
 
 	return(
-			<QuizContext.Provider value = {{time,ready,type,level,link,game,player,gameCode,category,message,setTime,setReady,setType,setLevel,setLink,setGame,setGameCode,setCategory,setMessage,setPlayer,createLink,setChoosenCategory,choosenCategory,setCurrentPlayer,questionNumber,setQuestionNumber,gameMode,setGameMode}} >
-			<div>
+			<QuizContext.Provider value = {{time,ready,type,level,link,game,player,gameCode,category,message,setTime,setReady,setType,setLevel,setLink,setGame,setGameCode,setCategory,setMessage,setPlayer,createLink,setChoosenCategory,choosenCategory,setCurrentPlayer,questionNumber,setQuestionNumber,gameMode,setGameMode,setCreate}} >
+			<div class="-4" class="container">
 			{choice.id === 1 && <SingleMode />}
 			{choice.id === 2 && <VersusQuizSettings />}
 			{choice.id === 3 && <JoinQuizSettings />}
+			
 			{choice.id === 0 && <GameModeList gameModes={gameModes} clickChoice={clickChoice} />}
 			
 			{message && <div class="text-danger sz-16"> <i>{message}</i> </div>}
@@ -127,14 +145,14 @@ function SingleMode(props){
 	const name = React.useRef()
 	const cat = React.useRef()
 
-	const {setPlayer,category, createLink,setChoosenCategory,setCurrentPlayer,setLevel,gameMode,setGameMode} = React.useContext(QuizContext)
+	const {setPlayer,category, createLink,setChoosenCategory,setCurrentPlayer,setLevel,gameMode,setGameMode,player,setCreate} = React.useContext(QuizContext)
 
 	const createGame = ()=>{
 		setCurrentPlayer(name.current.value);
 		setPlayer(name.current.value);
 		setChoosenCategory(cat.current.value)
 		setLevel(1)
-		createLink()
+		setCreate(true)
 		setGameMode('level')
 	}
 
@@ -142,7 +160,7 @@ function SingleMode(props){
 			<div class="">
 				<div class="row sz-16 my-3">
 					<div class="col my-2 bold">
-						Enter your Name (Your are playing as Guest)
+						Enter your Name <i class="sz-12">(You are playing as Guest) </i>
 					</div>
 					<div class="w-100"></div>
 					<div class="col my-2">
@@ -150,7 +168,7 @@ function SingleMode(props){
 					</div>
 				</div>
 
-				<div class="row">
+				<div class="row sz-16">
 			<div class="col my-2 bold">Categories </div> 
 			<div class="w-100"></div>
 			<div class="col my-2">
@@ -160,7 +178,7 @@ function SingleMode(props){
 			 </div>
 			</div>
 
-				<div class="row mx-auto my-2"> <button class="color-bg-p no-border rounded sz-18 color-white p-2" onClick={()=>createGame()}> Start </button> </div>
+				<div class="row mx-auto my-3"> <button class="color-bg-p no-border rounded sz-18 color-white p-2" onClick={()=>createGame()}> Start </button> </div>
 			</div>
 		)
 }

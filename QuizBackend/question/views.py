@@ -28,7 +28,9 @@ def createGame(request,id=None):
 	if request.method == 'POST':
 		game = Game.objects.create()
 		data = json.loads(request.body.decode())
+		print('data',data)
 		playerName = data.get('name')
+		print('player name',playerName)
 		player = Player.objects.create(name=playerName)
 		serializer = PlayerSerializer(player)
 		game.host = player
@@ -43,6 +45,7 @@ def createGame(request,id=None):
 		
 		for question in queryset:
 			game.question.add(question)
+			print('done here')
 		game.save()
 		data = dict(id=game.id,player=serializer.data,code=game.code)
 		return Response(data)
