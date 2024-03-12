@@ -15,7 +15,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="container">{children}</body>
+      <body className="container">
+       <h1 class="sz-20 mt-2"> Qui<span class="text-danger animate__animated animate__bounce animate__infinie animate__delay-3s" style={{display:'inline-block'}}>zz</span>ify </h1>
+      {children}</body>
     </html>
   )
 }

@@ -6,6 +6,7 @@ import boosound from './sounds/booing.wav'
 import gameoversound from './sounds/gameover.wav'
 import axios from 'axios'
 import {endpoint, wsEndpoint} from '../endpoints.js'
+import countdownsound from '../calmtickling.mp3'
 
 const QuizBoxContext = React.createContext()
 
@@ -15,6 +16,7 @@ function Quiz(props){
 	const options = React.useRef([])
 	const clap = React.useRef()
 	const boo = React.useRef()
+	const countdown = React.useRef()
 	const gameover = React.useRef()
 	const [details ,showDetails] = React.useState(false)
 	const [active , setActive] =  React.useState(0)
@@ -77,9 +79,11 @@ function Quiz(props){
 		clap.current.currentTime = 0
 		boo.current.currentTime = 0
 		gameover.current.currentTime = 0
+		countdown.current.currentTime = 0
 		clap.current.pause()
 		boo.current.pause()
 		gameover.current.pause()
+		countdown.current.pause()
 	
 	}
 
@@ -125,6 +129,8 @@ function Quiz(props){
 	}
 
 	const checkAnswer = () =>{
+		countdown.current.currentTime = 0
+		countdown.current.pause()
 		
 		if(optionChoose == data[active].answer){
 			setMessage('Correct Answer')
@@ -169,6 +175,7 @@ function Quiz(props){
 		if(active != 0 ){
 			options.current.map((element)=>{element.current.classList.remove('select');element.current.classList.remove('color-p')})
 		}
+		countdown.current.play()
 
 	},[active])
 
@@ -193,32 +200,49 @@ function Quiz(props){
 		return(<div class="spinner-border sz-24 center">loading</div>)
 	}
 
-	// if(currentPlayer.active == false){
+	if(currentPlayer.active == false){
 		
-	// 	return (<div> <PlayerRanking game={props.game} code={props.code} /></div>)
-	// }
+		return (
+			<QuizBoxContext.Provider value = {{checkAnswer}}>
+			<div> 
+			<PlayerRanking game={props.game} code={props.code} />
+			</div>
+			</QuizBoxContext.Provider>
+			)
+	}
 
 	return(
-			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown,gameover,setWrong,hasMount,wrong,correct,mark,missedOut,setMissedOut,missedCount,setMissedCount}} >
+			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown,gameover,setWrong,hasMount,wrong,correct,mark,missedOut,setMissedOut,missedCount,setMissedCount,countdown}} >
 			<div>
 			
 				<div class="col-12">
 				<div class='w-100 center' style={{textAlig:'right'}}><div class='rounded sz-18  color-s  p-2 color-bd-p' style={{display:'inline-block'}}>0 : {countDown}</div> </div>				
 			</div>
 				{props.gameMode === 'level' && <LevelQuiz countDown={countDown} game={props.game} />}
-				{props.gameMode === 'versus' && <Multiplayer currentPlayer={props.currentPlayer} game={props.game} />}						
-
-				<p class="sz-18 center"> <b>Score</b> :{score} </p>
+										
+				{props.gameMode === 'versus' && <NotAvailable /> }
+				<div class="center border-top py-3">
+				<span class="sz-14 center rounded border inline-block p-3 color-bg-s"> <b>Score</b> <br/>{score} </span>
+				</div>
 				{message && <Message game={props.game} players={props.players} code={props.code} /> }
 
 				<audio src={clapsound} ref={clap} ></audio>
 				<audio src={boosound} ref={boo}></audio>
 				<audio src={gameoversound} ref={gameover} ></audio>
+				<audio src={countdownsound} ref={countdown} ></audio>
 			</div>
 			</QuizBoxContext.Provider>
 		)
 }
 
+//{props.gameMode === 'versus' && <Multiplayer currentPlayer={props.currentPlayer} game={props.game} />}
+
+function NotAvailable(props){
+	return(
+		<div class="sz-24 center">
+			Your Request is Not Available right now, Coming Soon !!!
+		</div>)
+}
 
 function Multiplayer(props){
 	const [startGame,setStartGame] = React.useState(false)
@@ -324,7 +348,7 @@ if(hasMount.current){sendMessage({body:players.length},'waiting')}
 
 function LevelQuiz(props){
 
-		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore,nextLevel,setNextLevel,setRestart,gameOver,countDown,setCountDown,currentPlayer,gameover,setWrong,missedOut,setMissedOut,missedCount,setMissedCount} = React.useContext(QuizBoxContext)
+		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore,nextLevel,setNextLevel,setRestart,gameOver,countDown,setCountDown,currentPlayer,gameover,setWrong,missedOut,setMissedOut,missedCount,setMissedCount,correct,countdown} = React.useContext(QuizBoxContext)
 		
 		const [holder ,setHolder] = React.useState([])
 
@@ -339,7 +363,8 @@ function LevelQuiz(props){
 
 		React.useEffect(()=>{
 			if(!questions){
-			if(score/parseInt(level) >= 70){
+			//if(score/parseInt(level) >= 70){
+			if(correct.length > 9){
 			setNextLevel(true)
 			setMessage("Good Job!!!, Proceed to Next Level")
 			getNextLevel()
@@ -385,6 +410,8 @@ function LevelQuiz(props){
 		}
 
 		if (countDown <= 0){
+			countdown.current.currentTime = 0
+			countdown.current.pause()
 			gameover.current.play()
 			setMessage('Time Out')
 			setWrong((prevArray)=>[...prevArray,data[active]])
@@ -436,7 +463,7 @@ function QuizBox(props){
 			
 			<div class="col-12 my-3">
 				<div class="row">
-				{data[active].options.map((x,i)=><div class='col-md-6 my-1 p-3 p-sm-2 my-sm-1' key={i} ><div id={active+x} ref={options.current[i]}  class='border rounded sz-16 p-3 color-p-hover option' style={{cursor:'pointer'}} onClick={()=>{markChoose(i);setOptionChoose(x)}}>{x}</div></div>)}
+				{data[active].options.map((x,i)=><div class='col-md-6 my-1 p-3 p-sm-2 my-sm-1' key={i} ><div id={active+x} ref={options.current[i]}  class='border rounded sz-18 p-3 color-p-hover option' style={{cursor:'pointer'}} onClick={()=>{markChoose(i);setOptionChoose(x)}}>{x}</div></div>)}
 				</div>
 				{showSelect && <div class="my-4 display-sm-none"><button class="btn color-bg-p color-white w-100 sz-20 color-bg-s-hover p-3" onClick={()=>checkAnswer()}>Select </button></div>}
 
@@ -485,7 +512,9 @@ function Message(props){
 
 		{restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>restartQuiz()}>Restart </button></p>}
 		<hr />
-		{showRestart && <PlayerRanking players={players} game={props.game} code={props.code} /> }
+
+
+		 {showRestart && <PlayerRanking players={players} game={props.game} code={props.code} /> }
 		</div>
 		</div>
 		
@@ -509,8 +538,8 @@ function PlayerRanking(props){
 	
 
 	return(
-		<>
-		<p class="color-black"> Players Score </p>
+		<div class="center">
+		<p class="color-blac sz-18 bold color-s"> Players Score </p>
 
 		{players.map((x)=>{
 			return(
@@ -526,13 +555,13 @@ function PlayerRanking(props){
 		})}
 		<hr />
 
-		<p class="sz-16 color-black">Share this code with your Friend, to also play the game </p>
-		<div clas="bold">{props.code}</div>
+		<p class=" color-black sz-14">Share this code with your Friend, to also play the game </p>
+		<div class="bold sz-16">{props.code}</div>
 		
 		<div class="row">
 			<div class="col sz- 14"><Link class="no-decoration sz-14" href="/" >Go back Home </Link> </div>
 		</div>
-		</>
+		</div>
 		)
 }
 

@@ -45,9 +45,15 @@ function QuizSetting(){
 	const [create,setCreate] = React.useState(false)
 
 	const getCategory = async () => {
-		const resp = await axios.get(endpoint + 'category')
+		try{const resp = await axios.get(endpoint + 'category')
+			setCategory(resp.data)
+	}
+		catch(error){
+			setMessage('unable to fetch category')
+		}
+		
 		console.log('category fetched')
-		setCategory(resp.data)
+		
 
 	}
 
@@ -99,14 +105,14 @@ function QuizSetting(){
 
 	return(
 			<QuizContext.Provider value = {{time,ready,type,level,link,game,player,gameCode,category,message,setTime,setReady,setType,setLevel,setLink,setGame,setGameCode,setCategory,setMessage,setPlayer,createLink,setChoosenCategory,choosenCategory,setCurrentPlayer,questionNumber,setQuestionNumber,gameMode,setGameMode,setCreate}} >
-			<div class="-4" class="container">
+			<div class="container justify-content-center">
 			{choice.id === 1 && <SingleMode />}
 			{choice.id === 2 && <VersusQuizSettings />}
 			{choice.id === 3 && <JoinQuizSettings />}
 			
 			{choice.id === 0 && <GameModeList gameModes={gameModes} clickChoice={clickChoice} />}
 			
-			{message && <div class="text-danger sz-16"> <i>{message}</i> </div>}
+			{message && <div class="text-danger sz-16 center"> <i>{message}</i> </div>}
 			
 			
 			{ready && <p class='w-100 color-white center my-3 p-2 rounded sz-15 color-bg-s'> 
@@ -157,7 +163,8 @@ function SingleMode(props){
 	}
 
 	return(
-			<div class="">
+		<div class="row justify-content-center">
+			<div class="col-md-6">
 				<div class="row sz-16 my-3">
 					<div class="col my-2 bold">
 						Enter your Name <i class="sz-12">(You are playing as Guest) </i>
@@ -179,6 +186,7 @@ function SingleMode(props){
 			</div>
 
 				<div class="row mx-auto my-3"> <button class="color-bg-p no-border rounded sz-18 color-white p-2" onClick={()=>createGame()}> Start </button> </div>
+			</div>
 			</div>
 		)
 }
@@ -223,17 +231,18 @@ function JoinQuizSettings(props){
 	}
 
 	return(
-		<div>
+		<div class="row justify-content-center">
+		<div class="col-md-6">
 		{!ready && <div>
 
-			<div class="row my-2">
+			<div class="row my-3">
 			<div class="col"> 
-			<input ref={player} class="form-control" placeholder='Enter your name' />
+			<input ref={player} class="form-control sz-16" placeholder='Enter your name' />
 			</div>
 			</div>
-			<div class="row my-2">
+			<div class="row my-3">
 			<div class="col">
-			<input ref={code} class="form-control" placeholder='Enter Game Code' />
+			<input ref={code} class="form-control sz-16" placeholder='Enter Game Code' />
 			</div>
 			</div>
 				<p class="text-danger">{message}</p>
@@ -242,6 +251,7 @@ function JoinQuizSettings(props){
 			{ready && <div class="mb-2"> Already joined Game, Click to start Game <p class='w-100 color-bg-p color-white center p-2 rounded'> 
 			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:player.current.value,gameMode:'versus'}}} class='color-white no-decoration'> Start </Link></p></div>}
 			
+		</div>
 		</div>
 		)
 }
