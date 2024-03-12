@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import image from './quizImage.png'
+import image from './quizimage.png'
 import Image from 'next/image'
 import soundtrack from './soundtrack.mp3'
 import React from 'react'
