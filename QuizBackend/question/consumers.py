@@ -4,7 +4,6 @@ import asyncio
 from .models import Game,Player
 from asgiref.sync import sync_to_async
 from django.urls import reverse
-import requests
 import time
 
 class QuizConsumer(AsyncWebsocketConsumer):
