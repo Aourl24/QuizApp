@@ -518,7 +518,7 @@ function Message(props){
 			</div>
 
 		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-black sz-18 black">{restartQuiz ? 'Total Score':'Your Score' } </span> <br /><b  class="sz-36">{score}</b></div> </div>
-		{questions && <p class="my-5"> <button class="no-border rounded color-bg-s color-white w-100 sz-24 color-bg-s-hover" onClick={()=>changeActive()}> {buttonMessage ? buttonMessage :'Next Question'} </button></p>}
+		{questions && <p class="my-5"> <button class="no-border rounded color-bg-s color-white w-100 sz-24 color-bg-s-hover p-3" onClick={()=>changeActive()}> {buttonMessage ? buttonMessage :'Next Question'} </button></p>}
 
 		{restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>restartQuiz()}>Restart </button></p>}
 		
