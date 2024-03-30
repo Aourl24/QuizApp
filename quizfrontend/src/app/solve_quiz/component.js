@@ -475,7 +475,7 @@ function QuizBox(props){
 				<div class="row">
 				{data[active].options.map((x,i)=><div class='col-md-6 my-1 p-3 p-sm-2 my-sm-1' key={i} ><div id={active+x} ref={options.current[i]}  class='border rounded sz-18 p-3 color-p-hover option' style={{cursor:'pointer'}} onClick={()=>{markChoose(i);setOptionChoose(x)}}>{x}</div></div>)}
 				</div>
-				{showSelect && <div class="my-4 display-sm-none"><button class="no-border rounded color-bg-p color-white w-100 sz-24 color-bg-s-hover p-2" onClick={()=>checkAnswer()}>Select </button></div>}
+				{showSelect && <div class="my-4 display-sm-non"><button class="no-border rounded color-bg-p color-white w-100 sz-24 color-bg-s-hover p-2" onClick={()=>checkAnswer()}>Select </button></div>}
 
 				{showSelect && <div class="fixed-bottom mb-3 hide d-fle justify-content-end rounded p-2 displa-md-none"><button class="no-border rounded color-bg-p color-white sz-24 color-bg-s-hover p-2 w-100" onClick={()=>checkAnswer()}>Select </button></div>}
 
