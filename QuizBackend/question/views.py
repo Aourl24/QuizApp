@@ -38,11 +38,18 @@ def createGame(request,id=None):
 		game.code = f'{getCode()}{game.id}G'
 		game.time = data.get('time')
 		game.difficulty = data.get('level')
+		game.gameType = int(data.get('type'))
+		print('gametype',game.gameType)
 		
 		questionNumber = int(data.get('questionNumber'))
 		category = data.get('category')
-		queryset = Question.objects.filter(level__name=game.difficulty,category__name=category).order_by('?')[:questionNumber]
+
+		if category == 'Any Category':
+			queryset = Question.objects.all().order_by('?')[:questionNumber]
+		else:
+			queryset = Question.objects.filter(category__name=category).order_by('?')[:questionNumber]
 		
+
 		for question in queryset:
 			game.question.add(question)
 			print('done here')

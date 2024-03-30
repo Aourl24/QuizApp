@@ -24,6 +24,7 @@ class Game(models.Model):
 	public = models.BooleanField(default=True)
 	code = models.CharField(max_length=2000000,null=True,blank=True,unique=True,editable=False)
 	status = models.BooleanField(default=True)
+	gameType = models.IntegerField(default=0)
 
 
 

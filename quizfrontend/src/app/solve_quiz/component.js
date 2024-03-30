@@ -19,6 +19,7 @@ function Quiz(props){
 	const countdown = React.useRef()
 	const gameover = React.useRef()
 	const [details ,showDetails] = React.useState(false)
+	const [type,setType] = React.useState(props.type === 0 ? true : false)
 	const [active , setActive] =  React.useState(0)
 	const [message, setMessage] = React.useState()
 	const [countDown , setCountDown] = React.useState(props.time)
@@ -40,6 +41,7 @@ function Quiz(props){
 	const [mark,setMark] = React.useState()
 	const [missedOut,setMissedOut] = React.useState()
 	const [missedCount,setMissedCount] = React.useState([])
+	//const [loading , setLoading] = React.useState(false)
 	// if(data[active]){
 	// 	options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
 	// }
@@ -64,12 +66,12 @@ function Quiz(props){
 	const changeActive = ()=> {
 		if(active > data.length){
 			setQuestions(false)
-			//gameOver()
+			gameOver()
 		}
 		else if(active+1 == data.length){
 			setActive(active)
 			setQuestions(false)
-			//gameOver()
+			gameOver()
 		}
 		else{
 			setActive(active+1)
@@ -106,6 +108,7 @@ function Quiz(props){
 	}
 
 	const gameMissedOut =(x)=>{
+		if(type){
 		if(missedOut){
 			if(wrong.length === missedOut){
 				setMessage("Game Over")
@@ -117,7 +120,7 @@ function Quiz(props){
 			}
 
 
-		}
+		}}
 	}
 
 	const restartQuiz = () =>{
@@ -152,7 +155,7 @@ function Quiz(props){
 			//setChance(gChance)
 		}
 		setShowSelect(false)
-		gameMissedOut(missedOut)
+		if(type)gameMissedOut(missedOut)
 		//if(props.threeMissedOut){threeMissedOut()}
 		
 	}
@@ -196,9 +199,6 @@ function Quiz(props){
 		}
 	},[missedOut])
 
-	if(!data){
-		return(<div class="spinner-border sz-24 center">loading</div>)
-	}
 
 	if(currentPlayer.active == false){
 		
@@ -212,17 +212,17 @@ function Quiz(props){
 	}
 
 	return(
-			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown,gameover,setWrong,hasMount,wrong,correct,mark,missedOut,setMissedOut,missedCount,setMissedCount,countdown}} >
+			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown,gameover,setWrong,hasMount,wrong,correct,mark,missedOut,setMissedOut,missedCount,setMissedCount,countdown,type,setType}} >
 			<div>
 			
 				<div class="col-12">
-				<div class='w-100 center' style={{textAlig:'right'}}><div class='rounded sz-18  color-s  p-2 color-bd-p' style={{display:'inline-block'}}>0 : {countDown}</div> </div>				
+				<div class='w-100 center' style={{textAlig:'right'}}><div class='rounded-circle sz-18  color-s  p-3 color-bd-p bold border' style={{display:'inline-block'}}>{countDown}</div> </div>				
 			</div>
 				{props.gameMode === 'level' && <LevelQuiz countDown={countDown} game={props.game} />}
 										
 				{props.gameMode === 'versus' && <NotAvailable /> }
-				<div class="center border-top py-3">
-				<span class="sz-14 center rounded border inline-block p-3 color-bg-s"> <b>Score</b> <br/>{score} </span>
+				<div class="center py-3">
+				<span class="sz-14 center rounded border color-bg-silver inline-block p-3"> <b>Score</b> {score} </span>
 				</div>
 				{message && <Message game={props.game} players={props.players} code={props.code} /> }
 
@@ -235,7 +235,7 @@ function Quiz(props){
 		)
 }
 
-//{props.gameMode === 'versus' && <Multiplayer currentPlayer={props.currentPlayer} game={props.game} />}
+
 
 function NotAvailable(props){
 	return(
@@ -346,13 +346,14 @@ if(hasMount.current){sendMessage({body:players.length},'waiting')}
 		)
 }
 
+
 function LevelQuiz(props){
 
-		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore,nextLevel,setNextLevel,setRestart,gameOver,countDown,setCountDown,currentPlayer,gameover,setWrong,missedOut,setMissedOut,missedCount,setMissedCount,correct,countdown} = React.useContext(QuizBoxContext)
+		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore,nextLevel,setNextLevel,setRestart,gameOver,countDown,setCountDown,currentPlayer,gameover,setWrong,missedOut,setMissedOut,missedCount,setMissedCount,correct,countdown,type} = React.useContext(QuizBoxContext)
 		
 		const [holder ,setHolder] = React.useState([])
 
-		setMissedOut(3)
+		if(type) setMissedOut(3)
 
 		React.useEffect(()=>{
 			for (var i=0;i<missedOut;i++){
@@ -362,43 +363,52 @@ function LevelQuiz(props){
 		},[missedOut])
 
 		React.useEffect(()=>{
-			if(!questions){
-			//if(score/parseInt(level) >= 70){
-			if(correct.length > 9){
-			setNextLevel(true)
-			setMessage("Good Job!!!, Proceed to Next Level")
-			getNextLevel()
-			}
+			if(questions){
 
+			}
 			else{
-				setMessage('You did not have enough score to proceed to Next Level')
-
-				gameOver()
+				gameover()
 			}
-		}
-		},[questions])
+		},[])
 
-		const getNextLevel = async ()=> {
-			let next = parseInt(level) + 1
-			const res = await axios.get(endpoint + 'nextlevel/' + props.game + '/' + next)
-			let newQuestion = res.data.question.filter((x)=>x.level.name === next.toString())
-			console.log(res.data.question)
-			console.log(level)
-			console.log(newQuestion)
-			if(newQuestion.length > 1){
-			setActive(0)
-			setQuestions(true)
-			setData(newQuestion)
-			//console.log(data[active])
-			setlevel(next)
-		}
-		else{
-			setMessage('You have reach maximum level')
+		// React.useEffect(()=>{
+		// 	if(!questions){
+		// 	//if(score/parseInt(level) >= 70){
+		// 	if(correct.length > 9){
+		// 	//setNextLevel(true)
+		// 	setMessage("You are doing Great")
+		// 	//getNextLevel()
+		// 	}
+
+		// 	else{
+		// 		setMessage('You did not have enough score to proceed to Next Level')
+
+		// 		gameOver()
+		// 	}
+		// }
+		// },[questions])
+
+		// const getNextLevel = async ()=> {
+		// 	let next = parseInt(level) + 1
+		// 	const res = await axios.get(endpoint + 'nextlevel/' + props.game + '/' + next)
+		// 	let newQuestion = res.data.question.filter((x)=>x.level.name === next.toString())
+		// 	console.log(res.data.question)
+		// 	console.log(level)
+		// 	console.log(newQuestion)
+		// 	if(newQuestion.length > 1){
+		// 	setActive(0)
+		// 	setQuestions(true)
+		// 	setData(newQuestion)
+		// 	//console.log(data[active])
+		// 	setlevel(next)
+		// }
+		// else{
+		// 	setMessage('You have reach maximum level')
 			
-			gameOver()
-		}
+			//gameOver()
+		//}
 
-		}
+		//}
 
 
 	React.useEffect(()=>{
@@ -434,7 +444,7 @@ function LevelQuiz(props){
 		return(
 			<div>
 			<div class='w-100 center' style={{textAlig:'right'}}>
-			<p> <b class='color-p'>Level</b> : {level} </p>
+			<p class="my-2"> <b class='color-p'>Question </b>  {active+1} </p>
 			{missedCount && <p>{holder.map((x,e)=>{
 				if(e < missedCount.length)
 					{return(<i class="fas fa-heart color-p p-1"></i>)}
@@ -497,21 +507,21 @@ function Message(props){
 	return(
 		<div class='sz-24 text-danger modal d-flex align-items-center color-bg-white' style={{transition:"all 0.5 ease",backgroundColor:"rgba(100,100,100,0.8)"}}>
 		<div class="modal-dialog modal-dialog-centered w-100 h-100 p-3" styl={{transition:"all 0.5 ease",backgroundColor:"rgba(200,200,200,0.5)"}}>
-		<div class="modal-content p-2 center animate__animated animate__slideInUp">
+		<div class="modal-content p-3 center animate__animated animate__slideInUp">
 			{nextLevel && <div> </div>}
 			<div class="row my-2 color-p">
-			{mark ? <i class="fas fa-check color-green"></i> : <i class="fas fa-times color-red"></i>} 
+			{mark ? <i class="fas fa-check color-green sz-36"></i> : <i class="fas fa-times color-red sz-36"></i>} 
 			{!showRestart  && <p class='sz-30 animate__animated animate__bounce hide'>{props.body == 'Correct Answer' ? <i class="fas fa-check color-green"></i> : <i class="fas fa-times color-red"></i>} </p> }
 			<div class="col">
 			{message}
 			</div>
 			</div>
 
-		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-black sz-18 black">{restartQuiz ? 'Total Score':'Your Score' } </span> <br /><b>{score}</b></div> </div>
-		{questions && <p class="my-5"> <button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>changeActive()}> {buttonMessage ? buttonMessage :'Next'} </button></p>}
+		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-black sz-18 black">{restartQuiz ? 'Total Score':'Your Score' } </span> <br /><b  class="sz-36">{score}</b></div> </div>
+		{questions && <p class="my-5"> <button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>changeActive()}> {buttonMessage ? buttonMessage :'Next Question'} </button></p>}
 
 		{restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>restartQuiz()}>Restart </button></p>}
-		<hr />
+		
 
 
 		 {showRestart && <PlayerRanking players={players} game={props.game} code={props.code} /> }

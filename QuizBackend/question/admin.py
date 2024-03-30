@@ -14,5 +14,5 @@ class QuestionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Question,QuestionAdmin)
-admin.site.register([Level,Game,Player,Category])
+admin.site.register([Level,Game,Player,Category,Option])
       

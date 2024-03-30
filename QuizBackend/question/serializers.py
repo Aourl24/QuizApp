@@ -1,5 +1,6 @@
 from .models import *
 from rest_framework import serializers
+from random import shuffle
 
 class CategorySerializer(serializers.ModelSerializer):
 	class Meta:
@@ -32,7 +33,9 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 	def to_representation(self,instance):
 		representation = super().to_representation(instance)
-		representation['options'] = [option['body'] for option in representation['options']]
+		options = [option['body'] for option in representation['options']]
+		shuffle(options)
+		representation['options'] = options
 		condition = lambda option: option['answer'] == True
 		answer_in_list = list(filter(condition,representation['answer']))
 		representation['answer'] = answer_in_list[0]['body']

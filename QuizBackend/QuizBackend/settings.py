@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import environ
 
+env = environ.Env()
+environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(_c_rxmv_bkcrrx8h4tc&znyg*a*(ns)$@^y*=s97gpbj+4o(f'
+SECRET_KEY=env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -78,12 +81,25 @@ ASGI_APPLICATION = 'QuizBackend.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'HOST': env("HOST"),
+        'NAME': env("NAME"),
+        'USER': env("USER"),
+        'PASSWORD':env("PASSWORD"),
+        'PORT':env("PORT"),
+
     }
 }
+
 
 CHANNEL_LAYERS = {
     'default':{
@@ -132,6 +148,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://192.168.133.92:3000","https://quizzifyapp.vercel.app"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://192.168.130.92:3000","https://quizzifyapp.vercel.app"]
 
 #CORS_ALLOW_ALL_ORIGINS = True

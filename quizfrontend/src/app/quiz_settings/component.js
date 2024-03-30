@@ -12,9 +12,9 @@ const QuizContext = React.createContext()
 function QuizSetting(){
 		const gameModes = [
 		{
-			id: 1, title:'Single Mode',info:'Allows one player to answer questions and accumulate points or progress through levels'},
+			id: 1, title:'Single Mode',info:'Play as a single player'},
 			//{id: 2 ,title:'Multiplayer Mode',info:'Enables multiple players to compete against each other simultaneously'},
-			{id: 3 ,title:'Join Quiz',info:'Join Quiz and Play with friends'},
+			{id: 3 ,title:'Multi-Player',info:'Play with friends'},
 			//{id : 3,title:'Challenge Mode',info:'Players compete in head-to-head matches'},
 			//{id:4,title:'Team Mode',info:'Players form teams to collaborate and answer questions collectively'},
 			//{id:5,title:'Survival Mode',info:'players strive to answer questions correctly to avoid elimination, with each incorrect answers resulting in a loss of life or points'}, 
@@ -28,9 +28,9 @@ function QuizSetting(){
 		setChoice(...gameModes.filter((i)=> i.id === x ))
 	}
 
-	const [time,setTime] = React.useState(15)
+	const [time,setTime] = React.useState(20)
 	const [ready,setReady] = React.useState(false)
-	const [type,setType] = React.useState('versus')
+	const [type,setType] = React.useState(0)
 	const [level,setLevel] = React.useState(1)
 	const [link,setLink] = React.useState('')
 	const [game,setGame] = React.useState()
@@ -39,10 +39,11 @@ function QuizSetting(){
 	const [category,setCategory] = React.useState([])
 	const [message,setMessage] = React.useState()
 	const [choosenCategory,setChoosenCategory] = React.useState()
-	const [questionNumber,setQuestionNumber] = React.useState(10)
+	const [questionNumber,setQuestionNumber] = React.useState(20)
 	const [currentPlayer,setCurrentPlayer] = React.useState()
 	const [gameMode,setGameMode] = React.useState()
 	const [create,setCreate] = React.useState(false)
+	const [loading , setLoading] = React.useState(false)
 
 	const getCategory = async () => {
 		try{const resp = await axios.get(endpoint + 'category')
@@ -61,10 +62,11 @@ function QuizSetting(){
 		let postData = {time:time,type:type,level:level,name:player,questionNumber:questionNumber,category:choosenCategory}
 		if(player == ""){
 				setMessage("Enter Player Name")
-				return
+				setCreate(false)
 		}
 		else{
 		setMessage("Creating Game...")
+		setLoading(true)
 		
 		try{var resp =await axios.post(`${endpoint}creategame`,postData,{headers:{
 			'Content-Type':'application/json'
@@ -79,6 +81,7 @@ function QuizSetting(){
 		//console.log(resp.data.player)
 		setReady(true)
 		setMessage('')
+		setLoading(false)
 	}
 	}
 
@@ -89,12 +92,16 @@ function QuizSetting(){
 	React.useEffect(()=>{
 		getCategory()
 	},[])
+
+	if(loading){
+		return(<div class="center sz-18"><div class="spinner-grow sz-36"></div><br /> Getting Ready <br/> <span class="text-danger">{message}</span> </div>)
+	}
 	
 	if(ready){
 		return(
 		<div>
 			<p class='w-100 color-white center my-3 p-2 rounded sz-16 color-bg-s'> 
-			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:currentPlayer,gameMode:gameMode}}} class='color-white no-decoration '>Click to Start Game </Link>
+			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:currentPlayer,gameMode:gameMode,type:type}}} class='color-white no-decoration '>Click to Start Game </Link>
 			</p>
 			<p class="center"> Share Game Code with friends to play <b class="sz-20">
 			<hr /> {gameCode}</b></p>
@@ -104,7 +111,7 @@ function QuizSetting(){
 
 
 	return(
-			<QuizContext.Provider value = {{time,ready,type,level,link,game,player,gameCode,category,message,setTime,setReady,setType,setLevel,setLink,setGame,setGameCode,setCategory,setMessage,setPlayer,createLink,setChoosenCategory,choosenCategory,setCurrentPlayer,questionNumber,setQuestionNumber,gameMode,setGameMode,setCreate}} >
+			<QuizContext.Provider value = {{time,ready,type,level,link,game,player,gameCode,category,message,setTime,setReady,setType,setLevel,setLink,setGame,setGameCode,setCategory,setMessage,setPlayer,createLink,setChoosenCategory,choosenCategory,setCurrentPlayer,questionNumber,setQuestionNumber,gameMode,setGameMode,setCreate,loading,setLoading}} >
 			<div class="container justify-content-center">
 			{choice.id === 1 && <SingleMode />}
 			{choice.id === 2 && <VersusQuizSettings />}
@@ -135,6 +142,10 @@ function GameModeList(props){
 					return(
 					<div class="col-md-6 col-sm-12">
 						<div class="rounded p-4 color-bg-white color-bg-p-hover center color-white-hover color-bg-p-focus color-white-focus shadow m-2" style={{cursor:'pointer'}} onClick={()=>props.clickChoice(x.id)}>
+							<div class="sz-36">
+								{x.id === 1 && <i class="fas fa-user"></i>}
+								{x.id === 3 && <><i class="fas fa-users"></i></>}
+							</div>
 							<div class="sz-20  bold">{x.title} </div>
 							
 							<p class="sz-16">{x.info} </p>
@@ -150,8 +161,9 @@ function SingleMode(props){
 
 	const name = React.useRef()
 	const cat = React.useRef()
+	const code = React.useRef()
 
-	const {setPlayer,category, createLink,setChoosenCategory,setCurrentPlayer,setLevel,gameMode,setGameMode,player,setCreate} = React.useContext(QuizContext)
+	const {setPlayer,category, setMessage, type, setType, setReady, setGame,createLink,setChoosenCategory,setCurrentPlayer,setLevel,gameMode,setGameMode,player,setCreate,loading,setLoading} = React.useContext(QuizContext)
 
 	const createGame = ()=>{
 		setCurrentPlayer(name.current.value);
@@ -162,8 +174,48 @@ function SingleMode(props){
 		setGameMode('level')
 	}
 
+	const confirmCode = async ()=>{
+		
+
+		if (code.current.value === ''){
+			setMessage("Can't confirm empty code")
+			
+		}
+		else if(name.current.value === ''){
+			setMessage("Enter Player Name")
+
+		}
+		else{
+			setLoading(true)
+		setMessage('confirming code...')
+		try{
+			const resp = await axios.get(endpoint  + 'join/' + code.current.value + '/' + name.current.value)
+			
+			if (resp.data.message){
+				setMessage(resp.data.message)
+				return 
+			}
+			if (resp.status === 500){
+				setLoading(false)
+				setMessage("Error Loading Quiz Code")
+
+				return
+			}
+			
+		setGame(resp.data.id)
+		setCurrentPlayer(name.current.value)
+		setGameMode('level')
+		setReady(true)
+		setLoading(false)
+	}
+		catch(error){
+			setMessage("Error Loading Quiz Code")
+		}
+	}
+	}
+
 	return(
-		<div class="row justify-content-center">
+		<div class="row justify-content-center align-items-center">
 			<div class="col-md-6">
 				<div class="row sz-16 my-3">
 					<div class="col my-2 bold">
@@ -175,26 +227,54 @@ function SingleMode(props){
 					</div>
 				</div>
 
-				<div class="row sz-16">
+			<div class="row sz-16 my-3">
+			<div class="col my-2 bold">Game Code (optional) </div> 
+			<div class="w-100"></div>
+			<div class="col my-2">
+			<div class="row">
+				<div class="col">
+				<input ref={code} class="form-control p-2 sz-15" />
+				</div>
+				<div class="col">
+					<button class="btn btn-success w-100 p-2 sz-15" onClick={()=>confirmCode()} >confirm game code </button>
+				</div>
+			</div>
+			 </div>
+			</div>
+
+			<div class="row sz-16 my-3">
+			<div class="col my-2 bold">Game Type </div> 
+			<div class="w-100"></div>
+			<div class="col my-2">
+			<div class="row">
+				<div class="col">
+					<div class={`w-100 p-2 sz-15 color-bg-none rounded center ${type === 0 ? 'border color-s':''}`} onClick={()=>setType(0)} > 3 Missed Out </div>
+				</div>
+				<div class="col">
+					<div class={`w-100 p-2 sz-15 color-bg-none rounded center ${type === 1 ? 'border color-s':''}`} onClick={()=>setType(1)} > Score Line </div>
+				</div>
+			</div>
+			 </div>
+			</div>
+
+
+				<div class="row sz-16 my-3">
 			<div class="col my-2 bold">Categories </div> 
 			<div class="w-100"></div>
 			<div class="col my-2">
-				<select ref={cat} class="form-control sz-15" >
-					{category.map((x)=><option> {x.name} </option>)} 
+				<select ref={cat} class="form-control sz-15 p-2" >
+					<option> Any Category </option>
+					{category.map((x)=><option class=''> {x.name} </option>)} 
 				</select>
 			 </div>
 			</div>
 
-				<div class="row mx-auto my-3"> <button class="color-bg-p no-border rounded sz-18 color-white p-2" onClick={()=>createGame()}> Start </button> </div>
+				<div class="row mx-auto my-5"> <button class="color-bg-p no-border rounded sz-18 color-white p-2" onClick={()=>createGame()}> Start </button> </div>
 			</div>
 			</div>
 		)
 }
 
-
-function Multiplayer(props){
-
-}
 
 function JoinQuizSettings(props){
 	const [ready,setReady] = React.useState()
