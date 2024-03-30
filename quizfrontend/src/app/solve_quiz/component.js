@@ -222,7 +222,7 @@ function Quiz(props){
 										
 				{props.gameMode === 'versus' && <NotAvailable /> }
 				<div class="center py-3">
-				<span class="sz-14 center rounded border color-bg-silver inline-block p-3"> <b>Score</b> {score} </span>
+				<span class="sz-14 center rounded border inline-block p-3"> <b>Score</b> {score} </span>
 				</div>
 				{message && <Message game={props.game} players={props.players} code={props.code} /> }
 
@@ -475,9 +475,9 @@ function QuizBox(props){
 				<div class="row">
 				{data[active].options.map((x,i)=><div class='col-md-6 my-1 p-3 p-sm-2 my-sm-1' key={i} ><div id={active+x} ref={options.current[i]}  class='border rounded sz-18 p-3 color-p-hover option' style={{cursor:'pointer'}} onClick={()=>{markChoose(i);setOptionChoose(x)}}>{x}</div></div>)}
 				</div>
-				{showSelect && <div class="my-4 display-sm-none"><button class="btn color-bg-p color-white w-100 sz-20 color-bg-s-hover p-3" onClick={()=>checkAnswer()}>Select </button></div>}
+				{showSelect && <div class="my-4 display-sm-none"><button class="no-border rounded color-bg-p color-white w-100 sz-24 color-bg-s-hover p-2" onClick={()=>checkAnswer()}>Select </button></div>}
 
-				{showSelect && <div class="fixed-bottom mb-3 d-fle justify-content-end rounded p-3 display-md-none"><button class="btn color-bg-p color-white sz-20 color-bg-s-hover p-3 w-100" onClick={()=>checkAnswer()}>Select </button></div>}
+				{showSelect && <div class="fixed-bottom mb-3 hide d-fle justify-content-end rounded p-2 displa-md-none"><button class="no-border rounded color-bg-p color-white sz-24 color-bg-s-hover p-2 w-100" onClick={()=>checkAnswer()}>Select </button></div>}
 
 			</div>
 			</div> }
@@ -518,7 +518,7 @@ function Message(props){
 			</div>
 
 		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-black sz-18 black">{restartQuiz ? 'Total Score':'Your Score' } </span> <br /><b  class="sz-36">{score}</b></div> </div>
-		{questions && <p class="my-5"> <button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>changeActive()}> {buttonMessage ? buttonMessage :'Next Question'} </button></p>}
+		{questions && <p class="my-5"> <button class="no-border rounded color-bg-s color-white w-100 sz-24 color-bg-s-hover" onClick={()=>changeActive()}> {buttonMessage ? buttonMessage :'Next Question'} </button></p>}
 
 		{restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>restartQuiz()}>Restart </button></p>}
 		

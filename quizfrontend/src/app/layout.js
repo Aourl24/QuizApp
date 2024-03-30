@@ -1,8 +1,8 @@
 import { Inter } from 'next/font/google';
-import './css/bootstrap-5/css/bootstrap.min.css';
-import './css/acss/acss.css'
 import './css/fontawesome/css/all.min.css'
 import './css/animate.min.css'
+import './css/bootstrap-5/css/bootstrap.min.css';
+import './css/acss/acss.css'
 import './globals.css'
 
 
