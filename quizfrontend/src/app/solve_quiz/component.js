@@ -221,7 +221,7 @@ function Quiz(props){
 				<div class="col-12">
 				<div class='w-100 center' style={{textAlig:'right'}}><div class='rounded-circle sz-18  color-s  p-3 color-bd-p bold border' style={{display:'inline-block'}}>{countDown}</div> </div>				
 			</div>
-			data length is {data.length}
+			
 				{props.gameMode === 'level' && <LevelQuiz countDown={countDown} game={props.game} />}
 										
 				{props.gameMode === 'versus' && <NotAvailable /> }
