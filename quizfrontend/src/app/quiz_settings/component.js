@@ -186,20 +186,13 @@ function SingleMode(props){
 
 		}
 		else{
-			setLoading(true)
+			//setLoading(true)
 		setMessage('confirming code...')
 		try{
 			const resp = await axios.get(endpoint  + 'join/' + code.current.value + '/' + name.current.value)
 			
 			if (resp.data.message){
 				setMessage(resp.data.message)
-				return 
-			}
-			if (resp.status === 500){
-				setLoading(false)
-				setMessage("Error Loading Quiz Code")
-
-				return
 			}
 			
 		setGame(resp.data.id)
@@ -209,17 +202,18 @@ function SingleMode(props){
 		setLoading(false)
 	}
 		catch(error){
+			console.log(error)
 			setMessage("Error Loading Quiz Code")
 		}
 	}
 	}
 
 	return(
-		<div class="row justify-content-center align-items-center">
-			<div class="col-md-6">
+		<div class="row justify-content-center align-items-center p-2">
+			<div class="col-md-6 p-4 rounded bg-light">
 				<div class="row sz-16 my-3">
 					<div class="col my-2 bold">
-						Enter your Name <i class="sz-12">(You are playing as Guest) </i>
+						Enter your Name <span class="sz-12"> </span>
 					</div>
 					<div class="w-100"></div>
 					<div class="col my-2">
@@ -236,11 +230,12 @@ function SingleMode(props){
 				<input ref={code} class="form-control p-2 sz-15" />
 				</div>
 				<div class="col">
-					<button class="btn btn-success w-100 p-2 sz-15" onClick={()=>confirmCode()} >confirm game code </button>
+					<button class="btn color-bg-p color-white w-100 p-2 sz-15" onClick={()=>confirmCode()} >confirm game code </button>
 				</div>
 			</div>
 			 </div>
 			</div>
+			<hr class="my-4" />
 
 			<div class="row sz-16 my-3">
 			<div class="col my-2 bold">Game Type </div> 
@@ -248,10 +243,10 @@ function SingleMode(props){
 			<div class="col my-2">
 			<div class="row">
 				<div class="col">
-					<div class={`w-100 p-2 sz-15 color-bg-none rounded center ${type === 0 ? 'border color-s':''}`} onClick={()=>setType(0)} > 3 Missed Out </div>
+					<div class={`w-100 p-2 sz-16  rounded center  ${type === 0 ? 'color-bg-s color-white':'color-bg-white'}`} onClick={()=>setType(0)} style={{cursor:'pointer'}} > 3 Missed Out </div>
 				</div>
 				<div class="col">
-					<div class={`w-100 p-2 sz-15 color-bg-none rounded center ${type === 1 ? 'border color-s':''}`} onClick={()=>setType(1)} > Score Line </div>
+					<div class={`w-100 p-2 sz-16 rounded center ${type === 1 ? 'color-bg-s color-white':'color-bg-white'}`} style={{cursor:'pointer'}} onClick={()=>setType(1)} > Score Line </div>
 				</div>
 			</div>
 			 </div>
@@ -262,14 +257,14 @@ function SingleMode(props){
 			<div class="col my-2 bold">Categories </div> 
 			<div class="w-100"></div>
 			<div class="col my-2">
-				<select ref={cat} class="form-control sz-15 p-2" >
+				<select ref={cat} class="form-control sz-16 p-2" >
 					<option> Any Category </option>
 					{category.map((x)=><option class=''> {x.name} </option>)} 
 				</select>
 			 </div>
 			</div>
 
-				<div class="row mx-auto my-5"> <button class="color-bg-p no-border rounded sz-18 color-white p-2" onClick={()=>createGame()}> Start </button> </div>
+				<div class="row mx-auto my-5"> <button class="btn btn-success no-border rounded sz-24 color-white p-2" onClick={()=>createGame()}> Start </button> </div>
 			</div>
 			</div>
 		)

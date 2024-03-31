@@ -168,7 +168,7 @@ function Quiz(props){
 
 	React.useEffect(()=>{
 		options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
-	},[data])
+	},[active])
 
 	React.useEffect(()=>{
 		getPlayer()
@@ -176,8 +176,11 @@ function Quiz(props){
 
 	React.useEffect(()=>{
 		if(active != 0 ){
-			options.current.map((element)=>{element.current.classList.remove('select');element.current.classList.remove('color-p')})
+			options.current.map((element)=>{
+				if(element.current){element.current.classList.remove('select');element.current.classList.remove('color-p')}
+			})
 		}
+
 		countdown.current.play()
 
 	},[active])
@@ -212,12 +215,13 @@ function Quiz(props){
 	}
 
 	return(
-			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown,gameover,setWrong,hasMount,wrong,correct,mark,missedOut,setMissedOut,missedCount,setMissedCount,countdown,type,setType}} >
+			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown,gameover,setWrong,hasMount,wrong,correct,mark,missedOut,setMissedOut,missedCount,setMissedCount,countdown,type,setType,setMark}} >
 			<div>
 			
 				<div class="col-12">
 				<div class='w-100 center' style={{textAlig:'right'}}><div class='rounded-circle sz-18  color-s  p-3 color-bd-p bold border' style={{display:'inline-block'}}>{countDown}</div> </div>				
 			</div>
+			data length is {data.length}
 				{props.gameMode === 'level' && <LevelQuiz countDown={countDown} game={props.game} />}
 										
 				{props.gameMode === 'versus' && <NotAvailable /> }
@@ -349,7 +353,7 @@ if(hasMount.current){sendMessage({body:players.length},'waiting')}
 
 function LevelQuiz(props){
 
-		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore,nextLevel,setNextLevel,setRestart,gameOver,countDown,setCountDown,currentPlayer,gameover,setWrong,missedOut,setMissedOut,missedCount,setMissedCount,correct,countdown,type} = React.useContext(QuizBoxContext)
+		const {active,gameStatus,setGameStatus,message,setMessage,questions,setQuestions,score,setShowRestart,level,setlevel,data,setData,setActive,setScore,nextLevel,setNextLevel,setRestart,gameOver,countDown,setCountDown,currentPlayer,gameover,setWrong,missedOut,setMissedOut,missedCount,setMissedCount,correct,countdown,type,setMark} = React.useContext(QuizBoxContext)
 		
 		const [holder ,setHolder] = React.useState([])
 
@@ -367,6 +371,7 @@ function LevelQuiz(props){
 
 			}
 			else{
+				setMessage("Quiz Ended")
 				gameover()
 			}
 		},[])
@@ -424,6 +429,7 @@ function LevelQuiz(props){
 			countdown.current.pause()
 			gameover.current.play()
 			setMessage('Time Out')
+			setMark(false)
 			setWrong((prevArray)=>[...prevArray,data[active]])
 			var d = missedCount
 			d.pop()
@@ -459,7 +465,7 @@ function LevelQuiz(props){
 }
 
 
-
+//options.current[i]
 	
 function QuizBox(props){
 
@@ -472,10 +478,10 @@ function QuizBox(props){
 			<div class='sz-24 bold rounded p-3 col-12'>{data[active].body}</div>
 			
 			<div class="col-12 my-3">
-				<div class="row">
-				{data[active].options.map((x,i)=><div class='col-md-6 my-1 p-3 p-sm-2 my-sm-1' key={i} ><div id={active+x} ref={options.current[i]}  class='border rounded sz-18 p-3 color-p-hover option' style={{cursor:'pointer'}} onClick={()=>{markChoose(i);setOptionChoose(x)}}>{x}</div></div>)}
+				<div class="row m-2">
+				{data[active].options.map((x,i)=><div class='col-md-6 my-1 p-3 p-sm-2 my-sm-1' key={i} ><div id={active+x} ref={options.current[i]}  class=' rounded sz-18 p-4 color-p-hover option color-bg-t' style={{cursor:'pointer'}} onClick={()=>{markChoose(i);setOptionChoose(x)}}>{x}</div></div>)}
 				</div>
-				{showSelect && <div class="my-4 display-sm-non"><button class="no-border rounded color-bg-p color-white w-100 sz-24 color-bg-s-hover p-2" onClick={()=>checkAnswer()}>Select </button></div>}
+				{showSelect && <div class="my-4 display-sm-non"><button class="no-border rounded color-bg-p color-white w-100 sz-24 color-bg-s-hover p-4" onClick={()=>checkAnswer()}>Select </button></div>}
 
 				{showSelect && <div class="fixed-bottom mb-3 hide d-fle justify-content-end rounded p-2 displa-md-none"><button class="no-border rounded color-bg-p color-white sz-24 color-bg-s-hover p-2 w-100" onClick={()=>checkAnswer()}>Select </button></div>}
 
@@ -510,15 +516,15 @@ function Message(props){
 		<div class="modal-content p-3 center animate__animated animate__slideInUp">
 			{nextLevel && <div> </div>}
 			<div class="row my-2 color-p">
-			{mark ? <i class="fas fa-check color-green sz-36"></i> : <i class="fas fa-times color-red sz-36"></i>} 
+			{mark ? <><i class="fas fa-smile sz-60"></i><i class="fas fa-check color-green sz-36"></i></> : <><i class="fas fa-sad-tear sz-60"></i> <i class="fas fa-times color-red sz-36"></i></>} 
 			{!showRestart  && <p class='sz-30 animate__animated animate__bounce hide'>{props.body == 'Correct Answer' ? <i class="fas fa-check color-green"></i> : <i class="fas fa-times color-red"></i>} </p> }
-			<div class="col">
+			<div class="col sz-36 bold">
 			{message}
 			</div>
 			</div>
 
-		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class="color-black sz-18 black">{restartQuiz ? 'Total Score':'Your Score' } </span> <br /><b  class="sz-36">{score}</b></div> </div>
-		{questions && <p class="my-5"> <button class="no-border rounded color-bg-s color-white w-100 sz-24 color-bg-s-hover p-3" onClick={()=>changeActive()}> {buttonMessage ? buttonMessage :'Next Question'} </button></p>}
+		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class=""><span class="color-black sz-18 black ">{restartQuiz ? 'Total Score':'Your Score' } </span> <br /><b  class="sz-36">{score}</b></span></div> </div>
+		{questions && <p class="my-5"> <button class="no-border rounded color-bg-p color-white w-100 sz-24 color-bg-s-hover p-2" onClick={()=>changeActive()}> {buttonMessage ? buttonMessage :'Next Question'} </button></p>}
 
 		{restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>restartQuiz()}>Restart </button></p>}
 		

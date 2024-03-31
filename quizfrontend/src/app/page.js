@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import image from './quizimage.png'
+import image from './quizImage.jpg'
 import Image from 'next/image'
 import soundtrack from './soundtrack.mp3'
 import React from 'react'
@@ -28,9 +28,9 @@ function App (){
         </div>
         </div>
         
-        <div class="col-md col-sm">
+        <div class="col-md col-sm center">
         <div class="display-md-none break-3"></div>
-        <Image class="img-fluid rounded" src={image} />
+        <Image class="img-fluid rounded-circle object-fit" style={{height:'400px',width:'400px',obejectFit:'cover'}} src={image} />
         </div>
         </div>
         <br />
