@@ -102,7 +102,7 @@ function Quiz(props){
 	const markChoose = (x)=>{
 		let optionBlock = options.current[x].current
 		let otherOption = options.current.map((element)=>{element.current.classList.remove('select')})//element.current.classList.remove('color-p')
-				optionBlock.classList.toggle('color-bg-s')
+				optionBlock.classList.toggle('select')
 		//optionBlock.classList.toggle('color-p')
 		setShowSelect(true)
 	}

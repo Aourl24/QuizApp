@@ -4,6 +4,16 @@
  --tertiary-color:#f8f9fa;
 }
 
+.select{
+  background-color: lightgreen;
+  color:green;
+}
+
+.button{
+  border:none;
+  border:no-border;
+}
+
 
 @font-face {
     font-family:Poppins;
