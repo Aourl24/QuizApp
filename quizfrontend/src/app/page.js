@@ -5,6 +5,7 @@ import Image from 'next/image'
 import soundtrack from './soundtrack.mp3'
 import React from 'react'
 
+
 function App (){
   let sound = React.useRef()
 
@@ -24,13 +25,13 @@ function App (){
         <div class="col-md col-sm">
         <h3 class="center sz-36 sz-md-72 bold my-4"><span class="color-p">Ready</span> to test your <span class="color-s">knowledge</span> and have a <span class="color-p">blast? </span>  </h3>
           <div class="color-bg-p color-white p-2 rounded w-100 center sz-24">
-          <Link href={{pathname:"quiz_settings",query:{data:'versus'}}} class='no-decoration color-white'> Start Quiz </Link>
+          <Link href={{pathname:"quiz_settings"}} class='no-decoration color-white'> Start Quiz </Link>
         </div>
         </div>
         
         <div class="col-md col-sm center">
         <div class="display-md-none break-3"></div>
-        <Image class="img-fluid rounded-circle object-fit" style={{height:'400px',width:'400px',obejectFit:'cover'}} src={image} />
+        <Image class="img-fluid rounded object-fit" style={{hight:'400px',wdth:'400px',obejectFit:'cover'}} src={image} />
         </div>
         </div>
         <br />

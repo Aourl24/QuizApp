@@ -11,4 +11,10 @@ urlpatterns = [
 	path('join/<str:id>/<str:player>',joinGame),
 	path('category',getCategory),
 	path('nextlevel/<int:game>/<str:level>',nextLevel),
+	path('signup',signUp),
+	path('login',loginView),
+	path('checkuser',checkLogin),
+	path('logout',logoutView),
+	path('token',generateToken),
+	path('userprofile',userView)
 ]

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import environ
+from datetime import timedelta
 
 env = environ.Env()
 environ.Env.read_env()
@@ -43,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'question',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'rest_framework_simplejwt'
 ]
 
 MIDDLEWARE = [
@@ -81,24 +83,24 @@ ASGI_APPLICATION = 'QuizBackend.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': env("HOST"),
-        'NAME': env("NAME"),
-        'USER': env("USER"),
-        'PASSWORD':env("PASSWORD"),
-        'PORT':env("PORT"),
-
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'HOST': env("HOST"),
+#         'NAME': env("NAME"),
+#         'USER': env("USER"),
+#         'PASSWORD':env("PASSWORD"),
+#         'PORT':env("PORT"),
+
+#     }
+# }
 
 
 CHANNEL_LAYERS = {
@@ -148,6 +150,22 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://192.168.130.92:3000","https://quizzifyapp.vercel.app"]
+#CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://192.168.130.92:3000","https://quizzifyapp.vercel.app"]
 
-#CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES" :(
+    'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME':timedelta(minutes=30),
+    'AUTH_HEADER_TYPES':('JWT',),
+}
+#SESSION_COOKIE_DOMAIN = '.localhost:3000'
+
+# SESSION_COOKIE_SECURE = True  # Set to True if using HTTPS
+# SESSION_COOKIE_HTTPONLY = True  # Set to True for improved security

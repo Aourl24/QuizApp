@@ -41,10 +41,12 @@ function Quiz(props){
 	const [mark,setMark] = React.useState()
 	const [missedOut,setMissedOut] = React.useState()
 	const [missedCount,setMissedCount] = React.useState([])
-	//const [loading , setLoading] = React.useState(false)
-	// if(data[active]){
-	// 	options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
-	// }
+	const [showNextButton,setShowNextButton] = React.useState(true)
+	const [buttonFunc,setButtonFunc] = React.useState({active:false,func:()=>{}})
+	const [host , setHost] = React.useState(props.player)
+	const [messageBody,setMessageBody] = React.useState()
+
+	let nextButtonFunc;
 
 	const getPlayer = ()=>{
 		let player = ''
@@ -64,6 +66,9 @@ function Quiz(props){
 	}
 
 	const changeActive = ()=> {
+		if(props.gameMode === 'versus'){
+
+		}
 		if(active > data.length){
 			setQuestions(false)
 			gameOver()
@@ -150,24 +155,20 @@ function Quiz(props){
 			d.pop()
 			setMissedCount(d)
 			gameover.current.play()
-			//let gChance = chance
-			//gChance.pop()
-			//setChance(gChance)
 		}
+
 		setShowSelect(false)
 		if(type)gameMissedOut(missedOut)
-		//if(props.threeMissedOut){threeMissedOut()}
 		
 	}
 
+
 	React.useEffect(()=>{
-		//console.log(props.items)
-		//setData(props.items)//.filter((x)=>x.level.name === '1'))
-		console.log(data)
+		setHost(props.player)
 	},[])
 
 	React.useEffect(()=>{
-		options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
+		if(data[active]) options.current = data[active].options.map((elem,i)=>options.current[i] ?? React.createRef())
 	},[active])
 
 	React.useEffect(()=>{
@@ -188,8 +189,6 @@ function Quiz(props){
 
 	React.useEffect(()=>{
 		let doneQuestions = correct.length + wrong.length
-		//setScore(correct.length + '/' + doneQuestions)
-
 	},[wrong,correct])
 
 	React.useEffect(()=>{
@@ -215,16 +214,15 @@ function Quiz(props){
 	}
 
 	return(
-			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown,gameover,setWrong,hasMount,wrong,correct,mark,missedOut,setMissedOut,missedCount,setMissedCount,countdown,type,setType,setMark}} >
+			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown,gameover,setWrong,hasMount,wrong,correct,mark,missedOut,setMissedOut,missedCount,setMissedCount,countdown,type,setType,setMark,showNextButton,setShowNextButton,buttonFunc,setButtonFunc,nextButtonFunc,host,saveScore,messageBody,setMessageBody}} >
 			<div>
 			
 				<div class="col-12">
 				<div class='w-100 center' style={{textAlig:'right'}}><div class='rounded-circle sz-18  color-s  p-3 color-bd-p bold border' style={{display:'inline-block'}}>{countDown}</div> </div>				
 			</div>
-			
 				{props.gameMode === 'level' && <LevelQuiz countDown={countDown} game={props.game} />}
 										
-				{props.gameMode === 'versus' && <NotAvailable /> }
+				{props.gameMode === 'versus' && <Multiplayer game={props.game} currentPlayer={props.currentPlayer} /> }
 				<div class="center py-3">
 				<span class="sz-14 center rounded border inline-block p-3"> <b>Score</b> {score} </span>
 				</div>
@@ -252,12 +250,12 @@ function Multiplayer(props){
 	const [startGame,setStartGame] = React.useState(false)
 	const [info , setInfo] = React.useState(20)
 	const [trackPlayer,setTrackPlayer] = React.useState()
-	const {gameStatus,setGameStatus,setMessage,players,checkAnswer,questions,setQuestions,active,currentPlayer,showRestart,setShowRestart,score,setPlayers,game,changeActive,countDown,setCountDown,message,hasMount} = React.useContext(QuizBoxContext)
+	const [answerQuestion,setAnswerQuestion] = React.useState()
+	const {gameStatus,setGameStatus,setMessage,players,checkAnswer,questions,setQuestions,active,currentPlayer,showRestart,setShowRestart,score,setPlayers,game,changeActive,countDown,countdown,setWrong,setCountDown,message,hasMount,showNextButton,setShowNextButton,setButtonMessage,setMark,setButtonFunc,host,setActive,data,gameOver,gameover,setMissedCount,saveScore,messageBody,setMessageBody} = React.useContext(QuizBoxContext)
+	
+	let {nextButtonFunc} = React.useContext(QuizBoxContext)
 	const socket = React.useRef()
 	const mounted = React.useRef(false)
-
-	//setMessage('waiting for second User') 
-
 	const sendMessage = (e,i='main') =>{
 		const body = {...e,type:i}
 		const msg = JSON.stringify(body)
@@ -267,36 +265,20 @@ function Multiplayer(props){
 	}
 	}
 
-const checkPlayers = async () =>{
-		const res = await axios.get(endpoint + 'game/' + game + '/players')
-			setPlayers(res.data)
-		//console.log(res.data)
-	if(res.data.length < 2){
-		setMessage('Wating for other Players')
-	}
-	else{
-		setMessage()
-	}
-}
+
 
 React.useEffect(()=>{
-	console.log('i send a message')
-	sendMessage({body:countDown},'start')
-},[active,countDown])
+	setButtonFunc((prev)=>({...prev,func:()=>sendMessage({body:"I am ready",question:active},'ready')}))
+},[active])
 
 React.useEffect(()=>{
-sendMessage({body:players.length},'answer')
+	saveScore()
+	setAnswerQuestion(true)
 },[checkAnswer])
-
-React.useEffect(()=>{
-if(hasMount.current){sendMessage({body:players.length},'waiting')}
-	else{hasMount.current = true}
-},[changeActive])
 
 
 	React.useEffect(()=>{
 
-		//'ws://127.0.0.1:8000
 		socket.current = new WebSocket(wsEndpoint + props.game + '/' + props.currentPlayer)
 		
 		socket.current.onopen = ()=>{
@@ -307,45 +289,132 @@ if(hasMount.current){sendMessage({body:players.length},'waiting')}
 
 		socket.current.onmessage = (message) =>{
 			const data = JSON.parse(message.data)
+			console.log("received data is below")
 			console.log(data.message)
-			if (data.message === 'joined'){
-				checkPlayers()
-			}
-			else if(data.message.type === 'time'){
-				console.log('message from time')
-				setCountDown(data.message.body)
-			}
-			else if(data.message.type === 'endTime'){
-				setMessage('Time Out')
-			}
-			else if(data.message.type ==='waiting'){
-				if(data.message.body ==='failed'){
-					setMessage('waiting for other players to play')
+			if (data.message.type === 'joined'){
+				setTrackPlayer(parseInt(data.users))
+				if (host.name === currentPlayer.name){
+					setMessage(`${data.message.body}`)
+					setShowNextButton(true)
+					setButtonFunc({active:true,func:()=>sendMessage({body:"Game Can Start now"},'start')})
+					setButtonMessage("Click to Start")
 				}
-				
 
+				else{
+					setMessage(data.message.body)
+					if(startGame){
+						setShowNextButton(true)
+						setButtonMessage("Return to Game")
+					}
+					else{
+						setShowNextButton(false)
+					}
+				}
+				setMessageBody(`${data.message.users} users has joined`)
+				setMark(true)
 			}
-			//setInfo(data.message)
 
+			else if(data.message.type === 'start'){
+				setMessage()
+				setStartGame(true)
+				setShowNextButton(true)
+				setMessageBody()
+				setButtonFunc({active:true,func:()=>sendMessage({body:"I am ready",question:active},'ready')})
+				setButtonMessage('Ready for Next Round')
+				sendMessage({body:'Let the coundown started'},'countdown')
+								
+			}
+
+			else if(data.message.type === 'all_ready'){
+				//checkAnswer()
+				setMessage()
+				setShowNextButton(true)
+				console.log(active)
+				console.log(data.length)
+				if(active >= data.length || active+1 == data.length){
+					gameOver()
+					setMessage("Game Over")
+				}
+				else{
+				setActive((prev)=>prev + 1)
+				sendMessage({body:'Let the coundown started'},'countdown')
+				}
+				setAnswerQuestion(false)
+				saveScore()
+				//setButtonFunc((prev)=>({...prev,func:()=>sendMessage({body:"I am ready",question:active},'ready')}))
+			}
+
+			else if(data.message.type ==='waiting_for_answer'){
+				if (data.message.player === currentPlayer.name){
+					setMessage(data.message.body)
+					setShowNextButton(false)
+				}
+				else{
+					setMessage(data.message.body)
+					setShowNextButton(false)
+				}
+				setMark(true)
+				setAnswerQuestion(true)
+				setShowRestart(true)
+			}
+
+			else if(data.message.type === 'countdown_end'){
+				
+				if(!answerQuestion) {
+				countdown.current.currentTime = 0
+				countdown.current.pause()
+				gameover.current.play()
+				setMessage('Time Out')
+				setMark(false)
+				setShowNextButton(true)
+				setWrong((prevArray)=>[...prevArray,data[active]])
+				sendMessage({body:"Timeout",question:active},"timeout")}
+			}
+		
 		}
 
 		socket.current.onclose = () => {
 			setMessage("You are disconnected")
+			setButtonMessage("Reconnect")
+			setButtonFunc({active:true,func:()=>{socket.current = new WebSocket(wsEndpoint + props.game + '/' + props.currentPlayer);setMessage();sendMessage({body:'start game again'},'start')}})
 		}
 
+		mounted.current = true
+		countdown.current.end;
 		return () =>{
 			socket.current.close()
 		}
 		
-		//sendMessage({data:'success'},'start')
+		
 
 	},[])
 
+		React.useEffect(()=>{
+		const timer = setInterval(()=>{setCountDown(()=>countDown-1)},1000);
+
+		
+		// if(currentPlayer.active == false){
+		// 	clearInterval(timer)
+		// }
+
+		if(message){
+			clearInterval(timer)
+		}
+		return () => clearInterval(timer)
+	}
+		
+	,[countDown])
+
+
+	React.useEffect(()=>{
+		if(trackPlayer > 2){
+			sendMessage({body:"Yes we can start"},'start')
+		}
+	},[trackPlayer])
+
 	return(
 			<div>
-
-				<p>{countDown}</p>
-				<div class={startGame ? 'd-block' : 'hide'}> <QuizBox /> </div>
+				 <QuizBox />
 			</div>
 		)
 }
@@ -375,45 +444,6 @@ function LevelQuiz(props){
 				gameover()
 			}
 		},[])
-
-		// React.useEffect(()=>{
-		// 	if(!questions){
-		// 	//if(score/parseInt(level) >= 70){
-		// 	if(correct.length > 9){
-		// 	//setNextLevel(true)
-		// 	setMessage("You are doing Great")
-		// 	//getNextLevel()
-		// 	}
-
-		// 	else{
-		// 		setMessage('You did not have enough score to proceed to Next Level')
-
-		// 		gameOver()
-		// 	}
-		// }
-		// },[questions])
-
-		// const getNextLevel = async ()=> {
-		// 	let next = parseInt(level) + 1
-		// 	const res = await axios.get(endpoint + 'nextlevel/' + props.game + '/' + next)
-		// 	let newQuestion = res.data.question.filter((x)=>x.level.name === next.toString())
-		// 	console.log(res.data.question)
-		// 	console.log(level)
-		// 	console.log(newQuestion)
-		// 	if(newQuestion.length > 1){
-		// 	setActive(0)
-		// 	setQuestions(true)
-		// 	setData(newQuestion)
-		// 	//console.log(data[active])
-		// 	setlevel(next)
-		// }
-		// else{
-		// 	setMessage('You have reach maximum level')
-			
-			//gameOver()
-		//}
-
-		//}
 
 
 	React.useEffect(()=>{
@@ -506,7 +536,7 @@ function MissedOut(props){
 
 function Message(props){
 	
-	const {message, changeActive,score,restartQuiz,showRestart,nextLevel,setNextLevel,restart, questions,setShowRestart,buttonMessage,players,wrong,correct,mark} = React.useContext(QuizBoxContext)
+	const {message, changeActive,score,restartQuiz,showRestart,nextLevel,setNextLevel,restart, questions,setShowRestart,buttonMessage,players,wrong,correct,mark,showNextButton,nextButtonFunc,buttonFunc,messageBody} = React.useContext(QuizBoxContext)
 
 
 
@@ -515,16 +545,21 @@ function Message(props){
 		<div class="modal-dialog modal-dialog-centered w-100 h-100 p-3" styl={{transition:"all 0.5 ease",backgroundColor:"rgba(200,200,200,0.5)"}}>
 		<div class="modal-content p-3 center animate__animated animate__slideInUp">
 			{nextLevel && <div> </div>}
+
+			{questions && 
 			<div class="row my-2 color-p">
-			{mark ? <><i class="fas fa-smile sz-60"></i><i class="fas fa-check color-green sz-36"></i></> : <><i class="fas fa-sad-tear sz-60"></i> <i class="fas fa-times color-red sz-36"></i></>} 
+			{mark ? <><i class="fas fa-smile sz-60 hide"></i><i class="fas fa-check color-green sz-36"></i></> : <><i class="fas fa-sad-tear hide sz-60"></i> <i class="fas fa-times color-red sz-36"></i></>} 
 			{!showRestart  && <p class='sz-30 animate__animated animate__bounce hide'>{props.body == 'Correct Answer' ? <i class="fas fa-check color-green"></i> : <i class="fas fa-times color-red"></i>} </p> }
 			<div class="col sz-36 bold">
 			{message}
 			</div>
 			</div>
 
-		<div class="sz-30 color-black row"> <div class="col center sz-24"><span class=""><span class="color-black sz-18 black ">{restartQuiz ? 'Total Score':'Your Score' } </span> <br /><b  class="sz-36">{score}</b></span></div> </div>
-		{questions && <p class="my-5"> <button class="no-border rounded color-bg-p color-white w-100 sz-24 color-bg-s-hover p-2" onClick={()=>changeActive()}> {buttonMessage ? buttonMessage :'Next Question'} </button></p>}
+		}
+		{!questions && <div class="sz-36"> Game End </div> }
+
+		{messageBody ? <div class="color-black"> {messageBody}</div> : <div class="sz-30 color-black row"> <div class="col center sz-24"><span class=""><span class="color-black sz-18 black ">{restartQuiz ? 'Total Score':'Your Score' } </span> <br /><b  class="sz-36">{score}</b></span></div> </div>}
+		{showNextButton && questions && <p class="my-5"> <button class="no-border rounded color-bg-p color-white w-100 sz-24 color-bg-s-hover p-2" onClick={()=> buttonFunc.active ? buttonFunc.func() : changeActive()}> {buttonMessage ? buttonMessage :'Next Question'} </button></p>}
 
 		{restart && <p class="my-5 hide"><button class="btn color-bg-s color-white w-100 sz-20 color-bg-s-hover" onClick={()=>restartQuiz()}>Restart </button></p>}
 		

@@ -10,9 +10,12 @@ function App(){
 	//const dummy = [{body:'what is my name',options:['boy','girl','albino','white'],answer:'girl'},{body:'who are you',options:['awwal','yusuf','itachi','kakashi'],answer:'itachi'},{body:'who place is this',options:['ibadan','osogbo','lagos','oyo'],answer:'oyo'}]
 	//const addition = [{body:'where is cotonou',options:['benue','congo','yobe','river'],answer:'yobe'},{body:'where are we',options:['pes','yese','rona','pata'],answer:'pes'},{body:'hw far',options:['taraba','sokoto','ilesha','jos'],answer:'oyo'}]
 	const router = useSearchParams()
+	const route = useRouter()
 	const game = router.get('game')
 	const allow = router.get('allow')
 	const currentPlayer = router.get('currentPlayer')
+	const linkCode = router.get('linkCode')
+	if (linkCode) route.push('quiz_settings?link=True')
 	const gameMode = router.get('gameMode')
 	const [players,setPlayers] = React.useState([])
 	const [time,setTime] = React.useState()
@@ -27,6 +30,7 @@ function App(){
 
 	const fetchData = async () =>{
 		//console.log('now getting data')
+		
 		try{const res = await axios.get(endpoint + 'creategame/' + game)
 		//console.log(res.data)
 		setItems(res.data.question)
