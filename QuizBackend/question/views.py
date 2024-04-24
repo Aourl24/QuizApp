@@ -2,7 +2,6 @@ import jwt
 from django.shortcuts import render
 from .models import *
 from .serializers import *
-from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,authentication_classes, permission_classes
 import json
@@ -27,12 +26,13 @@ def getCode():
 	return code
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated]) 
+#@permission_classes([IsAuthenticated]) 
 def userView(request):
-	user = User.objects.get(id=request.user.id)
+	r_user = request.data.get('user')
+	user = User.objects.get(id=r_user)
 	player = Player.objects.get(user=user)
 	serializer = PlayerSerializer(player)
-	return Response({'success':True,'msg':serializer.data})
+	return Response({'success':True,'data':serializer.data})
 
 @api_view(['GET'])
 def questionApi(request,gameType,level='easy'):
@@ -55,8 +55,8 @@ def createGame(request,id=None):
 		game.time = data.get('time')
 		game.difficulty = data.get('level')
 		game.gameType = int(data.get('type'))
-		
 		questionNumber = int(data.get('questionNumber'))
+		print(questionNumber)
 		if questionNumber == None or questionNumber == 0:
 			questionNumber = 20
 		category = data.get('category')
@@ -66,11 +66,12 @@ def createGame(request,id=None):
 		else:
 			queryset = Question.objects.filter(category__name=category).order_by('?')[:20]
 		
+		print(queryset.count(),'queryset number')
 
 		for question in queryset:
 			game.question.add(question)
 			print('done here')
-		game.save()
+			game.save()
 		data = dict(id=game.id,player=serializer.data,code=game.code)
 		return Response(data)
 	else:

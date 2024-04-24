@@ -97,6 +97,7 @@ function Login(props){
 	const router = useRouter()
 
 	const validateInput = ()=>{
+		setMessage()
 		if(username.current.value === "" || password.current.value === ""){
 			setMessage("Input can not be Empty")
 		}
@@ -107,7 +108,7 @@ function Login(props){
 				Cookies.set('token',res.token)
 				setLogin(res.status);
 			}
-		)}
+		).catch(()=>{setMessage("Error Login");setLogin(false)})}
 	}
 
 	React.useEffect(()=>{

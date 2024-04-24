@@ -1,10 +1,13 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-const host = '192.168.215.92:8000'
-export const endpoint = `http://${host}/`//'http://127.0.0.1:8000/'
+//const api_host = '192.168.8.92:8000'
+//const api_host = '127.0.0.1:8000'
+const api_host = 'https://quizbackend.leapcell.app'
+export const host = '127.0.0.1:3000'
+export const endpoint = `http://${api_host}/`//'http://127.0.0.1:8000/'
 export const endpath = endpoint.trim().replace(/\/$/, '')
-export const wsEndpoint = `ws:/${host}/quizroom/`;
+export const wsEndpoint = `ws:/${api_host}/quizroom/`;
 axios.defaults.baseURL = endpoint
 
 export const api = [{
@@ -16,7 +19,12 @@ export const api = [{
 }, {
     name: 'checkuser',
     url: 'checkuser'
-}]
+},
+    {
+        name:'profile',
+        url : 'userprofile'
+    }
+]
 
 export function getData(e) {
 	 const sessionid = Cookies.get('sessionid')
@@ -51,9 +59,7 @@ export async function postData(e, data) {
         const resp = await axios.post(`${path.url}`, data, headers);
         return resp.data;
     } catch (error) {
-        if(error.response.status === 401){
-        	Cookies.remove('token')
-        }
+        
     }
 }
 

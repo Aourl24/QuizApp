@@ -10,7 +10,7 @@ export function useAuth(){
 		postData('checkuser').then((res)=>{
 			setIsAuthenticated(res.status ? res.status : false)
 			setUser(res.user ? res.user : null)
-		})
+		}).catch(()=>{setIsAuthenticated(false); setUser(null)})
 	}
 	catch(error){
 		console.log(error)

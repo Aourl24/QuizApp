@@ -14,8 +14,8 @@ function App(){
 	const game = router.get('game')
 	const allow = router.get('allow')
 	const currentPlayer = router.get('currentPlayer')
-	const linkCode = router.get('linkCode')
-	if (linkCode) route.push('quiz_settings?link=True')
+	const linkCode = router.get('link')
+	if (linkCode) route.push(`quiz_settings?link=${linkCode}`)
 	const gameMode = router.get('gameMode')
 	const [players,setPlayers] = React.useState([])
 	const [time,setTime] = React.useState()
@@ -61,7 +61,7 @@ fetchData()
 
 
 if(!items){
-		return(<div class="center sz-18"><div class="spinner-grow sz-36"></div><br /> Getting Ready <br/> <span class="text-danger">{message}</span> </div>)
+		return(<div class="center sz-18"><div class="spinner-border"></div><br /> Getting Ready <br/> <span class="text-danger">{message}</span> </div>)
 	}
 
 

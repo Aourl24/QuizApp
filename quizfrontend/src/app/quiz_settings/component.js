@@ -4,7 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import {useSearchParams,useRouter} from 'next/navigation'
 import axios from 'axios';
-import {endpoint} from '../endpoints.js'
+import {endpoint,host} from '../endpoints.js'
 import {useAuth} from '../auth.js'
 
 const QuizContext = React.createContext()
@@ -14,30 +14,30 @@ function QuizSetting(){
 		const guestModes = [
 		{
 			id: 1, title:'Guest Mode',info:'Play in Guest Mode'},
+			{id:10,title:"Enter Game Code",info:"Enter a Game Code"},
 			{id: 2 ,title:'Sign up',info:'Create Account to save your progress'},
-			{id:10,title:"Enter Game Code",info:"Enter a Game Code"}
 			]
 
 		const authModes = [
 			{id: 3 ,title:'Single Mode',info:'Play single Games'},
 			{id: 4 ,title:'Multi-Player',info:'Play with friends'},
-			{id : 5,title:'Challenge Mode',info:'Players compete in head-to-head matches'},
+			/*{id : 5,title:'Challenge Mode',info:'Players compete in head-to-head matches'},
 			{id:6,title:'Team Mode',info:'Players form teams to collaborate and answer questions collectively'},
 			{id:7,title:'Survival Mode',info:'players strive to answer questions correctly to avoid elimination, with each incorrect answers resulting in a loss of life or points'}, 
 			{id:8,title:"Tournament Mode",info:'Organize a series of matches or rounds with the winner determined based on overall performance throughout the Tournament'},
-			{id:9,title:"Customize Mode",info:'Lets players tailor game parameters such as question,categories,difficulty levels and scoring mechanics to suit their preference'}
+			{id:9,title:"Customize Mode",info:'Lets players tailor game parameters such as question,categories,difficulty levels and scoring mechanics to suit their preference'}*/
 			]
 
 	
 	const [gameModes , setGameModes] = React.useState([{}])
 	const router = useSearchParams()
 	const fromLink = router.get('link')
-	const [choice,setChoice] = React.useState({id:fromLink ? 10 : 0})
+	const [choice,setChoice] = React.useState({id:fromLink ? 10 : 0,title:"Quiz Session"})
 	const {isAuthenticated,user} = useAuth()
-
+	const [title,setTitle] = React.useState("Create Quiz Session")
 	const [time,setTime] = React.useState(20)
 	const [ready,setReady] = React.useState(false)
-	const [type,setType] = React.useState(0)
+	const [type,setType] = React.useState(1)
 	const [level,setLevel] = React.useState(1)
 	const [link,setLink] = React.useState('')
 	const [game,setGame] = React.useState()
@@ -48,7 +48,7 @@ function QuizSetting(){
 	const [choosenCategory,setChoosenCategory] = React.useState()
 	const [questionNumber,setQuestionNumber] = React.useState(20)
 	const [currentPlayer,setCurrentPlayer] = React.useState()
-	const [gameMode,setGameMode] = React.useState()
+	const [gameMode,setGameMode] = React.useState('single')
 	const [create,setCreate] = React.useState(false)
 	const [loading , setLoading] = React.useState(false)
 
@@ -87,7 +87,7 @@ function QuizSetting(){
 			setMessage("Error Creating Game")
 		}
 
-		setLink(`${endpoint}solve_quiz?game=${resp.data.id}&allow=true&currentPlayer=${player}&gameMode=versus&type=0link${resp.data.code}`)
+		setLink(`${host}/solve_quiz?game=${resp.data.id}&allow=true&currentPlayer=${player}&gameMode=versus&type=0&link=${resp.data.code}`)
 		setGame(resp.data.id)
 		setGameCode(resp.data.code)
 		setPlayer(resp.data.player.id)
@@ -144,6 +144,10 @@ function QuizSetting(){
 		}
 	},[])
 
+	React.useEffect(()=>{
+		setTitle(choice.title)
+	},[choice])
+
 	const copyToClipboard = (x,b)=>{
 		navigator.clipboard.writeText(x)
 		setMessage(`${b} is copied to clipboard`)
@@ -156,14 +160,20 @@ function QuizSetting(){
 	},[isAuthenticated])
 
 	if(loading){
-		return(<div class="center sz-18"><div class="spinner-grow sz-36"></div><br /> Getting Ready <br/> <span class="text-danger">{message}</span> </div>)
+		return(<div class="center sz-18"><div class="spinner-border"></div><br /> Getting Ready <br/> <span class="text-danger">{message}</span> </div>)
 	}
 	
 
 	if(ready){
 		return(
-		<div class="center">
-		{gameMode === 'versus' &&
+		<div class="container">
+		<BackButton goBack={()=>setChoice({id:0})} />
+		<div class="row">
+			<div class="col center sz-20">
+				Game Created Successfully 
+			</div>
+		</div>
+		{gameMode == 'versus' &&
 			<div><p class="center sz-18 p-3"> Game Code - 
 			
 			 <b class="sz-16 color-p"> {gameCode}</b>
@@ -176,9 +186,11 @@ function QuizSetting(){
 				<button class="btn btn-default color-bg-silver" onClick={()=>copyToClipboard(link,'Game link')}> Copy To clipboard </button>
 				</p>
 				</p></div>}
-			<p class='w-100 color-white center my-3 p-2 rounded sz-16 color-bg-s'> 
-			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:currentPlayer,gameMode:gameMode,type:type}}} class='color-white no-decoration '>Click to Start Game </Link>
-			</p>
+			<div class="row my-2">
+				<div class="col center">
+			<Link href={{pathname:'solve_quiz', query:{game:game,allow:true,currentPlayer:currentPlayer,gameMode:gameMode,type:type}}} class='color-white no-decoration color-bg-s p-3 inline-block rounded center'>Click to Start Game </Link>
+			</div>
+			</div>
 				<p>{message}</p>
 		</div>
 		)
@@ -186,8 +198,12 @@ function QuizSetting(){
 
 
 	return(
-			<QuizContext.Provider value = {{time,ready,type,level,link,game,player,gameCode,category,message,setTime,setReady,setType,setLevel,setLink,setGame,setGameCode,setCategory,setMessage,setPlayer,createLink,setChoosenCategory,choosenCategory,setCurrentPlayer,questionNumber,setQuestionNumber,gameMode,setGameMode,setCreate,loading,setLoading,joinGame,isAuthenticated}} >
+			<QuizContext.Provider value = {{time,ready,type,level,link,game,player,gameCode,category,message,setTime,setReady,setType,setLevel,setLink,setGame,setGameCode,setCategory,setMessage,setPlayer,createLink,setChoosenCategory,choosenCategory,setCurrentPlayer,questionNumber,setQuestionNumber,gameMode,setGameMode,setCreate,loading,setLoading,joinGame,isAuthenticated,title,setTitle}} >
 			<div class="container justify-content-center pt-3">
+			<div class="row align-items-center">
+				<div class="col-1">{choice.id != 0 && <BackButton goBack={()=>setChoice({id:0,title:'Quiz Session'})} />}</div>
+				<div class="col"><h2 class="color-p bold my-4 center sz-24">  {title} </h2> </div>
+			</div>
 			{choice.id === 1 && <SingleMode />}
 			{choice.id === 2 && <SignUp />}
 			{choice.id == 3 && <SingleMode auth={true} />}
@@ -207,21 +223,24 @@ function QuizSetting(){
 		)
 }
 
+const BackButton = (props)=> <button class="btn btn-danger" onClick={()=>props.goBack()}> <i class="fas fa-arrow-left"></i> </button>
 
 const SignUpIcon = (props)=> props.id === 2 && <i class="fas fa-sign-in-alt"></i>
 
 function GameModeList(props){
 	return(
-			<div class="row">
+			<div class="row justify-content-center">
 				
 				{props.gameModes.map((x)=>{
 					return(
 					<div class="col-md-6 col-sm-12">
 						<div class="rounded p-4 color-bg-white color-bg-p-hover center color-white-hover color-bg-p-focus color-white-focus shadow m-2" style={{cursor:'pointer'}} onClick={()=>props.clickChoice(x.id)}>
 							<div class="sz-36">
+								{x.id === 3 && <i class="fas fa-user"></i>}
 								{x.id === 1 && <i class="fas fa-user"></i>}
 								<SignUpIcon id={x.id} />
-								{x.id === 3 && <><i class="fas fa-users"></i></>}
+								{x.id === 4 && <><i class="fas fa-users"></i></>}
+								{x.id === 10 && <>#</>}
 							</div>
 							<div class="sz-20  bold"> {x.title} </div>
 							
@@ -262,7 +281,7 @@ function SingleMode(props){
 		setChoosenCategory(cat.current.value)	
 		setLevel(1)
 		setCreate(true)
-		setGameMode('level')
+		//setGameMode('level')
 	}
 
 	const confirmCode = async ()=>{
@@ -300,8 +319,8 @@ function SingleMode(props){
 	}
 
 	return(
-		<div class="row justify-content-center align-items-center p-2">
-			<div class="col-md-6 p-4 rounded">
+		<div class="row justify-content-center align-items-center p-2 m-2">
+			<div class="col-md-6 p-4 rounded color-bg-white">
 				{!props.auth && <div class="row sz-16 my-3">
 					<div class="col my-2 bold">
 						Enter your Name <span class="sz-12"> </span>
@@ -326,7 +345,6 @@ function SingleMode(props){
 			</div>
 			 </div>
 			</div>
-			<hr class="my-4" />
 
 			{isAuthenticated ?
 			<div class="row sz-16 my-3">
@@ -335,10 +353,10 @@ function SingleMode(props){
 			<div class="col my-2">
 			<div class="row">
 				<div class="col">
-					<div class={`w-100 p-2 sz-16  rounded center  ${type === 0 ? 'color-bg-s color-white':'border'}`} onClick={()=>setType(0)} style={{cursor:'pointer'}} > 3 Missed Out </div>
+					<div class={`w-100 p-2 sz-16  rounded center  ${type === 0 ? 'color-bg-t color-white':'border'}`} onClick={()=>setType(0)} style={{cursor:'pointer'}} > 3 Missed Out </div>
 				</div>
 				<div class="col">
-					<div class={`w-100 p-2 sz-16 rounded center ${type === 1 ? 'color-bg-s color-white':'border'}`} style={{cursor:'pointer'}} onClick={()=>setType(1)} > Score Line </div>
+					<div class={`w-100 p-2 sz-16 rounded center ${type === 1 ? 'color-bg-t color-white':'border'}`} style={{cursor:'pointer'}} onClick={()=>setType(1)} > Score Line </div>
 				</div>
 			</div>
 			 </div>
@@ -350,10 +368,10 @@ function SingleMode(props){
 			<div class="col my-2">
 			<div class="row">
 				<div class="col">
-					<div class={`w-100 p-2 sz-16  rounded center  ${gameMode === 'single' ? 'color-bg-s color-white':'border'}`} onClick={()=>setGameMode('single')} style={{cursor:'pointer'}} > Single Mode </div>
+					<div class={`w-100 p-2 sz-16  rounded center  ${gameMode === 'single' ? 'color-bg-t color-white':'border'}`} onClick={()=>setGameMode('single')} style={{cursor:'pointer'}} > Single Mode </div>
 				</div>
 				<div class="col">
-					<div class={`w-100 p-2 sz-16 rounded center ${gameMode === 'versus' ? 'color-bg-s color-white':'border'}`} style={{cursor:'pointer'}} onClick={()=>setGameMode('versus')} > Multiplayer </div>
+					<div class={`w-100 p-2 sz-16 rounded center ${gameMode === 'versus' ? 'color-bg-t color-white':'border'}`} style={{cursor:'pointer'}} onClick={()=>setGameMode('versus')} > Multiplayer </div>
 				</div>
 			</div>
 			 </div>
@@ -376,7 +394,7 @@ function SingleMode(props){
 			</div>
 
 
-				<div class="row mx-auto my-5"> <button class="btn btn-success no-border rounded sz-24 color-white p-2" onClick={()=>createGame()}> Start </button> </div>
+				<div class="row mx-auto my-5"> <button class="btn color-bg-p color-bg-t-hover no-border rounded sz-24 color-white p-2" onClick={()=>createGame()}> Start </button> </div>
 			</div>
 			</div>
 		)
@@ -485,8 +503,9 @@ function JoinRoom(props){
 
 
 		return(
-				<div class="container-fluid">
-					<div class="row my-3">
+			<div class="row justify-content-center m-2">
+				<div class="m-2 col-md-6 color-bg-white rounded p-3">
+					<div class="row my-3 hide">
 						<div class="col color-p sz-24"> Join Room </div>
 					</div>
 					
@@ -498,12 +517,13 @@ function JoinRoom(props){
 					<div class="row sz-16 my-3">
 						<div class="col my-2 bold"> Game Code </div>
 						<div class="w-100"></div>
-						<div class="col"> <input ref={code} class="form-control p-3" value={gameCode ? gameCode : ''}/> </div>
+						<div class="col"> <input ref={code} class="form-control p-3" value={gameCode ? gameCode : null}/> </div>
 					</div>
 					<div class="row my-3 py-3">
 					<div class="col"><button class="btn sz-20 w-100 color-bg-p color-white p-2" onClick={()=>joinGameFunc()}> Join Room </button> </div>
 				</div>
 				</div>
+			</div>
 			)
 
 }
