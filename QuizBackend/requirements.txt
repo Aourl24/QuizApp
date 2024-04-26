@@ -5,4 +5,4 @@ daphne
 channels
 django_environ==0.10.0
 psycopg2-binary==2.9.6
-django-rest-simple-jwt
+djangorestframework-simplejwt
