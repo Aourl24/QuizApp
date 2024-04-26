@@ -90,7 +90,7 @@ ASGI_APPLICATION = 'QuizBackend.asgi.application'
 #    }
 #}
 
- DATABASES = {
+DATABASES = {
      'default': {
          'ENGINE': 'django.db.backends.postgresql_psycopg2',
          'HOST': env("HOST"),
