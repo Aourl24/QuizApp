@@ -3,9 +3,10 @@ import Cookies from 'js-cookie'
 
 //const api_host = '192.168.8.92:8000'
 //const api_host = '127.0.0.1:8000'
-const api_host = 'https://quizbackend.leapcell.app'
+const api_host ='quizbackend.leapcell.app'
 export const host = '127.0.0.1:3000'
-export const endpoint = `http://${api_host}/`//'http://127.0.0.1:8000/'
+//export const endpoint = `http://${api_host}/`//'http://127.0.0.1:8000/'
+export const endpoint = 'https://quizbackend.leapcell.app'
 export const endpath = endpoint.trim().replace(/\/$/, '')
 export const wsEndpoint = `ws:/${api_host}/quizroom/`;
 axios.defaults.baseURL = endpoint
