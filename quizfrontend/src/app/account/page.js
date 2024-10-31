@@ -4,11 +4,20 @@ import axios from 'axios'
 import {postData} from '../endpoints.js'
 import {useRouter} from 'next/navigation';
 import Cookies from 'js-cookie';
+import {useAuth} from '../auth.js'
 
 function App(){
 	const [login,setLogin] = React.useState(false)
+	const {isAuthenticated} = useAuth()
+
+	if(isAuthenticated){
+		setLogin(true)
+	}
+
+
 
 	return(
+		<div class="container">
 			<div class="row justify-content-center">
 			{!login ? <SignUp setlogin={setLogin} /> : <Login />}
 			
@@ -16,6 +25,7 @@ function App(){
 				<div class="col"> <a class="color-bg-none bg-none color-s w-100 no-decoration sz-18" style={{backgroundColor:'none',cursor:'pointer'}} onClick={()=>setLogin((prev)=>prev == false ? true:false)} > {login ? 'Sign-Up' :'Log-In'} </a> </div>
 			</div>
 			</div>
+		</div>
 
 		)
 
@@ -52,6 +62,14 @@ function SignUp(props){
 		}
 	}
 
+	const checkDifference = ()=>{
+		if(passwords.current[0].value != passwords.current[1].value){
+			setMessage("Password does not match")
+		}
+		else{
+			setMessage()
+		}
+	}
 
 	React.useEffect(()=>{
 
@@ -63,22 +81,24 @@ function SignUp(props){
 					<div class="col color-p sz-30 bold"> Sign Up </div>
 				</div>
 
+				{message &&
 				<div class="row py-4">
-					<div class="col text-danger sz-18">{message}</div>
+					<div class="col text-danger sz-18"><div class="alert alert-danger">{message}</div></div>
 				</div>
+				}
 
 				<div class="row align-items-center py-4">
-					<div class="col-2 sz-18"> Username </div>
+					<div class="col-12 sz-18 py-2"> Username </div>
 					<div class="col"> <input ref={username} class="form-control sz-18" /> </div>
 				</div>
 				<div class="row align-items-center py-4">
-					<div class="col-2 sz-18"> Password </div>
+					<div class="col-12 sz-18 py-2"> Password </div>
 					<div class="col"> <input type='password' class="form-control sz-18" ref={el=>passwords.current[0] = el} /> </div>
 				</div>
 
 				<div class="row align-items-center py-4">
-					<div class="col-2 sz-18"> Confirm Password </div>
-					<div class="col"> <input type="password" class="form-control sz-18" ref={el=>passwords.current[1] = el} /> </div>
+					<div class="col-12 sz-18 py-2"> Confirm Password </div>
+					<div class="col"> <input type="password" class="form-control sz-18" onChange={()=>checkDifference()} ref={el=>passwords.current[1] = el} /> </div>
 				</div>
 
 				<div class="row py-4">
@@ -120,15 +140,19 @@ function Login(props){
 				<div class="row my-4">
 					<div class="col color-p sz-30 bold"> Login </div>
 				</div>
+				
+				{message &&
 				<div class="row py-4">
-					<div class="col text-danger sz-18">{message}</div>
+					<div class="col text-danger sz-18"><div class="alert alert-danger">{message}</div></div>
 				</div>
+				}
+
 				<div class="row align-items-center py-4">
-					<div class="col-2 sz-18"> Username </div>
+					<div class="col-12 sz-18 py-2"> Username </div>
 					<div class="col"> <input ref={username} class="form-control sz-18" /> </div>
 				</div>
 				<div class="row align-items-center py-4">
-					<div class="col-2 sz-18"> Password </div>
+					<div class="col-12 py-2 sz-18"> Password </div>
 					<div class="col"> <input type='password' class="form-control sz-18" ref={password} /> </div>
 				</div>
 				<div class="row py-4">

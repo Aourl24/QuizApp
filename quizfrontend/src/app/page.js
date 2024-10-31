@@ -24,8 +24,8 @@ function App (){
 
   return(
     <div>
-      <div class="d-flex flex-column color-bg-sm-white color-bg-whit p-2 p-md-4 rounded align-items-center container justify-content-center vh-md-90 font-poppins" styl={{height:'90vh'}}>
-        <div class="row align-items-center color-bg-white p-4 rounded">
+      <div class="d-flex flex-column color-bg-sm-white color-bg-whit p-2 p-md-4 rounded align-items-center container justify-content-center vh-md-90 " styl={{height:'90vh'}}>
+        <div class="row align-items-center color-bg-white p-5 rounded">
         <div class="col-md col-sm center sz-36">   
             <div class="row">
                 <div class="col sz-md-36">
@@ -40,11 +40,11 @@ function App (){
           
         <div class="row">
           <div class="col p-3">
-            <Link href={{pathname:"quiz_settings"}}  class='no-decoration color-white color-bg-s  color-bg-t-hover color-white-hover color-bd-p p-2 rounded inline-block w-100 center sz-24'> Play Quiz </Link>
+            <Link href={{pathname:"quiz_settings"}}  class='no-decoration color-white color-bg-s  color-bg-t-hover color-white-hover color-bd-p p-2 p-md-3 rounded inline-block w-100 center sz-24'> Play Quiz </Link>
           </div>
         </div>
 
-        <div class="row">
+        <div class="row d-none hide">
           <div class="col p-3">
             <Link href={{pathname:"account"}}  class='no-decoration color-p color-bg-white border border-2 color-white-hover color-bg-t-hover color-bd-p p-2 rounded inline-block w-100 center sz-24'> Create Account </Link>
           </div>

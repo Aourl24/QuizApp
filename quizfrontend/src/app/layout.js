@@ -10,6 +10,7 @@ import React from 'react'
 import quizzify_logo from './quzzify_logo.png'
 import Image from 'next/image'
 import Link from 'next/link'
+import {Quiz} from "./components.js"
 
 const metadata = {
   title: 'Quzzify',
@@ -21,9 +22,9 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body className="container-fluid bg-light p-0 font-opensans">
+      <body className="container-fluid bg-light p-0 font-montserrat">
        <div class="row align-items-center p-3">
-        <div class="col-md-9 col sz-24 bold color-p">
+        <div class="col-md-9 col sz-24  color-p">
             <Image src={quizzify_logo} class="img-fluid img-logo py-2 hide" style={{height:'50px',width:'50px',objectFit:'contain'}}/> Q<span class="font-great animate__animated animate__bounce animate__infinie animate__delay-3s bold" style={{display:'inline-block'}}>uizzify</span>
         </div>
         <div class="col" style={{textAlign:'right'}}>
@@ -33,7 +34,11 @@ export default function RootLayout({ children }) {
       </div>
 
       <div class="row vh-100">
-          <div class="col-12"> {children} </div>
+          <div class="col-12"> 
+          <Quiz>
+          {children} 
+          </Quiz>
+          </div>
 
           <div class="col">
               <div class="row center position-relative bottom-0 container hide">

@@ -16,7 +16,7 @@ function Profile(props){
 const [profile,setProfile] = React.useState()
 
 React.useEffect(()=>{
-	var resp = postData('profile',{user:user.id}).then((res)=>setProfile(res.data))
+	var resp = postData('profile',{user:user?.id}).then((res)=>setProfile(res.data))
 },[])
 
 if(!profile){
