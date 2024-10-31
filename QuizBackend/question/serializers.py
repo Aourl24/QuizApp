@@ -8,6 +8,11 @@ class UserSerializer(serializers.ModelSerializer):
 		model = User
 		fields = '__all__'
 
+class ProfileSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Profile
+		fields = '__all__'
+
 class CategorySerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Category
@@ -44,7 +49,10 @@ class QuestionSerializer(serializers.ModelSerializer):
 		representation['options'] = options
 		condition = lambda option: option['answer'] == True
 		answer_in_list = list(filter(condition,representation['answer']))
-		representation['answer'] = answer_in_list[0]['body']
+		if answer_in_list:
+			representation['answer'] = answer_in_list[0]['body']
+		else:
+			representation['answer'] = None
 		return representation
 
 class GameSerializer(serializers.ModelSerializer):

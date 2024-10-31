@@ -16,5 +16,9 @@ urlpatterns = [
 	path('checkuser',checkLogin),
 	path('logout',logoutView),
 	path('token',generateToken),
-	path('userprofile',userView)
+	path('userprofile',userView),
+	path('createquestion',createQuestions),
+	path('useranking',userRanking),
+	path('getgame',getAllGames),
+	path('quickplay/<str:category>',quickPlay)
 ]

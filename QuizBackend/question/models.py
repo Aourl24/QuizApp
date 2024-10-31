@@ -7,31 +7,38 @@ from django.dispatch import receiver
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 
+
+class Profile(models.Model):
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	about = models.TextField()
+	points = models.IntegerField()
+
+	def __str__(self):
+		return f'{self.user.username} Profile'
+
 class Player(models.Model):
-	user = models.OneToOneField(User, on_delete=models.CASCADE,null=True,blank=True)
+	profile = models.ForeignKey(Profile,related_name='player',on_delete=models.CASCADE,null=True,blank=True)
 	name = models.CharField(max_length=100000)
 	score = models.IntegerField(default=0)
 	active = models.BooleanField(default=True)
-	connected = models.BooleanField(default=False)
-	total_score = models.IntegerField(null=True,blank=True)
-	# channel = models.CharField(max_length=100000000,blank=True,null=True)
 
 	def __str__(self):
 		return self.name
 
 
 class Game(models.Model):
+	title = models.CharField(max_length=100000,blank=True,null=True)
+	creator = models.ForeignKey(Profile,related_name='game_creator',on_delete=models.CASCADE,null=True,blank=True)
 	host = models.ForeignKey(Player,related_name='game_host',on_delete=models.CASCADE,null=True,blank=True)
 	players = models.ManyToManyField(Player,related_name='game')
 	question = models.ManyToManyField('Question',related_name='game')
-	time = models.IntegerField(default=10)
-	difficulty = models.CharField(default='easy',max_length=20000)
+	time = models.IntegerField(default=20)
 	public = models.BooleanField(default=True)
 	code = models.CharField(max_length=2000000,null=True,blank=True,unique=True,editable=False)
-	status = models.BooleanField(default=True)
+	active = models.BooleanField(default=True)
 	gameType = models.IntegerField(default=0)
-
-
+	max_players = models.IntegerField(default=10)
+	multiplayer = models.BooleanField(default=False)
 
 	def __str__(self):
 		return f'Game {self.id}'
@@ -73,7 +80,7 @@ class Option(models.Model):
 @receiver(post_save,sender=User)
 def createPlayer(sender,created,instance,**kwargs):
 	if created:
-		player = Player.objects.create(user=instance,name=instance.username)
+		player = Profile.objects.create(user=instance,points=0)
 
 # @receiver(user_logged_in)
 # def clear_session(sender,request,user,**kwargs):
