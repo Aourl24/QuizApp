@@ -3,14 +3,7 @@ from .views import *
 
 
 urlpatterns = [
-	path('questionapi/<int:gameType>/<str:level>',questionApi),
-	path('creategame',createGame),
-	path('creategame/<int:id>',createGame),
-	path('game/<int:id>/players',getPlayers),
-	path('save/<int:id>/<int:score>',saveScores,name='SaveUrl'),
-	path('join/<str:id>/<str:player>',joinGame),
 	path('category',getCategory),
-	path('nextlevel/<int:game>/<str:level>',nextLevel),
 	path('signup',signUp),
 	path('login',loginView),
 	path('checkuser',checkLogin),
@@ -20,5 +13,10 @@ urlpatterns = [
 	path('createquestion',createQuestions),
 	path('useranking',userRanking),
 	path('getgame',getAllGames),
-	path('quickplay/<str:category>',quickPlay)
+	path('quickplay/<str:category>/<int:next>',quickPlay),
+	path('dailychallenge/<int:player>',dailyChallenge),
+	path('completed/<int:player>/<int:score>/<int:game>',completeGame),
+	path('blitz/<int:next>',blitzMode),
+	path('survival/<int:next>',survivalMode),
+	path('leaderboard',leaderBoards)
 ]

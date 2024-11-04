@@ -25,23 +25,31 @@ class Player(models.Model):
 	def __str__(self):
 		return self.name
 
+class GameMode(models.Model):
+	name = models.CharField(max_length=2000000,unique=True)
+	intstructions = models.TextField(null=True,blank=True)
+
+	def __str__(self):
+		return self.name
 
 class Game(models.Model):
 	title = models.CharField(max_length=100000,blank=True,null=True)
 	creator = models.ForeignKey(Profile,related_name='game_creator',on_delete=models.CASCADE,null=True,blank=True)
-	host = models.ForeignKey(Player,related_name='game_host',on_delete=models.CASCADE,null=True,blank=True)
-	players = models.ManyToManyField(Player,related_name='game')
+	host = models.ForeignKey(Profile,related_name='game_host',on_delete=models.CASCADE,null=True,blank=True)
+	players = models.ManyToManyField(Profile,related_name='game',blank=True)
 	question = models.ManyToManyField('Question',related_name='game')
-	time = models.IntegerField(default=20)
+	time = models.IntegerField(default=20,null=True,blank=True)
 	public = models.BooleanField(default=True)
 	code = models.CharField(max_length=2000000,null=True,blank=True,unique=True,editable=False)
 	active = models.BooleanField(default=True)
 	gameType = models.IntegerField(default=0)
 	max_players = models.IntegerField(default=10)
 	multiplayer = models.BooleanField(default=False)
+	mode = models.ForeignKey(GameMode , related_name="game",on_delete=models.CASCADE,null=True,blank=True)
+	date = models.DateTimeField(auto_now_add=True,null=True,blank=True) 
 
 	def __str__(self):
-		return f'Game {self.id}'
+		return f'{self.title} Game'
 
 	def get_absolute_url(self):
 		pass
@@ -62,7 +70,7 @@ class Category(models.Model):
 
 class Question(models.Model):
 	category = models.ForeignKey(Category,related_name='category',on_delete=models.CASCADE,null=True,blank=True)
-	level = models.ForeignKey(Level,related_name='question',on_delete=models.CASCADE)
+	level = models.ForeignKey(Level,related_name='question',on_delete=models.CASCADE,null=True,blank=True)
 	body = models.TextField()
 
 	def __str__(self):
@@ -76,6 +84,13 @@ class Option(models.Model):
 	def __str__(self):
 		return self.body
 
+class Points(models.Model):
+	player = models.ForeignKey(Profile,related_name="score",on_delete=models.CASCADE)
+	score = models.IntegerField(default=0)
+	game = models.ForeignKey(Game,related_name='player_points',on_delete=models.CASCADE)
+
+	def __str__(self):
+		return f"{self.player.user} score in {self.game.title}"
 
 @receiver(post_save,sender=User)
 def createPlayer(sender,created,instance,**kwargs):

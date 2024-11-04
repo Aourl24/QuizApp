@@ -6,12 +6,15 @@ from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
-		fields = '__all__'
+		fields = ["id","username"]
 
 class ProfileSerializer(serializers.ModelSerializer):
+	user = UserSerializer()
+	total_points = serializers.IntegerField()
+	
 	class Meta:
 		model = Profile
-		fields = '__all__'
+		fields = ["user","total_points"]
 
 class CategorySerializer(serializers.ModelSerializer):
 	class Meta:
@@ -57,9 +60,16 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class GameSerializer(serializers.ModelSerializer):
 	host = PlayerSerializer()
-	players = PlayerSerializer(many=True)
-	question =QuestionSerializer(many=True)
+	# players = PlayerSerializer(many=True)
+	# question =QuestionSerializer(many=True)
 
 	class Meta:
 		model = Game
 		fields = '__all__'
+
+class PointSerializer(serializers.ModelSerializer):
+	# player = UserSerializer()
+	total_points = serializers.IntegerField()
+	class Meta:
+		model = Points
+		fields = ['score','total_points',]
