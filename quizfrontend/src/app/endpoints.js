@@ -48,7 +48,7 @@ export function getData(e) {
 export async function postData(e, data) {
     const token = Cookies.get('token'); // Use 'csrftoken' instead of 'X-CSRFToken'
     const path = api.find((x) => x.name === e.trim());
-    if(token){
+    if(token && token != null ){
     	var headers = {headers: {
                 'Content-Type': 'application/json',
                'Authorization':`JWT ${token}`

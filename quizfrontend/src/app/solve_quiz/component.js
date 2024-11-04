@@ -52,7 +52,7 @@
 // 			<QuizBoxContext.Provider value = {{active,data,markChoose,setOptionChoose,checkAnswer,showSelect,options,gameStatus,setGameStatus,questions,setQuestions,setMessage,message,setShowRestart,setData,level,score,setActive,setlevel,setScore,level,changeActive, nextLevel, setNextLevel,restartQuiz,setRestart,restart,showRestart,gameOver,players,setPlayers,checkAnswer,currentPlayer,buttonMessage,setButtonMessage,game:props.game,countDown,setCountDown,gameover,setWrong,hasMount,wrong,correct,mark,missedOut,setMissedOut,missedCount,setMissedCount,countdown,type,setType,setMark,showNextButton,setShowNextButton,buttonFunc,setButtonFunc,nextButtonFunc,host,saveScore,messageBody,setMessageBody,setBlockMessage,setShowMark,showMark,gameMode:props.gameMode,ready,setReady}} >
 // 			<div class="container">
 // 				<div class="col-12">
-// 				<div class='w-100 center' style={{textAlig:'right'}}><div class='rounded-circle sz-18  color-s  p-3 color-bd-p bold border' style={{display:'inline-block'}}>{countDown}</div> </div>				
+								
 // 			</div>
 // 			{blockMessage && <BlockMessage text={blockMessage} /> }
 // 				{props.gameMode === 'single' && <LevelQuiz countDown={countDown} game={props.game} />}
