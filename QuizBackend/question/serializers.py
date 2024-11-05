@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
 	user = UserSerializer()
 	total_points = serializers.IntegerField()
-	
+
 	class Meta:
 		model = Profile
 		fields = ["user","total_points"]
@@ -59,7 +59,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 		return representation
 
 class GameSerializer(serializers.ModelSerializer):
-	host = PlayerSerializer()
+	# host = ProfileSerializer()
 	# players = PlayerSerializer(many=True)
 	# question =QuestionSerializer(many=True)
 

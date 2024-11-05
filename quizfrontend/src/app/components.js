@@ -4,6 +4,7 @@ import React, { createContext, useState, useRef, useEffect, useContext } from "r
 import axios from 'axios';
 import Link from "next/link";
 import {postData} from './endpoints.js';
+import Loader from "./loader.js"
 
 export const QuizBoxContext = createContext();
 
@@ -23,6 +24,9 @@ export function Quiz({ children }) {
     const [categories, setCategories] = useState([]);
     const [batch , setBatch] = React.useState()
     const [end , setEnd] = React.useState(false)
+    const [alert , setAlert] = React.useState()
+    const [loader , setLoader] = React.useState(true)
+    const [mark , setMark] = React.useState(0)
     const countdown = useRef();
     const clap = useRef();
     const boo = useRef();
@@ -83,7 +87,6 @@ export function Quiz({ children }) {
 
     React.useEffect(()=>{
         setQuestions(true);
-        setEnd(false)
     },[data])
 
     React.useEffect(()=>{
@@ -112,8 +115,18 @@ export function Quiz({ children }) {
             setActive, setScore, changeActive, restartQuiz,
             gameOver, buttonMessage, setButtonMessage,
             setWrong, wrong, correct,
-            categories, clap, boo, countdown, resetAudio ,restartQuiz, gameover ,setCorrect,setScore, batch  ,user ,setBatch , end , setEnd, setUser,scorePercent , setScorePercent , game ,setGame
+            categories, clap, boo, countdown, resetAudio ,restartQuiz, gameover ,setCorrect,setScore, batch  ,user ,setBatch , end , setEnd, setUser,scorePercent , setScorePercent , game ,setGame,setAlert , alert , loader , setLoader,mark , setMark
         }}>
+        {loader && <Loader />}
+        {alert &&
+                <div class="row position-fixed" style={{top:'0px'}}>
+                    <div class="col text-danger sz-18"><div class="alert alert-danger">{alert}
+                    <div class="right"> <i class="fas fa-times rounded color-bg-red color-white p-2" onClick={()=>setAlert()}></i></div>
+                    </div></div>
+
+                </div>
+                }
+
         {message && <Message />}
             {children}
         </QuizBoxContext.Provider>
@@ -123,9 +136,10 @@ export function Quiz({ children }) {
 export function QuizBox({path}) {
     const options = React.useRef([]);
     const selectedOption = React.useRef()
-
+    const correctWords = ["Nailed it!","Spot on!","On Point!","Legit!","Boom"]
+    const wrongWords = ["Nah, Fam!","Uh-Oh!","Swing n Miss!","Legit!","Whoops"]
     const [showSelect, setShowSelect] = useState(false);
-    const { active, data,countdown ,countDown,setMessage,setCountDown,setData, resetAudio , restartQuiz,setWrong,message,gameover, setCorrect, clap ,setScore ,questions , setQuestions,scorePercent,batch,setGme,setShowRestart,setGame,setEnd} = useContext(QuizBoxContext);
+    const { active, data,countdown ,countDown,setMessage,setCountDown,setData, resetAudio , restartQuiz,setWrong,message,gameover, setCorrect, clap ,setScore ,questions , setQuestions,scorePercent,batch,setGme,setShowRestart,setGame,setEnd,setMark} = useContext(QuizBoxContext);
 
     const fetchData = ()=>{
         fetch(endpoint + path).then(x=>x.json()).then(x=>{
@@ -185,13 +199,15 @@ export function QuizBox({path}) {
         resetAudio();
         if (selectedOption.current === data[active].answer) {
             setScore((prev)=>prev += scorePercent )
-            setMessage('Correct Answer');
+            setMark(2)
+            setMessage(correctWords[Math.floor(Math.random() * correctWords.length)]);
             setCorrect(prev => [...prev, data[active]]);
             
             clap.current.play();
             
         } else {
-            setMessage('Wrong Answer');
+            setMark(1)
+            setMessage(wrongWords[Math.floor(Math.random() * wrongWords.length)])
             setWrong(prev => [...prev, data[active]]);
             gameover.current.play();
         }
@@ -226,23 +242,36 @@ export function QuizBox({path}) {
 }
 
 function Message(){
-    const { message, changeActive, score, restartQuiz, showRestart, questions, buttonMessage,  user , end ,data } = useContext(QuizBoxContext);
+    const { message, changeActive, score, restartQuiz, showRestart, questions, buttonMessage,  user , end ,data , mark} = useContext(QuizBoxContext);
 
 
     return(
     <div className="modal d-flex align-items-center color-bg-white" style={{ backgroundColor: "rgba(100,100,100,0.8)" }}>
             <div className="modal-dialog modal-dialog-centered w-100 h-100 p-3">
-                <div className="modal-content p-md-4 p-3 center animate__animated animate__slideInUp">
+                <div className="modal-content p-md-4 p-3 center animate__animated animate__slideInUp color-bg-p color-white">
 
-                    <div class="row my-3">
-                        <div class="col sz-30"> {message} </div>
+                    <div class="row mt-3">
+                        <div class="col sz-36">
+                        {mark === 1 && <i class="fas fa-times text-danger color-white p-3 "></i> } 
+                        {mark === 2 && <i class="fas fa-check rounded-circle bg-success color-white p-3 "></i> }
+                        {mark === 3 && <i class="fas fa-clock text-danger p-2 "></i> } 
+ 
+
+
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col sz-36"> {message} </div>
                     </div>
 
                     {data && 
                     <>
-                    <div class="row"> 
-                        <div class="col sz-18">
-                            Score <br /> <span class="sz-36 bold">{score}</span>
+                    <div class="row align-items-center justify-content-center"> 
+                        <div class="col sz-18 color-silver">
+                            Score </div>
+                            <div class="w-100"></div>
+                            <div class="col"> <span class="sz-36 bold">{score}</span>
                         </div>
                     </div>
                     
@@ -252,7 +281,7 @@ function Message(){
                 {
                     !end && 
                     <div class="row my-3">
-                        <div class="col"><button class="no-decoration color-bg-p color-white rounded-4 w-100 sz-18 p-2 py-3 no-border" onClick={()=>changeActive()}>{buttonMessage} </button>
+                        <div class="col"><button class="no-decoration bg-warning color-black rounded-4 w-100 sz-18 p-3 no-border" onClick={()=>changeActive()}>{buttonMessage} </button>
                         </div>
                     </div>
                 }
@@ -261,15 +290,15 @@ function Message(){
                 {
                     end && 
 
-                    <div class="row">
-                        <Link className="color-s w-100 sz-20  my-4 no-decoration col" href="">Play Again </Link>
+                    <div class="row hide">
+                        <Link className="color-s w-100 sz-20  my-4 no-decoration col" href="#">Play Again </Link>
                     </div>
                 }
 
                 {
                     end && !user && 
-                    <div class="row">
-                        <Link className="w-100 sz-20  no-decoration p-2 border-top rounded col" href="/account/signup"> Login or Create Account </Link> 
+                    <div class="row my-3">
+                        <Link className="w-100 sz-20  no-decoration p-2 rounded col py-4 text-warning" href="/account/signup"> Login or Create Account </Link> 
                     </div>
                 }
 
@@ -294,7 +323,7 @@ export const MissedOut = ({number})=>{
 }
 
 export function CountDown({number}){
-    const {wrong , correct, gameover , setWrong , setMessage , resetAudio , message ,countdown , active , data} = React.useContext(QuizBoxContext)
+    const {wrong , correct, gameover , setWrong , setMessage , resetAudio , message ,countdown , active , data , setMark} = React.useContext(QuizBoxContext)
     const [countDown, setCountDown] = useState(number ? number : 20);
 
     useEffect(() => {
@@ -302,15 +331,17 @@ export function CountDown({number}){
         if (countDown <= 0) {
             resetAudio();
             gameover.current.play();
+            setMark(3)
             setMessage('Time Out');
             setWrong(prev => [...prev, data[active]]);
             clearInterval(timer);
         }
         else{
-            if(countdown.current)countdown.current.play();
+            //if(countdown.current)countdown.current.play();
         }
         if (message) {clearInterval(timer);countdown.current.currentTime = 0;
-            countdown.current.pause();}
+            //countdown.current.pause();
+    }
         return () => clearInterval(timer);
     }, [countDown, message]);
 
@@ -332,12 +363,12 @@ export const Header = ()=>{
     return(
         <div class="row align-items-center p-3">
         <div class="col-md-9 col sz-24  color-p">
-             Q<span class="font-great animate__animated animate__bounce animate__infinie animate__delay-3s bold" style={{display:'inline-block'}}>uizzify</span>
+             <span class="font-great" style={{display:'inline-block'}}>Quizzify</span>
         </div>
         <div class="col" style={{textAlign:'right'}}>
-          {user ? <Link href="profile" class="color-p no-decoration" style={{}}>{user.username}</Link> : <Link href="/account/signup" class="color-p no-decoration">Sign Up </Link> }
+          {user ? <Link href="profile" class="color-p no-decoration" style={{}}>{user.username}</Link> : <Link href="/account/signup" class="color-white p-md-3 p-2 rounded-5 sz-14 no-decoration color-bg-black">Sign Up </Link> }
         </div>
-        <div class="col"> <Menu /> </div>
+        {user && <div class="col"> <Menu /> </div>}
       </div>
         )
 }
@@ -347,10 +378,7 @@ function Menu(props){
   return(
       <div class="row">
       <div class="col">
-        Abou
-      </div>
-      <div class="col">
-        Help
+        <Link href="/leaderboards" class="no-decoration color-s">LeaderBoards</Link>
       </div>
 
       </div>

@@ -52,13 +52,31 @@ def paginate(model,number,next=1,game=None):
 		return Response({"questions":False})
 
 @api_view(['GET'])
-def quickPlay(request,category,next):
-	#category = Category.objects.filter(name)
-	# questions = Question.objects.filter(category__name=category,mode__name="quick play").order_by('?')
-	mode = GameMode.objects.get(id=1)
-	game= Game.objects.filter(mode=mode).latest('date')
-	questions = game.question.order_by('?')
-	return paginate(questions,10,next,game=game)
+def getGames(request,mode=None,category=None):
+	if category and mode:
+		games = Game.objects.filter(mode__id=mode,category__id=category)
+	elif mode:
+		games = Game.objects.filter(mode__id=mode)
+	elif category:
+		games = Game.objects.filter(Q(category__id=category) | Q(mode__isnull=True))
+	serializer = GameSerializer(games,many=True)
+	return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getGame(request,game,next):
+	get_game = Game.objects.get(id=game)
+	questions = get_game.question.order_by('?')
+	return paginate(questions,10,next,game=get_game)
+
+# @api_view(['GET'])
+# def quickPlay(request,category,next):
+# 	#category = Category.objects.filter(name)
+# 	# questions = Question.objects.filter(category__name=category,mode__name="quick play").order_by('?')
+# 	mode = GameMode.objects.get(id=1)
+# 	game= Game.objects.filter(mode=mode).latest('date')
+# 	questions = game.question.order_by('?')
+# 	return paginate(questions,10,next,game=game)
 	
 
 	
@@ -149,6 +167,7 @@ def loginView(request):
 def checkLogin(request):
 	authenticate = JWTAuthentication()
 	response = authenticate.authenticate(request)
+
 	if response is not None:
 		user = User.objects.get(username=request.user.username)
 		serializer = UserSerializer(user)

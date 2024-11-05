@@ -32,10 +32,20 @@ class GameMode(models.Model):
 	def __str__(self):
 		return self.name
 
+class Category(models.Model):
+	name =  models.CharField(max_length=200000)
+
+	def __str__(self):
+		return f"{self.name} {self.id}" 
+
+
 class Game(models.Model):
 	title = models.CharField(max_length=100000,blank=True,null=True)
 	creator = models.ForeignKey(Profile,related_name='game_creator',on_delete=models.CASCADE,null=True,blank=True)
 	host = models.ForeignKey(Profile,related_name='game_host',on_delete=models.CASCADE,null=True,blank=True)
+	mode = models.ForeignKey(GameMode , related_name="game",on_delete=models.CASCADE,null=True,blank=True)
+	category = models.ForeignKey(Category,related_name='category',on_delete=models.CASCADE,null=True,blank=True)
+
 	players = models.ManyToManyField(Profile,related_name='game',blank=True)
 	question = models.ManyToManyField('Question',related_name='game')
 	time = models.IntegerField(default=20,null=True,blank=True)
@@ -45,11 +55,11 @@ class Game(models.Model):
 	gameType = models.IntegerField(default=0)
 	max_players = models.IntegerField(default=10)
 	multiplayer = models.BooleanField(default=False)
-	mode = models.ForeignKey(GameMode , related_name="game",on_delete=models.CASCADE,null=True,blank=True)
 	date = models.DateTimeField(auto_now_add=True,null=True,blank=True) 
+	
 
 	def __str__(self):
-		return f'{self.title} Game'
+		return f'{self.title}'
 
 	def get_absolute_url(self):
 		pass
@@ -62,14 +72,7 @@ class Level(models.Model):
 	def __str__(self):
 		return f'level {self.name}'
 
-class Category(models.Model):
-	name =  models.CharField(max_length=200000)
-
-	def __str__(self):
-		return self.name
-
 class Question(models.Model):
-	category = models.ForeignKey(Category,related_name='category',on_delete=models.CASCADE,null=True,blank=True)
 	level = models.ForeignKey(Level,related_name='question',on_delete=models.CASCADE,null=True,blank=True)
 	body = models.TextField()
 

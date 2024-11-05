@@ -26,7 +26,7 @@ export default function LeaderBoard(){
 				<div class="col color-p sz-30"> LeaderBoard </div>
 			</div>
 
-				<div class="row">
+				<div class="row p-2">
 					{boards.map((board,e)=>(
 						<div class={`col pointer-cursor border p-3 ${e == show && "color-bg-p no-border color-white"}`} onClick={()=>setShow(e)}>
 							{board}

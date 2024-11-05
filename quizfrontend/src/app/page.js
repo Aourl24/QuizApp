@@ -23,40 +23,38 @@ function App (){
   },[])
 
   return(
-    <div>
-      <div class="d-flex flex-column color-bg-sm-white color-bg-whit p-2 p-md-4 rounded align-items-center container justify-content-center vh-md-90 " styl={{height:'90vh'}}>
-        <div class="row align-items-center color-bg-white p-5 rounded">
-        <div class="col-md col-sm center sz-36">   
+    <div class="">
+      <div class="d-flex p-2  rounded align-items-center vh-md-90 container" styl={{hight:'90vh'}}>
+      <div class="p-4">
+        <div class="row color-bg-white p-4 rounded shadow">
+        <div class="col-md col-sm center sz-30">   
             <div class="row">
                 <div class="col sz-md-36">
-                    Challenge , Compete ,<br/><span class="color-p"> Learn and Win.</span> 
+                    <br/><span class=""> Learn and Win.</span> 
                 </div>
             </div>
             <div class="row">
               <div class="col sz-md-36">
-                  Experience our Quiz App  <br/><span class="center inline-block color-p w-100 font-great sz-60 sz-md-60 animate__animated animate__bounce animate__infinie animate__delay-3s" style={{display:'inline-block'}}>Quizzify</span>    </div>
+                  Experience our Quiz App  <br/><span class="center inline-blck color-p w-100 font-great sz-60 hide sz-md-60 animate__animted aimate__bounce animte__infinie aimate__delay-3s" style={{isplay:'inline-block'}}>Quizzify</span>    </div>
             </div>
         
           
-        <div class="row">
-          <div class="col p-3">
-            <Link href={{pathname:"quiz_settings"}}  class='no-decoration color-white color-bg-s  color-bg-t-hover color-white-hover color-bd-p p-2 p-md-3 rounded inline-block w-100 center sz-24'> Play Quiz </Link>
+        <div class="row mt-md-5 mt-4">
+          <div class="col p-2 p-md-3">
+            <Link href={{pathname:"quiz_settings"}}  class='no-decoration color-white color-bg-s  color-bg-hover color-white-hover color-bd-p p-3 rounded-4 inline-block w-100 center sz-20 sz-md-24'> Play Quiz </Link>
           </div>
+          <div class="w-100"></div>
+          <div class="col p-2 p-md-3">
+            <Link href={{pathname:"account/signup"}}  class='no-decoration color-p color-bg-white border border-2 color-black-hover color-bg-t-hover color-bd-p p-3 rounded-4 inline-block w-100 center sz-20 sz-md-24'> Sign Up </Link>
+          </div>
+        </div>
         </div>
 
-        <div class="row d-none hide">
-          <div class="col p-3">
-            <Link href={{pathname:"account"}}  class='no-decoration color-p color-bg-white border border-2 color-white-hover color-bg-t-hover color-bd-p p-2 rounded inline-block w-100 center sz-24'> Create Account </Link>
-          </div>
-        </div>
-        </div>
         
-        <div class="col-md col-sm center px-4 order-first order-md-last">
-        <div class="display-md-none break-3"></div>
+        <div class="col-md col-sm center order-first order-md-last">
         <Image class="img-fluid rounded" style={{hight:'400px',wdth:'400px',obejectFit:'cover'}} src={image_1} />
         </div>
         </div>
-        <br />
         <div class="row sz-24 border p-2 hide rounded m-2">
         <div class='col-12 p-3 center hide'>
         <div class="color-bg-s color-white p-2 rounded w-100">
@@ -77,59 +75,74 @@ function App (){
         <audio ref={sound} autoplay>
           <source src={soundtrack} />
         </audio>
+        </div>
 
-        <div class="container-fluid color-bg-p w-100 p-4 vh-md-100" style={{}}>
-            <div class="row sz-md-48 sz-36 color-white bold center p-2">
+        <div class="container-fluid w-100 p-4" style={{}}>
+            <div class="row hide sz-md-48 sz-36 color-black bold center p-2">
               <div class="col">
                 What we Offer 
               </div>
             </div>
 
-            <div class="row sz-20 p-3 font-lato bold">
-                <div class="col-sm p-3 center">
-                    <div class="p-3 color-bg-white shadow">
-                        <Image src={image} class="img-fluid" style={{width:'350px',height:'350px',objectFit:'contain'}} />
-                        <div class="sz-30 color-p"> Quiz Challenge </div>
-                        <div class="w-100 my-3"></div>
-                          Quizzes from different Categories of Subjects
+            <div class="row sz-18 p-3 align-items-center">
+                <div class="col-12 p-3">
+
+                <div class="row align-items-center">
+                    <div class="p-3 col-md-6">
+                        <Image src={image} class="img-fluid" style={{wdth:'350px',heigt:'300px',objectFit:'contain'}} />
+                    </div>
+                    <div class="col center">
+                        <div class="sz-30 sz-md-36"> Quiz Challenge </div>
+                        <div class="w-100 my-2"></div>
+                          Play different Challenges
                     </div>
                 </div>
-
-                 <div class="col-sm p-3 center ">
-                    <div class="p-3 color-bg-white shadow">
-                        <Image src={image_2} class="img-fluid" style={{width:'350px',height:'350px',objectFit:'contain'}} />
-                        <div class="sz-30 color-p"> Multiplayer Mode </div>
-                        <div class="w-100 my-3"></div>
-                        
-                          Play and Compete with Friends
-                    </div>
                 </div>
 
-                <div class="col-sm p-3 center">
-                    <div class="p-3 color-bg-white shadow">
-                        <Image src={image_4} class="img-fluid" style={{width:'350px',height:'350px',objectFit:'contain'}} />
-                        <div class="sz-30 color-p"> Create Quizzes </div>
-                        <div class="w-100 my-3"></div>
-                         Create Your own Quiz Questions
+                <div class="col-12 p-3 py-4 my-5">
+
+                <div class="row align-items-center">
+                    <div class="p-3 col-md-6">
+                        <Image src={image_2} class="img-fluid" style={{wdth:'350px',heigt:'300px',objectFit:'contain'}} />
                     </div>
+                    <div class="col order-md-first center">
+                        <div class="sz-30 sz-md-36"> MutiPlayer</div>
+                        <div class="w-100 my-2"></div>
+                          Play with Friends
+                    </div>
+                </div>
+                </div>
+
+                <div class="col-12 p-3 py-4 my-5">
+
+                <div class="row align-items-center">
+                    <div class="p-3 col-md-6">
+                        <Image src={image_4} class="img-fluid" style={{wdth:'350px',heigt:'300px',objectFit:'contain'}} />
+                    </div>
+                    <div class="col center">
+                        <div class="sz-30 sz-md-36"> Create Quiz Questions</div>
+                        <div class="w-100 my-2"></div>
+                          Create your own quiz cards
+                    </div>
+                </div>
                 </div>
 
 
             </div>
         </div>
 
-        <div class="container vh-md-100 py-3">
+        <div class="container-fluid py-3 color-bg-p">
           <div class="row sz-24 hide">
             <div class="col-sm center">
                 Play as a Guest or Create Account with us
             </div>
           </div>
           <div class='row align-items-center my-3'>
-            <div class="col-sm color-black sz-36 sz-md-48 color-s order-last order-md-first py-4 center">
-              <b>Do you want to test your ability ? Give it a Shot!!! </b>
-               <Link href={{pathname:"quiz_settings"}}  class='no-decoration color-white my-3 color-bg-p  color-bg-t-hover color-white-hover color-bd-p p-2 rounded inline-block w-100 center sz-24'> Let's Go </Link>
+            <div class="col-sm color-black sz-30 sz-md-36 color-s order-last order-md-first py-4 center">
+              Do you want to test your ability ? Give it a Shot!!!
+               <Link href={{pathname:"quiz_settings"}}  class='btn no-decoration color-white my-3 color-bg-p  color-bg-t-hover color-white-hover color-bd-p rounded inline-block w-100 center sz-24'> Let's Go </Link>
             </div>
-            <div class="col py-4">
+            <div class="col py-4 hide">
               <Image src={questionImage} class="img-fluid" />
             </div>
           </div>

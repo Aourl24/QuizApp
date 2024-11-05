@@ -14,8 +14,9 @@ export default function SignUp(props){
 	const username = React.useRef()
 	const passwords = React.useRef([])
 	const [message, setMessage] = React.useState()
-
+	const {setLoader} = React.useContext(QuizBoxContext)
 	const validateInput = ()=>{
+		setLoader(true)
 		if(username.current.value === ""){
 			setMessage("Please enter Username")
 		}
@@ -53,8 +54,13 @@ export default function SignUp(props){
 	}
 
 	React.useEffect(()=>{
+		setLoader(false)
+	},[message])
 
-	},[])
+	React.useEffect(()=>{
+			setLoader(false)
+	return ()=>setLoader(true)
+},[])
 
 	return(
 		<div class="container">
@@ -70,18 +76,18 @@ export default function SignUp(props){
 				</div>
 				}
 
-				<div class="row align-items-center py-4">
-					<div class="col-12 sz-18 py-2"> Username </div>
-					<div class="col"> <input ref={username} class="form-control sz-18" /> </div>
+				<div class="row align-items-center py-3">
+					<div class="col-12 sz-18 pb-4"> Username </div>
+					<div class="col"> <input ref={username} class="form-control sz-18 p-3" /> </div>
 				</div>
-				<div class="row align-items-center py-4">
-					<div class="col-12 sz-18 py-2"> Password </div>
-					<div class="col"> <input type='password' class="form-control sz-18" ref={el=>passwords.current[0] = el} /> </div>
+				<div class="row align-items-center py-3">
+					<div class="col-12 sz-18 pb-4"> Password </div>
+					<div class="col"> <input type='password' class="form-control sz-18 p-3" ref={el=>passwords.current[0] = el} /> </div>
 				</div>
 
-				<div class="row align-items-center py-4">
-					<div class="col-12 sz-18 py-2"> Confirm Password </div>
-					<div class="col"> <input type="password" class="form-control sz-18" onChange={()=>checkDifference()} ref={el=>passwords.current[1] = el} /> </div>
+				<div class="row align-items-center py-3">
+					<div class="col-12 sz-18 pb-4"> Confirm Password </div>
+					<div class="col"> <input type="password" class="form-control sz-18 p-3" onChange={()=>checkDifference()} ref={el=>passwords.current[1] = el} /> </div>
 				</div>
 
 				<div class="row py-4">

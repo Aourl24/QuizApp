@@ -17,7 +17,7 @@ export default function Blitz(){
 
 				
 					{categories.map((cat)=>(
-						<div class='row my-3'>
+						<div class='row my-3 p-2'>
 						<Link class="rounded-3 col colr-bg-white no-decoration p-3 color-p w-100 color-bg-s-hover color-white-hover border" href={{pathname: "/blitz/game",query:{time:cat.time,point:cat.point}}}> {cat.name} </Link>
 						</div>
 						))}

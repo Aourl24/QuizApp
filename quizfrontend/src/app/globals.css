@@ -1,7 +1,10 @@
 :root {
- --primary-color:#355E3B;
- --secondary-color:#437C17;
- --tertiary-color:#8A9A5B;
+  --primary-color:#059669;
+  --primary-color:#065F46;
+ --secondary-color:#10B981;
+ --tertiary-color:#E7F9E9;
+ --hover-color:#22C55E;
+ --highlight-color:#A3E635;
 }
 
 .select{

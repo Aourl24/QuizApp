@@ -21,24 +21,10 @@ export default function RootLayout({ children }) {
   const user = null
   return (
     <html lang="en">
-      <body className="container-fluid bg-light p-0 font-montserrat">
+      <body className="container-fluid color-bg-t p-0 font-montserrat">
        <Quiz>
        <Header />
-
-      <div class="row vh-100">
-          <div class="col-12"> 
-          
           {children} 
-          
-          </div>
-
-          <div class="col">
-              <div class="row center position-relative bottom-0 container hide">
-
-                <div class="col"> <span class="sz-14">LouLou</span> <br/> <i class="fas fa-phone"></i> +2349078025667, <i class="fab fa-google"></i> awwalmustapha@gmail.com </div>
-              </div>
-          </div>
-          </div>
           </Quiz>
       </body>
     </html>

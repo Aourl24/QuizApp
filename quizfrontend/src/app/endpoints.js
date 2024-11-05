@@ -1,8 +1,8 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-//const api_host = '192.168.8.92:8000'
-const api_host = '127.0.0.1:8000'
+const api_host = '192.168.43.92:8000'
+//const api_host = '127.0.0.1:8000'
 //const api_host = 'https://quizbackend.leapcell.app'
 export const host = '127.0.0.1:3000'
 export const endpoint = `http://${api_host}/`//'http://127.0.0.1:8000/'

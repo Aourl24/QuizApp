@@ -3,15 +3,20 @@ import React from "react"
 import {QuizBox,QuizBoxContext,MissedOut , CountDown , useFetch} from '../../components.js'
 import {endpoint} from "../../endpoints.js"
 import axios from "axios"; 
+import {useSearchParams} from "next/navigation"
 
 export default function Main(){
-	const {data,setData ,batch,setMessage,setShowRestart,setBatch,setGame} = React.useContext(QuizBoxContext)
+	const {data,setData ,batch,setMessage,setShowRestart,setBatch,setGame,setLoader} = React.useContext(QuizBoxContext)
 	//const [page, setPage] = React.useState(1)
+	const params = useSearchParams()
+	const category = params.get('category')
 	setBatch(1)
 
+
 	React.useEffect(()=>{
-		//setBatch(1)
-	},[])
+			setLoader(false)
+	return ()=>setLoader(true)
+},[])
 
 	return(
 			<div class="container">
@@ -21,7 +26,7 @@ export default function Main(){
 				<div class="col right"> <MissedOut number={3} /> </div>
 			</div>
 
-			{data && <QuizBox path={"quickplay/General Knowledge/" + batch} /> }
+			{data && <QuizBox path={`getgame/${category}/${batch}`} /> }
 
 			</div>
 		)

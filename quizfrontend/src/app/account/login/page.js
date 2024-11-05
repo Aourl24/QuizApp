@@ -8,7 +8,7 @@ import {QuizBoxContext} from "../../components.js"
 import Link from "next/link"
 
 export default function Login(props){
-	const {user,setUser} = React.useContext(QuizBoxContext)
+	const {user,setUser,setLoader} = React.useContext(QuizBoxContext)
 	const username = React.useRef()
 	const password = React.useRef()
 	const [login,setLogin] = React.useState(false)
@@ -17,6 +17,7 @@ export default function Login(props){
 
 	const validateInput = ()=>{
 		setMessage()
+		setLoader(true)
 		if(username.current.value === "" || password.current.value === ""){
 			setMessage("Input can not be Empty")
 		}
@@ -24,9 +25,11 @@ export default function Login(props){
 			let data = {username:username.current.value,password:password.current.value}
 			postData('login',data).then((res)=>{
 				setMessage(res.msg);
-				setLogin(res.status);
-				Cookies.set('token',res.token)
-				setUser(res.user)
+				setLogin(res.status)
+				if(res.user){
+					Cookies.set('token',res.token)
+					setUser(res.user)
+				}
 			}
 		).catch(()=>{
 			setMessage("Error Logging In");setLogin(false)
@@ -41,6 +44,16 @@ export default function Login(props){
 	React.useEffect(()=>{
 		Cookies.remove('token')
 	},[])
+
+	React.useEffect(()=>{
+		setLoader(false)
+	},[message])
+
+	React.useEffect(()=>{
+			setLoader(false)
+	return ()=>setLoader(true)
+},[])
+
 
 	return(
 		<div class="container">
@@ -57,13 +70,13 @@ export default function Login(props){
 				</div>
 				}
 
-				<div class="row align-items-center py-4">
-					<div class="col-12 sz-18 py-2"> Username </div>
-					<div class="col"> <input ref={username} class="form-control sz-18" /> </div>
+				<div class="row align-items-center py-3">
+					<div class="col-12 sz-18 pb-4"> Username </div>
+					<div class="col"> <input ref={username} class="form-control sz-18 p-3" /> </div>
 				</div>
-				<div class="row align-items-center py-4">
-					<div class="col-12 py-2 sz-18"> Password </div>
-					<div class="col"> <input type='password' class="form-control sz-18" ref={password} /> </div>
+				<div class="row align-items-center py-3">
+					<div class="col-12 pb-4 sz-18"> Password </div>
+					<div class="col"> <input type='password' class="form-control sz-18 p-3" ref={password} /> </div>
 				</div>
 				<div class="row py-4">
 					<div class="col"> <button onClick={()=>validateInput()} class="color-bg-p no-border rounded-4 w-100 color-white color-bg-s-hover sz-20 p-2 py-3"> Log-In </button></div>

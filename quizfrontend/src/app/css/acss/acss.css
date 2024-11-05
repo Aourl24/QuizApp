@@ -2,6 +2,8 @@
  --primary-color:#0000CD;
  --secondary-color:darkblue;
  --tertiary-color:#8A9A5B;
+ --hover-color:#22C55E;
+ --highlight-color:#A3E635;
 }
 
 .select{
@@ -86,6 +88,14 @@
     cursor:pointer;
 }
 
+.higlight{
+    color:var(--highlight-color);
+}
+
+.higlight-background{
+    background-color:var(--highlight-color);
+}
+
 .font-adventor{
     font-family: Adventor;
 }
@@ -153,6 +163,14 @@
 
 .color-hover-focus:hover{
     color:black   
+}
+
+.color-bg-hover:hover {
+    background-color: var(--hover-color)
+}
+
+.color-hover:hover {
+    color: var(--hover-color)
 }
 
 .color-bg-p-hover:hover {

@@ -4,9 +4,9 @@ import React from 'react'
 
 function App(){
 	return(
-		<React.Fragment>
+		<div class="container">
 		<QuizSetting />
-		</React.Fragment>
+		</div>
 	)
 }
 
