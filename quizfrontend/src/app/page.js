@@ -10,16 +10,17 @@ import image_2 from './image_2.jpeg'
 import image_3 from './image_3.jpeg'
 import image_4 from './images_4.jpeg'
 import questionImage from './quizimage.png'
+import {QuizBoxContext} from "./components.js"
+
 
 function App (){
   let sound = React.useRef()
 
+  const {setLoader} = React.useContext(QuizBoxContext)
+
   React.useEffect(()=>{
-    //sound.current.play();
-    //sound.current.addEventListener('ended',()=>{
-      //this.currentTime = 0
-      //this.play()
-    //})
+    setLoader(false)
+    return ()=>setLoader(true)    
   },[])
 
   return(

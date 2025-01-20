@@ -16,21 +16,48 @@ class Profile(models.Model):
 	def __str__(self):
 		return f'{self.user.username} Profile'
 
-class Player(models.Model):
-	profile = models.ForeignKey(Profile,related_name='player',on_delete=models.CASCADE,null=True,blank=True)
-	name = models.CharField(max_length=100000)
-	score = models.IntegerField(default=0)
-	active = models.BooleanField(default=True)
-
-	def __str__(self):
-		return self.name
 
 class GameMode(models.Model):
 	name = models.CharField(max_length=2000000,unique=True)
-	intstructions = models.TextField(null=True,blank=True)
+	instructions = models.TextField(null=True,blank=True)
+	icon = models.CharField(max_length=200 , default="fas fa-")
+	score=models.IntegerField(default=10)
+	time=models.IntegerField(default=20)
+	order=models.IntegerField(default=1)
+	profiles = models.ManyToManyField(Profile,related_name='gameMode',blank=True)
+	verified_profile = models.BooleanField(default=True)
+
 
 	def __str__(self):
 		return self.name
+
+	def locked(self,id):
+		if self.verified_profile == False :
+			return False
+		if not id:
+			return True
+		profile = Profile.objects.get(id=id)
+		check = self.profiles.filter(id=profile.id).exists()
+		if check:
+			return False
+		else:
+			return True
+
+class Player(models.Model):
+	pass
+
+# class ProfileGameMode(models.Model):
+# 	profile = models.ForeignKey(Profile,related_name="gameMode",on_delete=models.CASCADE,null=True,blank=True)
+# 	mode = models.ForeignKey(GameMode,on_delete=models.CASCADE,related_name='profilegame',null=True,blank=True)
+# 	locked = models.BooleanField(default=False)
+
+# 	class Meta:
+# 		unique_together = ('profile','mode')
+
+# 	def __str__ (self):
+# 		return f"{self.profile} - {self.mode}"
+
+
 
 class Category(models.Model):
 	name =  models.CharField(max_length=200000)
@@ -81,7 +108,7 @@ class Question(models.Model):
 
 class Option(models.Model):
 	question = models.ForeignKey(Question,related_name='option',on_delete=models.CASCADE)
-	body = models.TextField()
+	body = models.TextField(null=True,blank=True)
 	answer = models.BooleanField()
 
 	def __str__(self):
@@ -94,6 +121,11 @@ class Points(models.Model):
 
 	def __str__(self):
 		return f"{self.player.user} score in {self.game.title}"
+
+class Setting(models.Model):
+	player = models.OneToOneField(Profile,related_name="settings",on_delete=models.CASCADE)
+	confirm = models.BooleanField(default=False)
+	sound = models.BooleanField(default=True)
 
 @receiver(post_save,sender=User)
 def createPlayer(sender,created,instance,**kwargs):

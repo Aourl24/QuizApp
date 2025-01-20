@@ -1,8 +1,10 @@
 "use client"
 import {endpoint} from "../endpoints.js"
 import React from "react"
+import {QuizBoxContext} from "../components.js"
 
 export default function LeaderBoard(){
+	const {setLoader} = React.useContext(QuizBoxContext)
 	const boards = ['Global Rank',"Daily Challenge","Blitz","survival"]
 	const [general,setGeneral] = React.useState()
 	const [daily , setDaily] = React.useState()
@@ -17,7 +19,10 @@ export default function LeaderBoard(){
 			setBlitz(x.blitz_leaderboards)
 			setSurvival(x.survival_leaderboards)
 			setShow(0)
+			setLoader(false)
 		})
+		return ()=>setLoader(true)
+
 	},[])
 
 		return(
@@ -49,7 +54,7 @@ function Rank({items}){
 					<div class="">
 					<br />
 					{
-						items.map((item,e)=>(
+						items.filter((item)=>item.total_points).map((item,e)=>(
 							<div class="row sz-18  p-3">
 								<div class="col-1">
 									{e+1}

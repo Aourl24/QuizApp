@@ -15,8 +15,10 @@ export default function SignUp(props){
 	const passwords = React.useRef([])
 	const [message, setMessage] = React.useState()
 	const {setLoader} = React.useContext(QuizBoxContext)
+
 	const validateInput = ()=>{
 		setLoader(true)
+		checkDifference()
 		if(username.current.value === ""){
 			setMessage("Please enter Username")
 		}
@@ -58,6 +60,7 @@ export default function SignUp(props){
 	},[message])
 
 	React.useEffect(()=>{
+		Cookies.remove('token')
 			setLoader(false)
 	return ()=>setLoader(true)
 },[])
@@ -87,7 +90,7 @@ export default function SignUp(props){
 
 				<div class="row align-items-center py-3">
 					<div class="col-12 sz-18 pb-4"> Confirm Password </div>
-					<div class="col"> <input type="password" class="form-control sz-18 p-3" onChange={()=>checkDifference()} ref={el=>passwords.current[1] = el} /> </div>
+					<div class="col"> <input type="password" class="form-control sz-18 p-3" ref={el=>passwords.current[1] = el} /> </div>
 				</div>
 
 				<div class="row py-4">

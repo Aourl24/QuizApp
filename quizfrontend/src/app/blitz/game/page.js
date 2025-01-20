@@ -6,7 +6,7 @@ import { useRouter ,useSearchParams } from 'next/navigation'
 import {endpoint} from "../../endpoints.js"
 
 export default function Game(){
-	const {setScorePercent,data, setData,setGame,setBatch,batch} = React.useContext(QuizBoxContext)
+	const {setScorePercent,data, setData,setGame,setBatch,batch,setLoader,user} = React.useContext(QuizBoxContext)
 	const router = useSearchParams()
 	const point  = router.get('point')
 	const time = router.get('time')
@@ -18,17 +18,28 @@ export default function Game(){
 			setData(x.questions)
 			setGame(x.game)
 		})
-
+		setLoader(false)
+		return ()=> setLoader(true)
 	},[])
+
+	if(!user){
+		return(
+			<div class="container">
+				<div class="row vh-90 align-items-center">
+					<div class="col center sz-18">You are not allow to view this page</div>
+				</div>
+			</div>
+			)
+	}
 
 	return(
 		<div class="container">
-			<div class="row">
+			<div class="row mb-4">
 				<div class="col sz-20"> Blitz Mode</div>
-				<div class="col"><CountDown number={+time} /> </div>
+				<div class="col  right"><CountDown number={+time} /> </div>
 			</div>
 
-			{data && <QuizBox path={'blitz/' + batch} /> }
+			{data && <QuizBox path={'getgamename/blitz/' + batch} /> }
 
 			</div>
 

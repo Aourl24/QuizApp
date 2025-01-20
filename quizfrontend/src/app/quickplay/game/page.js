@@ -6,28 +6,28 @@ import axios from "axios";
 import {useSearchParams} from "next/navigation"
 
 export default function Main(){
-	const {data,setData ,batch,setMessage,setShowRestart,setBatch,setGame,setLoader} = React.useContext(QuizBoxContext)
-	//const [page, setPage] = React.useState(1)
+	const {data,setData ,batch,setMessage,setShowRestart,setBatch,setGame,setLoader,setScorePercent,active} = React.useContext(QuizBoxContext)
 	const params = useSearchParams()
-	const category = params.get('category')
-	setBatch(1)
+	setScorePercent(parseInt(params.get('score')))
+	setBatch(false)
 
 
 	React.useEffect(()=>{
 			setLoader(false)
+			// setBatch(1)
 	return ()=>setLoader(true)
 },[])
 
 	return(
 			<div class="container">
-			<div class="row">
-				<div class="col sz-20"> Quick Play </div>
-				<div class="col"><CountDown /> </div>
-				<div class="col right"> <MissedOut number={3} /> </div>
+			<div class="row my-3 my-md-4 ">
+				<div class="col sz-20 color-p bold"> <i class={params.get('icon')}></i> {params.get('title')} </div>
+				<div class="col">{active + 1} / {data.length} </div>
+				<div class="col-2  right"><CountDown number={parseInt(params.get('score'))} /> </div>
+				{/*<div class="col right "> <MissedOut number={3} /> </div>*/}
 			</div>
 
-			{data && <QuizBox path={`getgame/${category}/${batch}`} /> }
-
+			 <QuizBox path={`getgamename/${params.get('title')}/${1}`} />
 			</div>
 		)
 }

@@ -1,7 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 import asyncio
-from .models import Game,Player
+from .models import Game
 from asgiref.sync import sync_to_async
 from django.urls import reverse
 import time

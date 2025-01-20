@@ -6,13 +6,15 @@ import {useRouter} from 'next/navigation';
 import Cookies from 'js-cookie';
 import {QuizBoxContext} from "../../components.js"
 import Link from "next/link"
+import {AuthContext} from "../../auth.js"
 
 export default function Login(props){
+	const {loginUser , login ,setLogin , message ,setMessage} = React.useContext(AuthContext)
 	const {user,setUser,setLoader} = React.useContext(QuizBoxContext)
 	const username = React.useRef()
 	const password = React.useRef()
-	const [login,setLogin] = React.useState(false)
-	const [message,setMessage] = React.useState()
+	// const [login,setLogin] = React.useState(false)
+	// const [message,setMessage] = React.useState()
 	const router = useRouter()
 
 	const validateInput = ()=>{
@@ -23,18 +25,20 @@ export default function Login(props){
 		}
 		else{
 			let data = {username:username.current.value,password:password.current.value}
-			postData('login',data).then((res)=>{
-				setMessage(res.msg);
-				setLogin(res.status)
-				if(res.user){
-					Cookies.set('token',res.token)
-					setUser(res.user)
-				}
-			}
-		).catch(()=>{
-			setMessage("Error Logging In");setLogin(false)
+		// 	postData('login',data).then((res)=>{
+		// 		setMessage(res.msg);
+		// 		setLogin(res.status)
+		// 		if(res.user){
+		// 			Cookies.set('token',res.token)
+		// 			setUser(res.user)
+		// 		}
+		// 	}
+		// ).catch(()=>{
+		// 	setMessage("Error Logging In");setLogin(false)
 			
-		})}
+		// })
+			loginUser('login',data)
+		}
 	}
 
 	React.useEffect(()=>{

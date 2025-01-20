@@ -43,13 +43,22 @@ def userView(request):
 
 def paginate(model,number,next=1,game=None):
 	paginator = Paginator(model,number)
+	
 	try:
 		page_question = paginator.page(next)
 		serializer = QuestionSerializer(page_question.object_list, many=True)
 		game_serializer = GameSerializer(game)
-		return Response({"questions":serializer.data,"game":game_serializer.data})
-	except EmptyPage:
+		return Response({"questions":serializer.data,"game":game_serializer.data, "has_next":page_question.has_next(),"pages_number":paginator.count,"next_page_number":page_question.next_page_number() if page_question.has_next() else None})
+	except EmptyPage as e:
+		print(e)
 		return Response({"questions":False})
+
+
+@api_view(['GET'])
+def getGameMode(request,id=None):
+	modes = GameMode.objects.all().order_by('order')
+	serializer = GameModeSerializer(modes,many=True,context=dict(id=id))
+	return Response(serializer.data)
 
 @api_view(['GET'])
 def getGames(request,mode=None,category=None):
@@ -64,29 +73,34 @@ def getGames(request,mode=None,category=None):
 
 
 @api_view(['GET'])
-def getGame(request,game,next):
-	get_game = Game.objects.get(id=game)
-	questions = get_game.question.order_by('?')
-	return paginate(questions,10,next,game=get_game)
+def getGame(request,next=1,game=None,name=None):
+	if game:
+		get_game = Game.objects.get(id=game)
+		questions = get_game.question.order_by('?')
+	if name:
+		mode = GameMode.objects.get(name=name)
+		try:
+			get_game = Game.objects.filter(mode=mode).order_by('?').first()
+			questions = get_game.question.all()
+		except:
+			get_game = Game.objects.create(title=name,mode=mode)
+			questions = Question.objects.filter(game__mode=mode).order_by('?').distinct()
+			get_game.question.set(questions)
 
-# @api_view(['GET'])
-# def quickPlay(request,category,next):
-# 	#category = Category.objects.filter(name)
-# 	# questions = Question.objects.filter(category__name=category,mode__name="quick play").order_by('?')
-# 	mode = GameMode.objects.get(id=1)
-# 	game= Game.objects.filter(mode=mode).latest('date')
-# 	questions = game.question.order_by('?')
-# 	return paginate(questions,10,next,game=game)
 	
-
+	return paginate(questions,20,next,game=get_game)
+	
 	
 @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
-def dailyChallenge(request,player):
+def dailyChallenge(request,player,games=None):
 	game = Game.objects.filter(mode__name="daily challenge").latest('date')
 	profile = Profile.objects.get(id=player)
 	already_played = game.players.filter(id=profile.id).exists()
 	
+	if games:
+		game_serializer = GameSerializer(game)
+		return Response(dict(game=game_serializer.data,already_played=already_played))
 	if already_played:
 		points = Points.objects.get(game=game,player=profile)
 		return Response({'message':'challenge already played',"score":points.score})
@@ -96,7 +110,6 @@ def dailyChallenge(request,player):
 
 @api_view(['GET'])
 def completeGame(request,player,score,game):
-	# game = Game.objects.filter(mode__name="daily challenge").latest('date')
 	game = Game.objects.get(id=game)
 	profile = Profile.objects.get(id=player)
 	points = Points.objects.create(game=game,player=profile,score=score)
@@ -104,18 +117,12 @@ def completeGame(request,player,score,game):
 	return Response({'message':"Game Completed"})
 
 @api_view(['GET'])
-def blitzMode(request,next):
-	game = Game.objects.filter(mode__name="blitz").latest('date')
-	question = game.question.all()
-	return paginate(question,10,next=next,game=game)
-
-
-@api_view(['GET'])
-def survivalMode(request,next):
-	game = Game.objects.filter(mode__name="survival").latest('date')
-	question = game.question.all()
-	return paginate(question,10, next=next, game=game)
-
+def completeMode(request,profile,mode):
+	mode = GameMode.objects.get(id=mode)
+	mode.profiles.add(profile)
+	profile = Profile.objects.get(id=profile)
+	mode.save()
+	return Response({'message':"Mode Updated"})
 
 
 @api_view(['GET'])
@@ -123,6 +130,7 @@ def getCategory(request):
 	category = Category.objects.all()
 	serializer = CategorySerializer(category,many=True)
 	return Response(serializer.data)
+
 
 @api_view(['POST'])
 def signUp(request):
@@ -153,7 +161,6 @@ def loginView(request):
 	username = data.get('username')
 	password = data.get('password')
 	user = authenticate(username=username,password=password)
-
 	if user is not None:
 		serializer = UserSerializer(user)
 		refresh = RefreshToken.for_user(user)
@@ -258,13 +265,9 @@ def getAllGames(request):
 @api_view(['GET'])
 def leaderBoards(request):
 	global_leaderboards = Profile.objects.annotate(total_points=Sum("score__score")).order_by("-total_points")[:15]
-
-	daily = Game.objects.filter(mode__name="daily challenge").latest('date')
-	blitz = Game.objects.filter(mode__name="blitz").latest('date')
-	survival = Game.objects.filter(mode__name="survival").latest('date')
-	daily_leaderboards = daily.players.annotate(total_points=Sum("score__score",filter=Q(score__game = daily))).order_by("-total_points")[:15]
-	blitz_leaderboards = blitz.players.annotate(total_points=Sum("score__score",filter=Q(score__game = blitz))).order_by("-total_points")[:15]
-	survival_leaderboards = survival.players.annotate(total_points=Sum("score__score",filter=Q(score__game = survival))).order_by("-total_points")[:15]
+	survival_leaderboards = Profile.objects.annotate(total_points=Sum("score__score",filter=Q(score__game__mode__name = "survival"))).order_by("-total_points")[:15] 
+	daily_leaderboards = Profile.objects.annotate(total_points=Sum("score__score",filter=Q(score__game__mode__name = "daily challenge") )).order_by("-total_points")[:15]
+	blitz_leaderboards = Profile.objects.annotate(total_points=Sum("score__score",filter=Q(score__game__mode__name = "blitz"))).order_by("-total_points")[:15]
 	global_serializer = ProfileSerializer(global_leaderboards,many=True)
 	daily_serializer = ProfileSerializer(daily_leaderboards,many=True)
 	survival_serializer = ProfileSerializer(survival_leaderboards,many=True)

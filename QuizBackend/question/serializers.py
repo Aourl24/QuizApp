@@ -21,10 +21,10 @@ class CategorySerializer(serializers.ModelSerializer):
 		model = Category
 		fields = '__all__'
 		
-class PlayerSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = Player
-		fields = '__all__'
+# class PlayerSerializer(serializers.ModelSerializer):
+# 	class Meta:
+# 		model = Player
+# 		fields = '__all__'
 
 class LevelSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -73,3 +73,13 @@ class PointSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Points
 		fields = ['score','total_points',]
+
+class GameModeSerializer(serializers.ModelSerializer):
+	locked = serializers.SerializerMethodField()
+	class Meta:
+		model = GameMode
+		fields = '__all__'
+
+	def get_locked(self,obj):
+		locked = obj.locked(self.context.get('id'))
+		return locked
