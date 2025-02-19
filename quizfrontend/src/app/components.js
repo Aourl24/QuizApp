@@ -231,10 +231,10 @@ export function QuizBox({path}) {
     };
 
     return (
-        <div class="container-fluid p-1">
+        <div class="contaier-fluid ">
             {data &&
                 <div className="row center justify-content-center">
-                    <div className="sz-24 bold rounded p-3 col-12">{data[active]?.body}</div>
+                    <div className="sz-20 sz-md-24  rounded p-3 col-12 color-p">{data[active]?.body}</div>
                     <div className="col-12 my-3">
                         <div className="row m-2">
                             {data[active]?.options?.map((option, i) => (
@@ -426,19 +426,19 @@ export function Instructions (props){
     const {confirm , sound , setConfirm , setSound} = useContext(QuizBoxContext);
 
     return(
-        <div class="container">
+        <div class="containr">
             <div class="box sz-24 center bold my-3 mb-4"> <i class={props.icon}></i>  {props.title} </div> 
             
             <div class="box mb-4"> 
-                <div class="color-p bold sz-16 my-2 "> <i class="fas fa-clock text-warning"> </i> Time </div> {props.time} seconds per question 
+                <div class="color-grey bold sz-16 my-2 "> <i class="fas fa-clock text-warning"> </i> Time </div> {props.time} seconds per question 
             </div>
             
             <div class="box mb-4">
-                <div class="color-p bold sz-16 my-2 "> <i class="fas fa-trophy text-primary"> </i> Score </div> {props.score} points per question
+                <div class="color-grey bold sz-16 my-2 "> <i class="fas fa-trophy text-primary"> </i> Score </div> {props.score} points per question
             </div>
 
             <div class="box mb-4">
-            <div class="sz-16 bold mb-3 color-p"> <i class="fas fa-exclamation-circle text-danger"> </i> Important Tips </div>
+            <div class="sz-16 bold mb-3 color-grey"> <i class="fas fa-exclamation-circle text-danger"> </i> Important Tips </div>
                 <ul>
                     <li> Read each question carefully before answering </li>
                     <li> Balace speed with accuracy - rushing leads to mistakes </li>
@@ -447,13 +447,13 @@ export function Instructions (props){
             </div>
 
             <div class="box mb-5">
-                <div class="sz-16 bold mb-3 color-p"> <i class="fas fa-cog color-s"> </i> Settings </div>
+                <div class="sz-16 bold mb-3 color-grey"> <i class="fas fa-cog color-s"> </i> Settings </div>
                 <div class="row my-3">
                     <div class="col"> Confirm answer </div> 
                     <div class="col">
                     <div class="row">
-                    <div class={`rounded-6   pointer-cursor col   ${confirm ? "color-bg-p color-white" : "border color-black"}`} style={{heigh:"15px",with:'15px'}}   onClick={()=>setConfirm(true)} > Yes </div>
-                        <div class={`rounded-6  inline-blok pointer-cursor col ${!confirm ? "color-bg-p color-white" : "border color-black"}`} style={{heght:"15px",widt:'15px'}}   onClick={()=>setConfirm(false)} > No </div>
+                    <div class={`rounded-6   pointer-cursor col   ${confirm ? "color-bg-s color-white" : "border color-black"}`} style={{heigh:"15px",with:'15px'}}   onClick={()=>setConfirm(true)} > Yes </div>
+                        <div class={`rounded-6  inline-blok pointer-cursor col ${!confirm ? "color-bg-s color-white" : "border color-black"}`} style={{heght:"15px",widt:'15px'}}   onClick={()=>setConfirm(false)} > No </div>
                     </div>
                     </div>
                 </div>
@@ -461,8 +461,8 @@ export function Instructions (props){
                     <div class="col"> Sound </div> 
                     <div class="col">
                     <div class="row">
-                    <div class={`rounded-6   pointer-cursor col   ${sound ? "color-bg-p color-white" : "border color-black"}`} style={{heigh:"15px",with:'15px'}}   onClick={()=>setSound(true)} > Yes </div>
-                        <div class={`rounded-6   inline-blok pointer-cursor col ${!sound ? "color-bg-p color-white" : "border color-black"}`} style={{heght:"15px",widt:'15px'}}   onClick={()=>setSound(false)} > No </div>
+                    <div class={`rounded-6   pointer-cursor col   ${sound ? "color-bg-s color-white" : "border color-black"}`} style={{heigh:"15px",with:'15px'}}   onClick={()=>setSound(true)} > Yes </div>
+                        <div class={`rounded-6   inline-blok pointer-cursor col ${!sound ? "color-bg-s color-white" : "border color-black"}`} style={{heght:"15px",widt:'15px'}}   onClick={()=>setSound(false)} > No </div>
                     </div>
                     </div>
                 </div>
