@@ -390,12 +390,12 @@ export const Header = ()=>{
     const { data } = React.useContext(AuthContext)
     
     return(
-        <div class="row align-items-center p-3 py-4 color-bg-t sticky-top" style={{backgroundColor:"#333333"}}>
+        <div class="row align-items-center py-4 color-bg-t sticky-top" style={{backgroundColor:"#333333"}}>
         <div class="col-md-9 col sz-18 color-white ">
              <span class="font-grea" style={{display:'inline-block'}}>Quizzify</span>
         </div>
         <div class="col" style={{textAlign:'right'}}>
-          {data?.user ? <Link href="profile" class="color-p no-decoration" style={{}}>{data.user.username}</Link> : <Link href="/account/signup" class="color-white p-md-3 p-2 rounded-5 sz-14 no-decoration color-bg-black">Sign Up </Link> }
+          {data?.user ? <Link href="profile" class="color-p no-decoration" style={{}}>{data.user.username}</Link> : <Link href="/account/signup" class="color-white p-md-3 p-2 rounded-5 sz-14 no-decoration color-bg-t">Sign Up </Link> }
         </div>
         {data?.user && <div class="col"> <Menu /> </div>}
       </div>

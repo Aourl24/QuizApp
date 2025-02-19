@@ -71,7 +71,7 @@ React.useEffect(()=>{
 							</div>
 							<div class="row sz-12 mt-5 p-0">
 								<div class="col right text-danger p-0">
-								<span class="bg-success p-2 rounded-3 color-white"> open <i class="fas fa-circle"></i> </span>
+								<span class="bg-success p-2 rounded-3 color-white"> open <i class="fas fa-bolt"></i> </span>
 								</div>
 							</div>
 						</div>

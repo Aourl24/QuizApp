@@ -24,7 +24,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
     <Auth>
-      <body className="container-fluid colo-bg-t p-0 font-montserrat">
+      <body className="container-fluid colo-bg-t font-montserrat">
        <Quiz>
        <Header />
           {children} 

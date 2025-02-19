@@ -25,66 +25,45 @@ function App (){
 
   return(
     <div class="">
-      <div class="d-flex p-2  rounded align-items-center vh-100 vh-md-90 container-fluid justify-content-center " styl={{hight:'90vh'}}>
-      <div class="p-4">
+      <div class="d-flex p-0 flex-column rounded  vh-100 vh-md-90 container jstify-content-center " styl={{hight:'90vh'}}>
         <div class="row p-4 rounded shado align-items-center">
-        <div class="col-md col-sm cente sz-30">   
-            <div class="row mt-4">
-                <div class="col sz-md-30 ">
-                <span class="sz-48 color-p inline-block" style={{transform:"scaleY(1.2)",transform:"scaleX(1)"}}>Quizzify!</span>
-                    <br/><span class="sz-sm-24"> Challenge your mind and test your skills</span> 
-                </div>
-            </div>
-            <div class="row my-2">
-              <div class="col sz-md-24 d-none">
-                  experience our quiz app  <br/><span class="center inline-blck color-p w-100 font-great sz-60 hide sz-md-60 animate__animted aimate__bounce animte__infinie aimate__delay-3s" style={{isplay:'inline-block'}}>Quizzify</span>    </div>
-            </div>
-        
-          
-        <div class="row mt-md-5 mt-4">
-          <div class="col p-2 p-md-3">
-            <Link href={{pathname:"quiz_settings"}}  class='no-decoration color-white color-bg-p  color-bg-hover color-white-hover color-bd-p p-3 rounded-4 inline-block w-100 center sz-20 sz-md-24'> Play Quiz </Link>
-          </div>
-          <div class="w-100 d-none"></div>
-          <div class="col p-2 p-md-3">
-            <Link href={{pathname:"account/signup"}}  class='no-decoration color-black color-white color-black-hover color-bg-t-hover color-white-hover color-bd-p p-3 rounded-4 inline-block w-100 center sz-20 sz-md-24 color-bg-s'> Sign Up </Link>
-          </div>
-        </div>
-        </div>
+          <div class="col-md col-sm cente sz-30 ">   
+              <div class="row mt-4">
+                  <div class="col sz-md-30 ">
+                  <span class="sz-48 color-p inline-block" style={{transform:"scaleY(1.2)",transform:"scaleX(1)"}}>Quizzify!</span>
+                      <br/><span class="sz-sm-24"> Challenge your mind and test your skills</span> 
+                  </div>
+              </div>
 
-        
-        <div class="col-md col-sm center order-first order-md-last">
-        <img class="img-fluid rounded" style={{height:'450px',widt:'400px',obejectFit:'cover'}} src="/quiz2.jpg" />
-        </div>
-        </div>
-        <div class="row sz-24 border p-2 hide rounded m-2">
-        <div class='col-12 p-3 center hide'>
-        <div class="color-bg-s color-white p-2 rounded w-100">
-          <Link href={{pathname:"quiz_settings",query:{data:'join'}}} class='no-decoration color-white'> Join Quiz </Link>
-        </div>
-        </div>
-        <div class='col-12 center p-3 hide'>
-        <div class="color-bg-p color-white p-2 rounded w-100 color-white">
-          <Link href={{pathname:"quiz_settings",query:{data:'solve'}}} class='no-decoration color-white'> Solve Quiz </Link>
-        </div>
-        </div>
-        <div class='col-12 center p-3 order-first'>
+              <div class="row my-2">
+                <div class="col sz-md-24 d-none">
+                    experience our quiz app  <br/><span class="center inline-blck color-p w-100 font-great sz-60 hide sz-md-60 animate__animted aimate__bounce animte__infinie aimate__delay-3s" style={{isplay:'inline-block'}}>Quizzify</span> 
+                  </div>
+              </div>
 
+            <div class="row mt-md-5 mt-4">
+              <div class="col p-2 p-md-3">
+                <Link href={{pathname:"quiz_settings"}}  class='no-decoration color-white color-bg-p  color-bg-hover color-white-hover color-bd-p p-3 rounded-4 inline-block w-100 center sz-20 sz-md-24'> Play Quiz </Link>
+              </div>
+              <div class="w-100 d-none"></div>
+              <div class="col p-2 p-md-3">
+                <Link href={{pathname:"account/signup"}}  class='no-decoration color-black color-white color-black-hover color-bg-t-hover color-white-hover color-bd-p p-3 rounded-4 inline-block w-100 center sz-20 sz-md-24 color-bg-s'> Sign Up </Link>
+              </div>
+            </div>
+          </div>
+        
+          <div class="col col-sm center order-firs orer-md-last">
+            <img class="img-fluid rounded" style={{height:'450px',widt:'400px',obejectFit:'cover'}} src="/quiz2.jpg" />
+          </div>
         </div>
-        </div>
-        <div class="container center my-3"> </div>
-        </div>
-        <audio ref={sound} autoplay>
-          <source src={soundtrack} />
-        </audio>
-        </div>
+      </div>
 
         
     <section id="services" class="services section font-montserrat">
 
       
       <div class="container section-title" data-aos="fade-up">
-        <h2 class="font-montserrat">Features</h2>
+        <h2 class="font-montserrat color-p">Features</h2>
         <p>Our Quizzify app contain the following Features</p>
       </div>
 
@@ -133,7 +112,7 @@ function App (){
 
 <section id="more-services" class="more-services section">
       <div class="container section-title" data-aos="fade-up">
-        <h2>Sign Up Now!!</h2>
+        <h2 class="color-p">Sign Up!!</h2>
         <p>Create account to enjoy more features from our quiz app</p>
       </div>
 
