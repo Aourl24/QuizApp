@@ -257,7 +257,7 @@ def userRanking(request):
 
 def getAllGames(request):
 	games = Game.objects.filter(active=True,public=True,multiplayer=True)
-	serializer = GameSerializer(game,many=True)
+	serializer = GameSerializer(games,many=True)
 	return Response(serializer.data)
 
 
