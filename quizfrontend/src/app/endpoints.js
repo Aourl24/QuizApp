@@ -3,7 +3,7 @@ import Cookies from 'js-cookie'
 
 const api_host = '192.168.14.92:8000'
 // const api_host = '127.0.0.1:8000'
-//const api_host = 'https://quizbackend.leapcell.app'
+const api_host = 'https://quizapp-p1lx.onrender.com'
 export const host = '127.0.0.1:3000'
 export const endpoint = `http://${api_host}/`//'http://127.0.0.1:8000/'
 export const endpath = endpoint.trim().replace(/\/$/, '')
