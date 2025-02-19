@@ -74,9 +74,9 @@ export function Quiz({ children }) {
     };
 
     useEffect(() => {
-        fetch(`${endpoint}category`)
-            .then(response => response.json())
-            .then(data => setCategories(data));
+        // fetch(`${endpoint}category`)
+        //     .then(response => response.json())
+        //     .then(data => setCategories(data));
 
         countdown.current = new Audio("/calmtickling.mp3");
         boo.current = new Audio("/booing.wav");
@@ -352,9 +352,8 @@ export const MissedOut = ({number})=>{
 }
 
 export function CountDown({number}){
-    const {wrong , correct, gameover , setWrong , setMessage , resetAudio , message ,countdown , active , data , setMark} = React.useContext(QuizBoxContext)
+    const {wrong , correct, gameover , setWrong , setMessage , resetAudio , message ,countdown , active , data , setMark, confirm , sound , setConfirm , setSound} = React.useContext(QuizBoxContext)
     const [countDown, setCountDown] = useState(number ? number : 20);
-    const {confirm , sound , setConfirm , setSound} = useSetting()
 
     useEffect(() => {
         if(data.length){
@@ -391,9 +390,9 @@ export const Header = ()=>{
     const { data } = React.useContext(AuthContext)
     
     return(
-        <div class="row align-items-center p-3 ">
-        <div class="col-md-9 col sz-24 ">
-             <span class="font-great" style={{display:'inline-block'}}>Quizzify</span>
+        <div class="row align-items-center p-3 py-4 color-bg-t sticky-top" style={{backgroundColor:"#333333"}}>
+        <div class="col-md-9 col sz-18 color-white ">
+             <span class="font-grea" style={{display:'inline-block'}}>Quizzify</span>
         </div>
         <div class="col" style={{textAlign:'right'}}>
           {data?.user ? <Link href="profile" class="color-p no-decoration" style={{}}>{data.user.username}</Link> : <Link href="/account/signup" class="color-white p-md-3 p-2 rounded-5 sz-14 no-decoration color-bg-black">Sign Up </Link> }
@@ -427,18 +426,19 @@ export function Instructions (props){
     const {confirm , sound , setConfirm , setSound} = useContext(QuizBoxContext);
 
     return(
-        <div class="container-fluid">
-            <div class="box sz-24 center bold mb-4"> <i class={props.icon}></i>  {props.title} </div> 
-            <div class="box mb-5"> 
+        <div class="container">
+            <div class="box sz-24 center bold my-3 mb-4"> <i class={props.icon}></i>  {props.title} </div> 
+            
+            <div class="box mb-4"> 
                 <div class="color-p bold sz-16 my-2 "> <i class="fas fa-clock text-warning"> </i> Time </div> {props.time} seconds per question 
             </div>
             
-            <div class="box mb-5">
+            <div class="box mb-4">
                 <div class="color-p bold sz-16 my-2 "> <i class="fas fa-trophy text-primary"> </i> Score </div> {props.score} points per question
             </div>
 
-            <div class="box my-5">
-            <div class="sz-16 bold mb-4 color-p"> <i class="fas fa-exclamation-circle text-danger"> </i> Important Tips </div>
+            <div class="box mb-4">
+            <div class="sz-16 bold mb-3 color-p"> <i class="fas fa-exclamation-circle text-danger"> </i> Important Tips </div>
                 <ul>
                     <li> Read each question carefully before answering </li>
                     <li> Balace speed with accuracy - rushing leads to mistakes </li>
@@ -446,8 +446,8 @@ export function Instructions (props){
                 </ul>
             </div>
 
-            <div class="box my-5">
-                <div class="sz-16 bold mb-4 color-p"> <i class="fas fa-cog color-s"> </i> Settings </div>
+            <div class="box mb-5">
+                <div class="sz-16 bold mb-3 color-p"> <i class="fas fa-cog color-s"> </i> Settings </div>
                 <div class="row my-3">
                     <div class="col"> Confirm answer </div> 
                     <div class="col">

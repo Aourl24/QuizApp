@@ -4,6 +4,7 @@ import './css/fontawesome/css/all.min.css'
 import './css/bootstrap-5/css/bootstrap.min.css';
 import './css/acss/acss.css'
 import './css/animate.min.css'
+import './css/main.css'
 import './globals.css'
 import React from 'react'
 import quizzify_logo from './quzzify_logo.png'
@@ -23,7 +24,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
     <Auth>
-      <body className="container-fluid color-bg-t p-0 font-montserrat">
+      <body className="container-fluid colo-bg-t p-0 font-montserrat">
        <Quiz>
        <Header />
           {children} 

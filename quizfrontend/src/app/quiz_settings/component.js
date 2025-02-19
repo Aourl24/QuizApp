@@ -55,9 +55,10 @@ React.useEffect(()=>{
 				
 
 				{modes?.map((item)=>(
-					<div class="col-md-6 p-md-4 p-2">
+					<div class="col-md-6 p-md-4 p-2 ">
 						{!item.locked ?
-						<Link class="rounded p-5 row center shadow-sm color-bg-white color-bg-hover color-white-hover no-decoration color-black" href={{pathname:'/quickplay',query:item}}>
+						<Link class="rounded p-5 row center shadow color-bg-white color-bg-hover color-white-hover no-decoration color-black" href={{pathname:'/quickplay',query:item}}>
+						<div class="col">	
 							<div class="row sz-36">
 								<div class="col color-p">
 									<i class={item.icon}></i>
@@ -68,13 +69,15 @@ React.useEffect(()=>{
 								 	{item.name} 
 								</div>
 							</div>
-							<div class="row sz-12 align-items-center">
-								<div class="col right text-danger">
+							<div class="row sz-12 mt-5 p-0">
+								<div class="col right text-danger p-0">
 								<span class="bg-success p-2 rounded-3 color-white"> open <i class="fas fa-circle"></i> </span>
 								</div>
 							</div>
+						</div>
 						</Link> :
-						<div class="rounded p-5 row center shadow-sm color-bg-white color-bg-hover color-white-hover no-decoration color-black pointer-cursor" onClick={()=>setAlert("You don't have access to this Mode")}>
+						<div class="rounded p-5 row center shadow color-bg-white color-bg-hover color-white-hover no-decoration color-black pointer-cursor" onClick={()=>setAlert("You don't have access to this Mode")}>
+							<div class="col">
 							<div class="row sz-36">
 								<div class="col color-p">
 									<i class={item.icon}></i>
@@ -85,11 +88,12 @@ React.useEffect(()=>{
 								 	{item.name} 
 								</div>
 							</div>
-							<div class="row sz-12">
-								<div class="col right text-danger">
+							<div class="row sz-12 mt-5 p-0">
+								<div class="col right text-danger p-0">
 
 								<span class="bg-danger p-2 rounded-3 color-white"> Locked <i class="fas fa-lock"></i> </span>
 								 </div>
+							</div>
 							</div>
 						</div>
 
