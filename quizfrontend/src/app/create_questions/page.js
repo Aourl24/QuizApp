@@ -9,6 +9,7 @@ export default function App(p){
 	const [titlePage,setTitlePage] = React.useState()
 	const [message, setMessage] = React.useState()
 	const [mode ,setMode] = React.useState()
+	const [uploadMode,setUploadMode] = React.useState()
 
 	React.useEffect(()=>{
 		setLoader(false)
@@ -17,15 +18,20 @@ export default function App(p){
 
 	
 	return(
-			<div class="container">
+			<div class="container p-1 justify-content-center col-md-6">
 			{message && 
-			<div class="row">
+			<div class="row my-2">
 				<div class="col">
 					<div class="alert alert-danger">{message} </div>
 				</div>
 			</div>
 			}
-				{!titlePage ? <TitlePage title={titlePage} setTitlePage={setTitlePage} setMode={setMode} message={message} setMessage={setMessage} /> : <QuestionPage title={titlePage} setMessage={setMessage} setLoader={setLoader} mode={mode} />}
+			<br />
+				{!titlePage ? <TitlePage title={titlePage} setTitlePage={setTitlePage} setMode={setMode} message={message} setMessage={setMessage} setUploadMode={setUploadMode} /> : <QuestionPage title={titlePage} setMessage={setMessage} setLoader={setLoader} mode={mode} uploadMode={uploadMode} />}
+			
+			<br />
+			<br />
+			<br />
 			</div>
 			)
 
@@ -41,6 +47,7 @@ const QuestionPage = (props)=>{
 	const option = React.useRef([])
 	const answer = React.useRef() 
 	const [message,setMessage] = React.useState()
+	const jsonFormat = React.useRef()
 
 	const saveQuestion = () =>{
 
@@ -61,14 +68,59 @@ const QuestionPage = (props)=>{
 			setMessage("saving...")
 			let opt= option.current.map((x,e)=>({body:x.value,answer: parseInt(answer.current.value) === e ? true : false }))
 			let data = {game:game ? game.id : 0 ,question:body.current.value,options:opt,title:props.title,mode:props.mode}
-			let request = postData('createquestion',data).then((response)=>{
+			save(data)
+		}
+	}
+
+	const sortJson = ()=>{
+		// console.log(jsonFormat.current.value)
+		try{
+		const process = JSON.parse(jsonFormat.current.value)
+		console.log(process)
+		for(let i of process){
+			if(i.question && i.options && i.title){
+				data = {game:game ? game.id : 0 ,question:i.question,options:i.option,title:i.title,mode:props.mode}
+				setMessage("saving questions")
+				save(data)
+
+			}
+			else{
+				setMessage("Invalid Json format")
+			}
+		}
+		}
+		catch(error){
+			console.log(error)
+			props.setMessage(error.toString())
+		}
+
+	}
+
+	const save = (data)=>{
+		let request = postData('createquestion',data).then((response)=>{
 				setMessage(response?.message)
 				setGame(response?.data)
 				body.current.value = ''
 				option.current.map((x)=>x.value="")
 				answer.current.value = ''
 				}).catch((error)=>props.setMessage(error.toString()))
-		}
+	}
+
+	if(props.uploadMode === "Json Mode"){
+		return(
+				<div>
+					<div class="row">
+						<div class="col">
+							<textarea ref={jsonFormat} class="form-control vh-70"> </textarea>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col">
+					<button class="p-3 rounded color-bg-p color-white no-border w-100" onClick={()=>sortJson()} > Save </button>
+				</div>
+					</div>
+				</div>
+			)
 	}
 
 	return(
@@ -131,7 +183,7 @@ const QuestionPage = (props)=>{
 			<br />
 
 			<div class="row">
-				<div class="col">
+				<div class="col d-none">
 					<button class="p-3 rounded color-bg-s color-white no-border w-100"> Save and add another </button>
 				</div>
 				<div class="col">
@@ -148,6 +200,7 @@ const TitlePage = (props)=>{
 	const mode = React.useRef()
 	const [modes , setModes] =React.useState([])
 	const title = React.useRef()
+	const uploadMode = React.useRef()
 
 	const checkTitle = ()=>{
 		if(!title.current.value){
@@ -157,6 +210,7 @@ const TitlePage = (props)=>{
 			props.setMessage("")
 			props.setTitlePage(title.current.value)
 			props.setMode(mode.current.value)
+			props.setUploadMode(uploadMode.current.value)
 		}
 	}
 
@@ -186,6 +240,18 @@ const TitlePage = (props)=>{
 				</div>
 			</div>
 
+			<br />
+			<div class="row">
+				<div class="col-12 py-2 sz-20">
+					Upload Mode 
+				</div>
+				<div class="col">
+					<select class="form-control" ref={uploadMode}>
+						<option value="Input Mode"> Input Mode </option>
+						<option value="Json Mode"> Json Mode </option>
+					</select>
+				</div>
+			</div>
 			<br />
 			<div class="row">
 				<div class="col">

@@ -25,6 +25,7 @@ export default function Home(){
 				</div>
 			</div>
 				<div class="">
+					{!games.length && <div class="alert alert-warning "> No games is available right now! </div> }
 					<Games items={games} />
 				</div>
 			</div>

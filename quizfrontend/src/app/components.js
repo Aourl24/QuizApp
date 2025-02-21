@@ -129,7 +129,7 @@ export function Quiz({ children }) {
         {loader && <Loader />}
         
         {alert &&
-                <div class="container-fluid p-2 position-fixed " style={{top:'2%'}}>
+                <div class="container-fluid p-2 position-fixed " style={{top:'4%'}}>
                 <div class="row alert alert-danger py-5">
                     <div class="col text-danger sz-18">{alert}
                     </div>
@@ -394,9 +394,9 @@ export const Header = ()=>{
     
     return(
         <div class="container-fluid">
-        <div class="row align-items-center py-4 color-bg-t stick-top" style={{backgroundColor:"#333333"}}>
+        <div class="row align-items-center py-3 color-bg-t stick-top" style={{backgroundColor:"#333333"}}>
         <div class="col-md-9 col sz-18 color-white ">
-             <span class="font-grea" style={{display:'inline-block'}}>Quizzify</span>
+             <span class="font-grea" style={{display:'inline-block'}}><span class="font-great color-p">Q</span>uizzify</span>
         </div>
         <div class="col" style={{textAlign:'right'}}>
           {data?.user ? <Link href="profile" class="color-p no-decoration" style={{}}>{data.user.username}</Link> : <Link href="/account/signup" class="color-white p-md-3 p-2 rounded-5 sz-14 no-decoration color-bg-t">Sign Up </Link> }
