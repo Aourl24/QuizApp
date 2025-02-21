@@ -5,7 +5,7 @@ import Cookies from 'js-cookie'
 // const api_host = '127.0.0.1:8000'
 const api_host = 'quizapp-p1lx.onrender.com'
 // export const host = '127.0.0.1:3000'
-export const endpoint = `https://${api_host}/`//'http://127.0.0.1:8000/'
+export const endpoint = `http://${api_host}/`//'http://127.0.0.1:8000/'
 export const endpath = endpoint.trim().replace(/\/$/, '')
 export const wsEndpoint = `ws:/${api_host}/quizroom/`;
 axios.defaults.baseURL = endpoint
@@ -64,8 +64,9 @@ export async function postData(e, data) {
         const resp = await axios.post(`${path.url}`, data, headers);
         return resp.data;
     } catch (error) {
-        
+        return error    
     }
+
 }
 
 export function joinPath(e) {

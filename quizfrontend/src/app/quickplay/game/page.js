@@ -20,7 +20,7 @@ export default function Main(){
 
 	return(
 			<div class="container">
-			<div class="row my-3 my-md-4 border-bottom pb-3 ">
+			<div class="row my-3 my-md-4 pb-3 ">
 				<div class="col sz-20 bold d-none d-md-block"> <i class={params.get('icon')}></i> {params.get('title')} </div>
 				<div class="col d-none hide">{active + 1} / {data.length} </div>
 				<div class="col col-md-1 text-center"><CountDown number={parseInt(params.get('score'))} /> </div>

@@ -47,7 +47,7 @@ React.useEffect(()=>{
 },[])
 
 	return(
-			<div class="container">
+			<div class="container p-1">
 
 
 			<div class="row p-2">

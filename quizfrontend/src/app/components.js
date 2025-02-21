@@ -31,8 +31,8 @@ export function Quiz({ children }) {
     const [alert , setAlert] = React.useState()
     const [loader , setLoader] = React.useState(true)
     const [mark , setMark] = React.useState(0)
-    const [confirm,setConfirm] = React.useState(true)
-    const [sound , setSound] = React.useState(true)
+    const [confirm,setConfirm] = React.useState(false)
+    const [sound , setSound] = React.useState(false)
     const countdown = useRef();
     const clap = useRef();
     const boo = useRef();
@@ -231,15 +231,15 @@ export function QuizBox({path}) {
     };
 
     return (
-        <div class="contaier-fluid ">
+        <div class="contaier-fluid p-1">
             {data &&
                 <div className="row center justify-content-center">
                     <div className="sz-20 sz-md-24  rounded p-3 col-12 color-p">{data[active]?.body}</div>
                     <div className="col-12 my-3">
                         <div className="row m-2">
                             {data[active]?.options?.map((option, i) => (
-                                <div className="col-md-6 my-1 p-3" key={i}>
-                                    <div className="rounded sz-18 p-4 color-p-hover option color-b- border" style={{ cursor: 'pointer' }} onClick={() => { markChoose(i,option) ; !confirm && selectAnswer() }} ref={el => options.current[i] = el}>{option}</div>
+                                <div className="col-md-6 my-1 p-2 p-md-2" key={i}>
+                                    <div className="rounded sz-16 p-4 color-p-hover option color-b- border" style={{ cursor: 'pointer' }} onClick={() => { markChoose(i,option) ; !confirm && selectAnswer() }} ref={el => options.current[i] = el}>{option}</div>
                                 </div>
                             ))}
                         </div>

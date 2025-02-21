@@ -223,14 +223,18 @@ def createQuestions(request):
 	# if not request.is_authenticated:
 	# 	return Response({'message':'You are not Log in'},status=status.HTTP_400_BAD_REQUEST)
 
+	print(request.data)
 	id = int(request.data.get('game'))
 	title =  request.data.get('title')
+	mode = int(request.data.get('mode'))
+
+	gameMode = GameMode.objects.get(id=mode)
 
 	if id == 0 or id == None:
 		creator = Profile.objects.get(user= request.user)
-		game = Game.objects.create(creator=creator,title=title)
+		game = Game.objects.create(creator=creator,title=title,mode=gameMode)
 	else:
-		game = Game.objects.get(id=id)
+		game = Game.objects.get(id=id,mode=gameMode)
 	
 	receive_question = request.data.get('question')
 	level = Level.objects.create(name="1")
