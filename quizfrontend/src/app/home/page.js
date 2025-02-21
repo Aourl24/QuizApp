@@ -10,6 +10,7 @@ import Loader from "../loader.js"
 
 export default function Home(){
 	const {setLoader} = React.useContext(QuizBoxContext)
+	const route = useRouter()
 	React.useEffect(()=>{
 		setLoader(false)
 	},[])
@@ -25,7 +26,7 @@ export default function Home(){
 			<div class="row ">
 				<div class='col-md col-sm my-2 '>
 					<div class="container">
-					<div class="rounded borde p-5 row center shadow colo-bg-white color-bg-t bg-white color-bg-hover color-white-hover no-decoration color-black pointer-cursor" onClick={()=>setAlert("You don't have access to this Mode")}>
+					<div class="rounded borde p-5 row center shadow color-bg-white color-bg-t color-bg-hover color-white-hover no-decoration color-black pointer-cursor" onClick={()=>route.push('home/game')}>
 							<div class="col">
 							<div class="row sz-36">
 								<div class="col color-p">
@@ -50,7 +51,7 @@ export default function Home(){
 
 				<div class="col-md col-sm my-2">
 				<div class="container">
-					<div class="rounded border p-5 row center shado color-bg-whit color-bg-p color-bg-hover color-white-hover no-decoration color-black pointer-cursor" onClick={()=>setAlert("You don't have access to this Mode")}>
+					<div class="rounded shadow p-5 row center shado color-bg-white color-bg-hover color-white-hover no-decoration color-black pointer-cursor" onClick={()=>setAlert("You don't have access to this Mode")}>
 							<div class="col">
 							<div class="row sz-36">
 								<div class="col color-p">

@@ -22,27 +22,12 @@ export default function Main(){
 },[])
 	
 	return(
-			<div class="container col-md-6">
-			<Instructions title={params.get('name')} score={params.get('score')} time={params.get('time')} icon={params.get('icon')} />
+			<div class="">
+			<Instructions name={params.get('name')} title={params.get('title')} score={params.get('score')} time={params.get('time')} icon={params.get('icon')} game={params.get('game')} />
 				</div>
 		)
 }
 
-
-function Games({items}){
-	return(
-			<div class="row">
-				{
-					items.map((item)=>(
-						<div class="col-sm col-md-12 p-2">
-							<Link class="color-bg-s rounded-3 color-white p-4 d-block no-decoration color-bg-hover pb-5" href={{pathname:"quickplay/game",query:{category:item.id}}}> <i class="fas fa-play sz-12"> </i>  {item.title} </Link>
-						</div>
-					))
-				}
-			</div>
-
-		)
-}
 
 
 

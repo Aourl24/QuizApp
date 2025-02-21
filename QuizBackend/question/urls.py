@@ -14,6 +14,7 @@ urlpatterns = [
 	path('useranking',userRanking),
 	path('getgame',getAllGames),
 	path('getgame/<int:game>/<int:next>',getGame),
+	path('getsinglegame/<int:game>',getGame),
 	path('getgamename/<str:name>/<int:next>',getGame),
 	path('dailychallenge/<int:player>',dailyChallenge),
 	path('dailychallenge/<int:player>/<str:games>',dailyChallenge),

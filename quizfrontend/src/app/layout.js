@@ -25,12 +25,12 @@ export default function RootLayout({ children }) {
     <html lang="en">
     <Auth>
       <body className="font-montserrat">
-      <div class="container-fluid">
        <Quiz>
        <Header />
+       <div class="container">
           {children} 
+        </div>
           </Quiz>
-          </div>
           <br />
         <br />
         <br />

@@ -43,7 +43,7 @@ function App (){
 
             <div class="row mt-md-5 mt-4">
               <div class="col p-2 p-md-3">
-                <Link href={{pathname:"quiz_settings"}}  class='no-decoration color-white color-bg-p  color-bg-hover color-white-hover color-bd-p p-3 rounded-4 inline-block w-100 center sz-20 sz-md-24'> Play Quiz </Link>
+                <Link href={{pathname:"home"}}  class='no-decoration color-white color-bg-p  color-bg-hover color-white-hover color-bd-p p-3 rounded-4 inline-block w-100 center sz-20 sz-md-24'> Play Quiz </Link>
               </div>
               <div class="w-100 d-none"></div>
               <div class="col p-2 p-md-3">

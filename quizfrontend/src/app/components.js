@@ -312,12 +312,15 @@ function EndBoard(){
 
     return(
         <div class="modal-content container center">
+            <div class="row py-3">
+                <div class="col sz-36 "> Game End </div>
+            </div>
                     {!user && <>
                     <div class="row">
-                        <Link className="w-100 sz-20  my-4 no-decoration col" href="/quiz_settings"> Restart </Link>
+                        <Link className="w-100 sz-20  my-1 no-decoration col" href="/quiz_settings"> Restart </Link>
                     </div>
-                     <div class="row my-3">
-                        <Link className="w-100 sz-20  no-decoration p-2 rounded col py-4 text-warning" href="/account/signup"> Login or Create Account </Link> 
+                     <div class="row my-1">
+                        <Link className="w-100 sz-20  no-decoration p-2 rounded col py-2 text-warning" href="/account/signup"> Login or Create Account </Link> 
                     </div>
                     </>
                     }
@@ -390,7 +393,8 @@ export const Header = ()=>{
     const { data } = React.useContext(AuthContext)
     
     return(
-        <div class="row align-items-center py-4 color-bg-t sticky-top" style={{backgroundColor:"#333333"}}>
+        <div class="container-fluid">
+        <div class="row align-items-center py-4 color-bg-t stick-top" style={{backgroundColor:"#333333"}}>
         <div class="col-md-9 col sz-18 color-white ">
              <span class="font-grea" style={{display:'inline-block'}}>Quizzify</span>
         </div>
@@ -398,6 +402,7 @@ export const Header = ()=>{
           {data?.user ? <Link href="profile" class="color-p no-decoration" style={{}}>{data.user.username}</Link> : <Link href="/account/signup" class="color-white p-md-3 p-2 rounded-5 sz-14 no-decoration color-bg-t">Sign Up </Link> }
         </div>
         {data?.user && <div class="col"> <Menu /> </div>}
+      </div>
       </div>
         )
 }
@@ -426,19 +431,19 @@ export function Instructions (props){
     const {confirm , sound , setConfirm , setSound} = useContext(QuizBoxContext);
 
     return(
-        <div class="containr">
-            <div class="box sz-24 center bold my-3 mb-4"> <i class={props.icon}></i>  {props.title} </div> 
+        <div class="container-fluid col-md-6">
+            <div class="box sz-20 center bold my-3 mb-4"> <i class={props.icon}></i>  {props.name} </div> 
             
-            <div class="box mb-4"> 
-                <div class="color-grey bold sz-16 my-2 "> <i class="fas fa-clock text-warning"> </i> Time </div> {props.time} seconds per question 
+            <div class="box mb-5"> 
+                <div class="color-grey bold sz-14 my-2 "> <i class="fas fa-clock color-s"> </i> Time </div> {props.time} seconds per question 
             </div>
             
-            <div class="box mb-4">
-                <div class="color-grey bold sz-16 my-2 "> <i class="fas fa-trophy text-primary"> </i> Score </div> {props.score} points per question
+            <div class="box mb-5">
+                <div class="color-grey bold sz-14 my-2 "> <i class="fas fa-trophy color-s"> </i> Score </div> {props.score} points per question
             </div>
 
-            <div class="box mb-4">
-            <div class="sz-16 bold mb-3 color-grey"> <i class="fas fa-exclamation-circle text-danger"> </i> Important Tips </div>
+            <div class="box mb-4 d-none">
+            <div class="sz-14 bold mb-3 color-grey"> <i class="fas fa-exclamation-circle color-s"> </i> Important Tips </div>
                 <ul>
                     <li> Read each question carefully before answering </li>
                     <li> Balace speed with accuracy - rushing leads to mistakes </li>
@@ -447,7 +452,7 @@ export function Instructions (props){
             </div>
 
             <div class="box mb-5">
-                <div class="sz-16 bold mb-3 color-grey"> <i class="fas fa-cog color-s"> </i> Settings </div>
+                <div class="sz-14 bold mb-3 color-grey"> <i class="fas fa-cog color-s"> </i> Settings </div>
                 <div class="row my-3">
                     <div class="col"> Confirm answer </div> 
                     <div class="col">
