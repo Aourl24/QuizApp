@@ -1,9 +1,11 @@
 "use client";
 import React from 'react'
-import { useRouter ,useSearchParams,usePathname } from 'next/navigation'
+import {usePathname} from 'next/navigation'
+import {QuizBoxContext} from './components.js'
 
 export function Loader({children}){
     const path = usePathname()
+    // const {setLoader,loader} = React.useContext(QuizBoxContext)
     const [loader,setLoader] = React.useState(true)
 
       React.useEffect(()=>{

@@ -5,7 +5,6 @@ import React, { createContext, useState, useRef, useEffect, useContext } from "r
 import axios from 'axios';
 import Link from "next/link";
 import {postData} from './endpoints.js';
-import Loader from "./loader.js"
 import {AuthContext} from "./auth.js"
 
 export const QuizBoxContext = createContext();

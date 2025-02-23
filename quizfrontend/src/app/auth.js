@@ -36,7 +36,7 @@ export function Auth({children , excludedPath=[], redirect='/login'}){
 
 	if(excludedPath.includes(path) && !login){
 		router.push(redirect)
-		return(<div> Permission Denied </div>)
+		return(<div class="sz-24">Permission Denied</div>)
 	}
 
 	return(<AuthContext.Provider value={{login,message,loginUser,setLogin,data ,setMessage}}>{children}</AuthContext.Provider>)
