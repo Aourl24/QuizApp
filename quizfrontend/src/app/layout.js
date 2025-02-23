@@ -5,7 +5,6 @@ import './css/acss/acss.css'
 import './css/animate.min.css'
 import './css/main.css'
 import './globals.css'
-import quizzify_logo from './quzzify_logo.png'
 import Image from 'next/image'
 import Link from 'next/link'
 import {Quiz , Header} from "./components.js"
