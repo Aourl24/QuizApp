@@ -5,37 +5,11 @@ import {useSearchParams,useRouter} from 'next/navigation'
 import axios from 'axios';
 import {endpoint,host} from '../endpoints.js'
 import {QuizBoxContext} from "../components.js"
-import Loader from "../loader.js"
+
 
 function QuizSetting(){
 	const {user , setUser,setAlert , setLoader} = React.useContext(QuizBoxContext)
 	const [modes, setModes] = React.useState()
-	// const freeMode = 	{
-	// 	name:"Candy Crush",icon:"fas fa-candy-cane",score:15,time:20
-	// }
-
-// 	const modes = [
-// 	{
-// 		name:'Quick Play', icon:'fas fa-user' , info:'play instant games',link:'quickplay'		
-// 	}
-// ]
-// 	const modes = [
-// 	{
-// 		name:"Mario Cart",icon:"fas fa-car-side",score:15,time:20
-// 	},
-// 		{
-// 		name:"Portal",icon:"fas fa-door-open", link:'/blitz'
-// 	},
-// 	{
-// 		name:"Dark Souls",icon:"fas fa-skull", link:'/survival'
-// 	},
-// 	{
-// 		name:"Dwarf Fortress",icon:"fas fa-mountain", link:'/survival'
-// 	},
-// 	{
-// 		name:"Leader Board",icon:"fas fa-chart-line", link:'/leaderboards'
-// 	}
-// ]
 
 React.useEffect(()=>{
 	fetch(`${endpoint}${user ? 'getmodes/'+user.id : 'getmodes'}`).then((x)=>x.json()).then((x)=>setModes(x))
