@@ -1,3 +1,4 @@
+"use client"
 import { endpoint } from './endpoints.js';
 //import { useAuth } from './auth.js';
 import React, { createContext, useState, useRef, useEffect, useContext } from "react";

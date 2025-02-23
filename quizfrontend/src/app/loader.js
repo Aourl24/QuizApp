@@ -1,5 +1,4 @@
-"use client"
-
+"use client";
 import React from 'react'
 import { useRouter ,useSearchParams,usePathname } from 'next/navigation'
 
@@ -8,7 +7,7 @@ export function Loader({children}){
     const [loader,setLoader] = React.useState(true)
 
       React.useEffect(()=>{
-        const timer = setTimeout(()=>setLoader(false),1000)
+        const timer = setTimeout(()=>setLoader(false),500)
         return ()=>{setLoader(true);clearTimeout(timer)}
     },[path])
 
