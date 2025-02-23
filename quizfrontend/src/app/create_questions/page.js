@@ -76,16 +76,17 @@ const QuestionPage = (props)=>{
 		// console.log(jsonFormat.current.value)
 		try{
 		const process = JSON.parse(jsonFormat.current.value)
-		console.log(process)
+		
 		for(let i of process){
+			console.log(i)
 			if(i.question && i.options && i.title){
 				data = {game:game ? game.id : 0 ,question:i.question,options:i.option,title:i.title,mode:props.mode}
-				setMessage("saving questions")
+				props.setMessage("saving questions " + i.body)
 				save(data)
 
 			}
 			else{
-				setMessage("Invalid Json format")
+				props.setMessage("Invalid Json format")
 			}
 		}
 		}

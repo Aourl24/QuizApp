@@ -5,7 +5,7 @@ import { useRouter ,useSearchParams,usePathname } from 'next/navigation'
 
 export const AuthContext = React.createContext()
 
-export function Auth({children , excludedPath=[]}){
+export function Auth({children , excludedPath=[], redirect='/login'}){
 	const path = usePathname()
 	const router = useRouter()
 	const token = Cookies.get('token')
@@ -32,12 +32,9 @@ export function Auth({children , excludedPath=[]}){
 		axios.get(url)
 	}
 
-	React.useState(()=>{
 
-	},[])
-
-	if(excludedPath.includes(path)){
-		router.push('/login')
+	if(excludedPath.includes(path) && !login){
+		router.push(redirect)
 		return(<div> Permission Denied </div>)
 	}
 

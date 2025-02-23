@@ -28,7 +28,7 @@ export default function Main(){
 				{/*<div class="col right "> <MissedOut number={3} /> </div>*/}
 			</div>
 
-			 <QuizBox path={game ? `getgame/${parseInt(game)}/${1}` :`getgamename/${params.get('title')}/${1}`} />
+			 <QuizBox path={game ? `getgame/${parseInt(game)}/${1}` :`getgamename/${params.get('name')}/${1}`} />
 			</div>
 		)
 }

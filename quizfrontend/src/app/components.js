@@ -126,10 +126,10 @@ export function Quiz({ children }) {
             setWrong, wrong, correct, error ,setError , 
             categories, clap, boo, countdown, resetAudio ,restartQuiz, gameover ,setCorrect,setScore, batch  ,user ,setBatch , end , setEnd, setUser,scorePercent , setScorePercent , game ,setGame,setAlert , alert , loader , setLoader,mark , setNextBatch, setMark , nextBatch , status , setStatus , confirm , setConfirm , sound , setSound
         }}>
-        {loader && <Loader />}
+        {/*{loader && <Loader />}*/}
         
         {alert &&
-                <div class="container-fluid p-2 position-fixed " style={{top:'4%'}}>
+                <div class="container-fluid p-2 position-absolute" style={{top:'8%'}}>
                 <div class="row alert alert-danger py-5">
                     <div class="col text-danger sz-18">{alert}
                     </div>

@@ -12,6 +12,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {Quiz , Header} from "./components.js"
 import {Auth} from "./auth.js"
+import {Loader} from "./loader.js"
+
 
 const metadata = {
   title: 'Quzzify',
@@ -23,12 +25,12 @@ export default function RootLayout({ children }) {
   const user = null
   return (
     <html lang="en">
-    <Auth>
+    <Auth excludedPath={['/quiz_settings']} redirect="/account/login">
       <body className="font-montserrat">
        <Quiz>
        <Header />
        <div class="container">
-          {children} 
+          <Loader>{children}</Loader> 
         </div>
           </Quiz>
           <br />
