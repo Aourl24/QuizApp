@@ -2,3 +2,5 @@ QuizBackend/QuizBackend/.env
 QuizBackend/db.sqlite3
 */.env.env
 *.env
+QuizBackend/.env
+.env
