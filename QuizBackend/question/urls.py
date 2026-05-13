@@ -77,8 +77,8 @@ urlpatterns = [
     path('getgame/<int:game>/<int:next>/', get_game, name='game-by-id'),
     path('getgamebyname/<str:name>/<int:next>/', get_game, name='game-by-name'),
 
-    # Game detail by slug
-    path('game/<str:slug>/', get_game_detail, name='game-detail'),
+    # Game detail by id
+    path('game/<int:id>/', get_game_detail, name='game-detail'),
 
     # ─── Daily Challenge ───
     path('dailychallenge/<int:player>/', daily_challenge, name='daily-challenge'),

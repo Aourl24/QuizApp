@@ -60,11 +60,11 @@ export default function Home() {
 
         // Fetch modes (backend handles guest filtering)
         const token = Cookies.get('token')
-const modeRes = axios.get(`${endpoint}getmodes`, {
+const modeRes =await axios.get(`${endpoint}getmodes`, {
   headers: token ? { Authorization: `JWT ${token}` } : {}
 })
         // const modesRes = await axios.get(`${endpoint}getmodes/`)
-        // setModes(modesRes.data)
+          setModes(modeRes.data)
 
         // Fetch leaderboard preview (top 3)
         const lbRes = await axios.get(`${endpoint}leaderboard/`)

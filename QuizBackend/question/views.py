@@ -398,6 +398,7 @@ def get_game_modes(request, id=None):
         # Guest: only show guest-allowed modes
         modes = GameMode.objects.filter(is_active=True, is_guest_allowed=True).order_by('order')
         profile_id = None
+    
     if id:
         modes = modes.filter(games__id=id)
 
@@ -406,6 +407,7 @@ def get_game_modes(request, id=None):
         many=True, 
         context={'profile_id': profile_id}
     )
+    print(modes)
     
     return Response(serializer.data)
 
@@ -430,7 +432,6 @@ def get_games(request, mode=None, category=None):
     Get active public games filtered by mode and/or category.
     """
     games = Game.objects.filter(active=True, public=True)
-
     if mode and category:
         games = games.filter(mode__id=mode, category__id=category)
     elif mode:
@@ -526,13 +527,13 @@ def get_all_games(request):
 
 
 @api_view(['GET'])
-def get_game_detail(request, slug):
+def get_game_detail(request, id):
     """
-    Get detailed info about a specific game by slug.
+    Get detailed info about a specific game by ID.
     Checks guest access permissions.
     """
     try:
-        game = Game.objects.get(slug=slug, active=True)
+        game = Game.objects.get(id=id, active=True)
     except Game.DoesNotExist:
         return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -542,6 +543,7 @@ def get_game_detail(request, slug):
         if not allowed:
             return error_response
 
+    print(game)
     serializer = GameDetailSerializer(game)
 
     personal_best = None
@@ -555,7 +557,7 @@ def get_game_detail(request, slug):
             }
         except Points.DoesNotExist:
             pass
-
+    print(serializer.data)
     return Response({
         'game': serializer.data,
         'personal_best': personal_best,

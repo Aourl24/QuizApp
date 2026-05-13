@@ -32,12 +32,12 @@ class UserDetailSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     """Full profile with user nested. Used for leaderboards and profiles."""
     user = UserSerializer(read_only=True)
-    avatar_url = serializers.SerializerMethodField()
+    # avatar_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Profile
         fields = [
-            "id", "user", "about", "avatar_url",
+            "id", "user", "about",
             "total_points", "total_games_played",
             "current_streak", "longest_streak",
             "joined_at", "last_active"
@@ -56,7 +56,7 @@ class ProfileMinimalSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Profile
-        fields = ["id", "username", "total_points", "avatar_url"]
+        fields = ["id", "username", "total_points"]
     
     def get_avatar_url(self, obj):
         if obj.avatar:
@@ -101,7 +101,7 @@ class OptionPlayerSerializer(serializers.ModelSerializer):
     """Hides correct answer — used when sending questions to players."""
     class Meta:
         model = Option
-        fields = ["id", "body", "order"]
+        fields = ["id", "body", "order","answer"]
 
 
 class OptionAdminSerializer(serializers.ModelSerializer):

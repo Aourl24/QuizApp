@@ -1,80 +1,80 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-// const api_host = '192.168.212.92:8000'
 const api_host = '127.0.0.1:8000'
 // const api_host = 'quizapp-p1lx.onrender.com'
-// export const host = '127.0.0.1:3000'
-export const endpoint = `http://${api_host}/`//'http://127.0.0.1:8000/'
-export const endpath = endpoint.trim().replace(/\/$/, '')
-export const wsEndpoint = `ws:/${api_host}/quizroom/`;
+
+export const endpoint    = `http://${api_host}/`
+export const endpath     = endpoint.trim().replace(/\/$/, '')
+export const wsEndpoint  = `ws:/${api_host}/quizroom/`
+
+// Set base URL once — all axios calls use this automatically
 axios.defaults.baseURL = endpoint
 
-export const api = [{
-    name: 'signup',
-    url: 'signup/'
-}, {
-    name: 'login',
-    url: 'login/'    
-}, {
-    name: 'checkuser',
-    url: 'checkuser/'
-},
-    {
-        name:'profile',
-        url : 'userprofile'
-    },
-    {
-        name: 'createquestion',
-        url : 'createquestion'
-    }
+export const api = [
+  { name: 'signup',         url: 'signup/' },
+  { name: 'login',          url: 'login/' },
+  { name: 'checkuser',      url: 'checkuser/' },
+  { name: 'profile',        url: 'userprofile/' },
+  { name: 'createquestion', url: 'createquestion/' },
 ]
 
-export function getData(e) {
-  const token = Cookies.get('token')  // read JWT token
-  const path = api.find((x) => x.name === e.trim())
-
-  const headers = token
-    ? { 'Authorization': `JWT ${token}`, 'Content-Type': 'application/json' }
-    : { 'Content-Type': 'application/json' }
-
-  const response = async () => {
-    const resp = await axios.get(path.url, { headers })
-    return resp.data
+/**
+ * getAuthHeaders — single place to build auth headers
+ * Used by both getData and postData
+ */
+function getAuthHeaders(extra = {}) {
+  const token = Cookies.get('token')
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `JWT ${token}` } : {}),
+    ...extra,
   }
-  return response()
 }
 
+/**
+ * getData — authenticated GET request via api name
+ */
+export async function getData(name) {
+  const path = api.find(x => x.name === name.trim())
+  if (!path) throw new Error(`Unknown API name: ${name}`)
+  const resp = await axios.get(path.url, { headers: getAuthHeaders() })
+  return resp.data
+}
 
-export async function postData(e, data) {
-    const token = Cookies.get('token'); // Use 'csrftoken' instead of 'X-CSRFToken'
-    const path = api.find((x) => x.name === e.trim());
-    if(token && token != null ){
-    	var headers = {headers: {
-                'Content-Type': 'application/json',
-               'Authorization':`JWT ${token}`
-            }}
+/**
+ * postData — authenticated POST request via api name
+ */
+export async function postData(name, data) {
+  const path = api.find(x => x.name === name.trim())
+  if (!path) throw new Error(`Unknown API name: ${name}`)
+  try {
+    const resp = await axios.post(path.url, data, { headers: getAuthHeaders() })
+    return resp.data
+  } catch (error) {
+    return error
+  }
+}
 
-    	}
+/**
+ * apiGet — authenticated GET to any raw URL (not in api list)
+ * Use this for endpoints like getgame/5/1/
+ */
+export async function apiGet(url) {
+  const resp = await axios.get(url, { headers: getAuthHeaders() })
+  return resp.data
+}
 
-    else{
-    	var headers = {headers:{'Content-Type':'application/json'}} 
-    }
-
-    try {
-        const resp = await axios.post(`${path.url}`, data, headers);
-        return resp.data;
-    } catch (error) {
-        return error    
-    }
-
+/**
+ * apiPost — authenticated POST to any raw URL
+ * Use this for endpoints like completegame/
+ */
+export async function apiPost(url, data) {
+  const resp = await axios.post(url, data, { headers: getAuthHeaders() })
+  return resp.data
 }
 
 export function joinPath(e) {
-    if (e.startsWith('http')) {
-        return e
-    } else {
-        const path = endpath + e
-        return path
-    }
+  if (e.startsWith('http')) return e
+  return endpath + e
 }
