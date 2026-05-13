@@ -14,7 +14,7 @@ from pathlib import Path
 import environ
 from datetime import timedelta
 import os
-import dj_database_url
+#import dj_database_url
 
 env = environ.Env()
 environ.Env.read_env()
@@ -37,7 +37,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',
+   # 'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -161,10 +161,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 
 
+# REST_FRAMEWORK = {
+#     "DEFAULT_AUTHENTICATION_CLASSES" :(
+#     'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     )
+# }
+# settings.py
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES" :(
-    'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',  # Optional, for admin/browser
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Default: open, override per-view
+    ],
 }
 
 SIMPLE_JWT = {

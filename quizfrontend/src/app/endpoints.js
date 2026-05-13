@@ -2,23 +2,23 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 
 // const api_host = '192.168.212.92:8000'
-// const api_host = '127.0.0.1:8000'
-const api_host = 'quizapp-p1lx.onrender.com'
+const api_host = '127.0.0.1:8000'
+// const api_host = 'quizapp-p1lx.onrender.com'
 // export const host = '127.0.0.1:3000'
-export const endpoint = `https://${api_host}/`//'http://127.0.0.1:8000/'
+export const endpoint = `http://${api_host}/`//'http://127.0.0.1:8000/'
 export const endpath = endpoint.trim().replace(/\/$/, '')
 export const wsEndpoint = `ws:/${api_host}/quizroom/`;
 axios.defaults.baseURL = endpoint
 
 export const api = [{
     name: 'signup',
-    url: 'signup'
+    url: 'signup/'
 }, {
     name: 'login',
-    url: 'login'    
+    url: 'login/'    
 }, {
     name: 'checkuser',
-    url: 'checkuser'
+    url: 'checkuser/'
 },
     {
         name:'profile',
@@ -30,20 +30,21 @@ export const api = [{
     }
 ]
 
-
 export function getData(e) {
-	 const sessionid = Cookies.get('sessionid')
-    const path = api.find((x) => x.name === e.trim())
-    const response = async () => {
-        var resp = await axios.get(path.url,
-        	{headers: {
-               'Cookie': `sessionid=${sessionid}` // Include session ID in request headers
-            }}
-        	);
-        return resp.data
-    }
-    return response()
+  const token = Cookies.get('token')  // read JWT token
+  const path = api.find((x) => x.name === e.trim())
+
+  const headers = token
+    ? { 'Authorization': `JWT ${token}`, 'Content-Type': 'application/json' }
+    : { 'Content-Type': 'application/json' }
+
+  const response = async () => {
+    const resp = await axios.get(path.url, { headers })
+    return resp.data
+  }
+  return response()
 }
+
 
 export async function postData(e, data) {
     const token = Cookies.get('token'); // Use 'csrftoken' instead of 'X-CSRFToken'

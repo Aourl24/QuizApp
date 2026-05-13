@@ -1,100 +1,111 @@
-import { Inter } from 'next/font/google';
-import './css/fontawesome/css/all.min.css'
-import './css/bootstrap-5/css/bootstrap.min.css';
-import './css/acss/acss.css'
-import './css/animate.min.css'
-import './css/main.css'
+import { Syne, DM_Sans } from 'next/font/google'
 import './globals.css'
-import Image from 'next/image'
 import Link from 'next/link'
-import {Quiz , Header} from "./components.js"
-import {Auth} from "./auth.js"
-import {Loader} from "./loader.js"
+import MobileMenu from './mobileMenu.js'
+import {AppProvider} from "./appContext.js"
 
+const syne = Syne({
+  subsets: ['latin'],
+  weight: ['400', '600', '700', '800'],
+  variable: '--font-head',
+  display: 'swap',
+})
 
-const metadata = {
-  title: 'Quzzify',
-  description: 'Test your Knowledge',
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-body',
+  display: 'swap',
+})
+
+export const metadata = {
+  title: 'Quizzify',
+  description: 'Challenge your mind and test your skills',
 }
 
 export default function RootLayout({ children }) {
-  
-  const user = null
   return (
-    <html lang="en">
-    <Auth excludedPath={['/quiz_settings']} redirect="/account/login">
-      <body className="font-montserrat">
-       <Quiz>
-       <Header />
-       <div class="container">
-          <Loader>{children}</Loader> 
-        </div>
-          </Quiz>
-          <br />
-        <br />
-        <br />
-        <br />
-        <br />
-          <footer id="footer" class="footer dark-background">
-    <div class="container footer-top ">
-      <div class="row gy-4 border justify-content-center d-none">
-        <div class="col sz-24">
-          <a href="index.html" class="logo d-flex align-items-center">
-            <span class="siename">Quizzify</span>
-          </a>
-  
-          <div class="social-links d-flex mt-4">
-            <a href=""><i class="fab fa-twitter"></i></a>
-            <a href=""><i class="fab fa-facebook"></i></a>
-            <a href=""><i class="fab fa-instagram"></i></a>
-            <a href=""><i class="fab fa-linkedin"></i></a>
-          </div>
-        </div>
-
-        <div class="col-lg-2 col-6 footer-links d-none">
-          <h4>Useful Links</h4>
-          <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About us</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Terms of service</a></li>
-            <li><a href="#">Privacy policy</a></li>
-          </ul>
-        </div>
-
-        <div class="col-lg-2 col-6 footer-links d-none">
-          <h4>Our Services</h4>
-          <ul>
-            <li><a href="#">Web Design</a></li>
-            <li><a href="#">Web Development</a></li>
-            <li><a href="#">Product Management</a></li>
-            <li><a href="#">Marketing</a></li>
-            <li><a href="#">Graphic Design</a></li>
-          </ul>
-        </div>
-
-        <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start d-none">
-          <h4>Contact Us</h4>
-          <p>A108 Adam Street</p>
-          <p>New York, NY 535022</p>
-          <p>United States</p>
-          <p class="mt-4"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
-          <p><strong>Email:</strong> <span>info@example.com</span></p>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="container copyright text-center mt-4">
-      <p>© <span>Copyright</span> <strong class="px-1 sitename">Quizzify</strong> <span>All Rights Reserved</span></p>
-      <div class="credits">
-        Created by Loulou      </div>
-    </div>
-
-  </footer>
+    <html lang="en" className={`${syne.variable} ${dmSans.variable}`}>
+      <body className="bg-bg text-txt font-body min-h-screen flex flex-col antialiased">
+        <AppProvider>
+        <Header />
+        <main className="flex-1">{children}</main>
+        <Footer />
+        </AppProvider>
       </body>
-      </Auth>
     </html>
   )
 }
+
+/* ─── Header ───────────────────────────────────────────────────────────────── */
+// This is a server component — interactive mobile menu lives in MobileMenu.js
+function Header() {
+  const navLinks = [
+    { href: '/home',         label: 'Play' },
+    { href: '/leaderboards', label: 'Leaderboards' },
+  ]
+
+  return (
+    <header className="sticky top-0 z-[100] border-b border-border bg-bg/90 backdrop-blur-md">
+      <div className="max-w-5xl mx-auto px-5 h-[60px] flex items-center justify-between">
+
+        {/* Logo */}
+        <Link href="/" className="font-head text-2xl font-extrabold text-txt no-underline shrink-0">
+          <span className="text-accent">Q</span>uizzify
+        </Link>
+
+        {/* Desktop nav — hidden on mobile */}
+        <nav className="hidden md:flex items-center gap-5">
+          {navLinks.map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-muted text-sm font-medium no-underline transition-colors hover:text-accent"
+            >
+              {link.label}
+            </Link>
+          ))}
+          <Link
+            href="/account/signup"
+            className="text-sm font-semibold no-underline px-4 py-[7px] rounded-lg border border-border text-muted transition-all hover:border-accent hover:text-accent"
+          >
+            Sign Up
+          </Link>
+        </nav>
+
+        {/* Mobile hamburger — client component handles open/close state */}
+        <MobileMenu links={navLinks} />
+
+      </div>
+    </header>
+  )
+}
+
+/* ─── Footer ───────────────────────────────────────────────────────────────── */
+function Footer() {
+  return (
+    <footer className="border-t border-border px-5 py-10">
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+
+        <div>
+          <Link href="/" className="font-head text-xl font-extrabold text-txt no-underline">
+            <span className="text-accent">Q</span>uizzify
+          </Link>
+          <p className="text-muted text-[0.8rem] mt-1">Challenge your mind. Test your skills.</p>
+        </div>
+
+        <nav className="flex items-center gap-6 flex-wrap justify-center">
+          <Link href="/home"           className="text-muted text-sm no-underline hover:text-accent transition-colors">Play</Link>
+          <Link href="/leaderboards"   className="text-muted text-sm no-underline hover:text-accent transition-colors">Leaderboards</Link>
+          <Link href="/account/signup" className="text-muted text-sm no-underline hover:text-accent transition-colors">Sign Up</Link>
+        </nav>
+
+        <p className="text-muted text-[0.8rem]">© {new Date().getFullYear()} Quizzify</p>
+
+      </div>
+    </footer>
+  )
+}
+
+
 

@@ -1,157 +1,145 @@
 'use client'
 import Link from 'next/link'
-import image from './quizImage.jpg'
-import Image from 'next/image'
-import soundtrack from './soundtrack.mp3'
 import React from 'react'
-import quizzify_logo from './quzzify_logo.png'
-import image_1 from './image_1.jpeg'
-import image_2 from './image_2.jpeg'
-import image_3 from './image_3.jpeg'
-import image_4 from './images_4.jpeg'
-import questionImage from './quizimage.png'
-import {QuizBoxContext} from "./components.js"
 
+const FEATURES = [
+  { icon: '⚡', title: 'Engaging Quizzes',  desc: 'Interactive and challenging quizzes across a wide range of topics.' },
+  { icon: '📊', title: 'Real-Time Scores',  desc: 'Instantly track your performance with live feedback after every answer.' },
+  { icon: '🏆', title: 'Leaderboard',       desc: 'Compete with players worldwide and climb the global rankings.' },
+  { icon: '📚', title: 'Learn & Grow',      desc: 'Expand your knowledge across subjects while having fun.' },
+];
 
-function App (){
-  let sound = React.useRef()
+const SIGNUP_PERKS = [
+  { icon: '🎯', title: 'Diverse Challenges', desc: 'Unlock quizzes of all difficulty levels across dozens of categories.' },
+  { icon: '👥', title: 'Multiplayer Mode',   desc: 'Challenge friends in real-time head-to-head quiz battles.' },
+  { icon: '💾', title: 'Save Progress',      desc: 'Your scores, streaks, and achievements are always saved to your profile.' },
+];
 
-  const {setLoader} = React.useContext(QuizBoxContext)
+function App() {
+  return (
+    <div className="bg-bg min-h-screen text-txt font-body">
 
-  React.useEffect(()=>{
-    setLoader(false)
-    return ()=>setLoader(true)    
-  },[])
+      {/* ── Hero ─────────────────────────────────────────────────── */}
+      <section className="min-h-screen flex items-center px-5 py-20 relative overflow-hidden">
 
-  return(
-    <div class="">
-      <div class="d-flex p-0 flex-column rounded  vh-100 vh-md-90 container jstify-content-center " styl={{hight:'90vh'}}>
-        <div class="row p-4 rounded shado align-items-center">
-          <div class="col-md col-sm cente sz-30 ">   
-              <div class="row mt-4">
-                  <div class="col sz-md-30 ">
-                  <span class="sz-48 color-p inline-block" style={{transform:"scaleY(1.2)",transform:"scaleX(1)"}}>Quizzify!</span>
-                      <br/><span class="sz-sm-24"> Challenge your mind and test your skills</span> 
-                  </div>
-              </div>
+        {/* Subtle radial glow */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse 60% 50% at 70% 50%, rgba(184,255,87,0.07) 0%, transparent 70%)' }}
+        />
 
-              <div class="row my-2">
-                <div class="col sz-md-24 d-none">
-                    experience our quiz app  <br/><span class="center inline-blck color-p w-100 font-great sz-60 hide sz-md-60 animate__animted aimate__bounce animte__infinie aimate__delay-3s" style={{isplay:'inline-block'}}>Quizzify</span> 
-                  </div>
-              </div>
+        <div className="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center relative z-10">
 
-            <div class="row mt-md-5 mt-4">
-              <div class="col p-2 p-md-3">
-                <Link href={{pathname:"home"}}  class='no-decoration color-white color-bg-p  color-bg-hover color-white-hover color-bd-p p-3 rounded-4 inline-block w-100 center sz-20 sz-md-24'> Play Quiz </Link>
-              </div>
-              <div class="w-100 d-none"></div>
-              <div class="col p-2 p-md-3">
-                <Link href={{pathname:"account/signup"}}  class='no-decoration color-black color-white color-black-hover color-bg-t-hover color-white-hover color-bd-p p-3 rounded-4 inline-block w-100 center sz-20 sz-md-24 color-bg-s'> Sign Up </Link>
-              </div>
-            </div>
-          </div>
-        
-          <div class="col col-sm center order-firs orer-md-last">
-            <img class="img-fluid rounded" style={{height:'450px',widt:'400px',obejectFit:'cover'}} src="/quiz2.jpg" />
-          </div>
-        </div>
-      </div>
+          {/* Left — text */}
+          <div>
+            <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-accent bg-accent/10 border border-accent/25 rounded-full px-[14px] py-[5px] mb-5">
+              The Ultimate Quiz Experience
+            </span>
 
-        
-    <section id="services" class="services section font-montserrat">
+            <h1 className="font-head text-[clamp(2.6rem,6vw,4.2rem)] font-extrabold leading-[1.05] mb-4 text-txt">
+              Challenge Your Mind<br />
+              with <span className="text-accent">Quizzify</span>
+            </h1>
 
-      
-      <div class="container section-title" data-aos="fade-up">
-        <h2 class="font-montserrat color-p">Features</h2>
-        <p>Our Quizzify app contain the following Features</p>
-      </div>
+            <p className="text-muted text-[1.1rem] leading-[1.7] mb-9 max-w-[440px]">
+              Test your knowledge, compete with others, and learn something new every day — one question at a time.
+            </p>
 
-      <div class="container">
-
-        <div class="row gy-4">
-
-          <div class="col-xl-3 col-md-6 d-fle " data-aos="fade-up" data-aos-delay="100">
-            <div class="service-item position-relative">
-              <div class="icon"><i class="bi bi-activity icon"></i></div>
-              <h4 class="font-montserrat">Engaging Quizzes</h4>
-              <p>Enjoy interactive and challenging quizzes across various topics</p>
+            <div className="flex gap-3 flex-wrap">
+              <Link
+                href={{ pathname: "home" }}
+                className="inline-flex items-center justify-center px-[30px] py-[14px] rounded-xl bg-accent text-bg font-bold text-base no-underline transition-opacity hover:opacity-85 active:scale-[0.97]"
+              >
+                Play Quiz →
+              </Link>
+              <Link
+                href={{ pathname: "account/signup" }}
+                className="inline-flex items-center justify-center px-[30px] py-[14px] rounded-xl bg-transparent text-txt border border-border font-bold text-base no-underline transition-all hover:border-accent hover:text-accent active:scale-[0.97]"
+              >
+                Sign Up Free
+              </Link>
             </div>
           </div>
 
-          <div class="col-xl-3 col-md-6 d-fle" data-aos="fade-up" data-aos-delay="200">
-            <div class="service-item position-relative">
-              <div class="icon"><i class="bi bi-bounding-box-circles icon"></i></div>
-              <h4 class="font-montserrat">Real Time Scores</h4>
-              <p>Instantly track your performance with real-time feedback</p>
-            </div>
-          </div>
-
-          <div class="col-xl-3 col-md-6 d-flx" data-aos="fade-up" data-aos-delay="300">
-            <div class="service-item position-relative">
-              <div class="icon"><i class="bi bi-calendar4-week icon"></i></div>
-              <h4 class="font-montserrat">LeaderBoard</h4>
-              <p>Compete with friends and climb the leaderboard</p>
-            </div>
-          </div>
-
-          <div class="col-xl-3 col-md-6 d-fex " data-aos="fade-up" data-aos-delay="400">
-            <div class="service-item position-relative">
-              <div class="icon"><i class="bi bi-broadcast icon"></i></div>
-              <h4 class="font-montserrat">Learning</h4>
-              <p>Learn new topics from various quiz</p>
-            </div>
+          {/* Right — hero image */}
+          <div className="rounded-[18px] overflow-hidden border border-border aspect-[4/3] order-first md:order-last relative">
+            <div className="absolute inset-0 z-10 pointer-events-none"
+              style={{ background: 'linear-gradient(135deg, rgba(184,255,87,0.08) 0%, transparent 60%)' }}
+            />
+            {/* Replace /quiz2.jpg with your actual public folder image */}
+            <img src="/quiz2.jpg" alt="Quizzify in action" className="w-full h-full object-cover block" />
           </div>
 
         </div>
+      </section>
 
-      </div>
+      {/* ── Features ─────────────────────────────────────────────── */}
+      <section className="py-[90px] px-5">
+        <div className="max-w-5xl mx-auto">
 
-    </section>
-
-
-<section id="more-services" class="more-services section">
-      <div class="container section-title" data-aos="fade-up">
-        <h2 class="color-p">Sign Up!!</h2>
-        <p>Create account to enjoy more features from our quiz app</p>
-      </div>
-
-      <div class="container">
-
-        <div class="row gy-4">
-
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="card">
-              <i class="fas fa-trophy sz-36"></i>
-              <h3>Play Different Challenges</h3>
-              <p>Play Different types of Challenges of all levels.</p>
-            </div>
+          <div className="text-center mb-14">
+            <span className="block text-[0.72rem] font-bold uppercase tracking-[0.15em] text-accent mb-3">What we offer</span>
+            <h2 className="font-head text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold text-txt mb-3">Packed with Features</h2>
+            <p className="text-muted text-base max-w-[500px] mx-auto">Everything you need for a competitive, fun, and educational quiz experience.</p>
           </div>
 
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-            <div class="card">
-              <i class="fas fa-users sz-36"></i>
-              <h3>Multiplayer Mode </h3>
-              <p>Play and compete with friends</p>
-            </div>
-          </div>
-
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
-            <div class="card">
-              <i class="fas fa-save sz-36"></i>
-              <h3>Save your Progress</h3>
-              <p> Your Game Progress are save</p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {FEATURES.map((f, i) => (
+              <div
+                key={i}
+                data-aos="fade-up" data-aos-delay={i * 100}
+                className="bg-surface border border-border rounded-xl px-[22px] py-7 transition-all duration-200 hover:border-accent hover:-translate-y-1"
+              >
+                <div className="w-[46px] h-[46px] bg-accent/10 rounded-[10px] flex items-center justify-center text-[1.3rem] mb-[18px]">
+                  {f.icon}
+                </div>
+                <div className="font-head text-base font-bold text-txt mb-2">{f.title}</div>
+                <p className="text-muted text-[0.875rem] leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
           </div>
 
         </div>
+      </section>
 
-      </div>
+      {/* ── Sign Up perks ─────────────────────────────────────────── */}
+      <section className="py-[90px] px-5 bg-surface border-y border-border">
+        <div className="max-w-5xl mx-auto">
 
-    </section>
-         
-      </div>
-    )
+          <div className="text-center mb-14">
+            <span className="block text-[0.72rem] font-bold uppercase tracking-[0.15em] text-accent mb-3">Members only</span>
+            <h2 className="font-head text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold text-txt mb-3">Level Up with an Account</h2>
+            <p className="text-muted text-base max-w-[500px] mx-auto">Create a free account to unlock the full Quizzify experience.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {SIGNUP_PERKS.map((p, i) => (
+              <div
+                key={i}
+                data-aos="fade-up" data-aos-delay={i * 100}
+                className="bg-bg border border-border rounded-xl px-6 py-8 text-center transition-all duration-200 hover:border-accent"
+              >
+                <div className="text-[2rem] mb-4">{p.icon}</div>
+                <div className="font-head text-[1.1rem] font-bold text-txt mb-[10px]">{p.title}</div>
+                <p className="text-muted text-[0.875rem] leading-relaxed">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-11">
+            <p className="text-muted mb-5 text-base">Join thousands of players already on the leaderboard.</p>
+            <Link
+              href={{ pathname: "account/signup" }}
+              className="inline-flex items-center justify-center px-[30px] py-[14px] rounded-xl bg-accent text-bg font-bold text-base no-underline transition-opacity hover:opacity-85 active:scale-[0.97]"
+            >
+              Create Free Account →
+            </Link>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  );
 }
 
-export default App
+export default App;

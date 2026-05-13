@@ -1,98 +1,186 @@
-"use client"
-import React from 'react'
+'use client'
+import React, { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import axios from 'axios'
-import {postData} from '../../endpoints.js'
-import {useRouter} from 'next/navigation';
-import Cookies from 'js-cookie';
-import {QuizBoxContext} from "../../components.js"
-import Link from "next/link"
-import {AuthContext} from "../../auth.js"
+import Cookies from 'js-cookie'
+import { endpoint , postData} from '../../endpoints.js'
+import { useApp } from '../../appContext.js'
 
-export default function Login(props){
-	const {loginUser , login ,setLogin , message ,setMessage} = React.useContext(AuthContext)
-	const {user,setUser,setLoader} = React.useContext(QuizBoxContext)
-	const username = React.useRef()
-	const password = React.useRef()
-	// const [login,setLogin] = React.useState(false)
-	// const [message,setMessage] = React.useState()
-	const router = useRouter()
+/**
+ * src/app/account/login/page.jsx
+ *
+ * POST ${endpoint}login/
+ * Body:    { username, password }
+ * Success: { status: true, msg, user, token, refresh }
+ * Error:   { status: false, msg }
+ *
+ * On success:
+ *  - Saves token to cookie as 'token' (matches how postData reads it)
+ *  - postData() in endpoints.js handles Authorization: JWT ${token} automatically
+ *  - Updates global user via useApp()
+ *  - Redirects to /home
+ */
+export default function Login() {
+  const router = useRouter()
+  const { setUser, setAlert } = useApp()
 
-	const validateInput = ()=>{
-		setMessage()
-		setLoader(true)
-		if(username.current.value === "" || password.current.value === ""){
-			setMessage("Input can not be Empty")
-		}
-		else{
-			let data = {username:username.current.value,password:password.current.value}
-		// 	postData('login',data).then((res)=>{
-		// 		setMessage(res.msg);
-		// 		setLogin(res.status)
-		// 		if(res.user){
-		// 			Cookies.set('token',res.token)
-		// 			setUser(res.user)
-		// 		}
-		// 	}
-		// ).catch(()=>{
-		// 	setMessage("Error Logging In");setLogin(false)
-			
-		// })
-			loginUser('login',data)
-		}
-	}
+  const [form, setForm]       = useState({ username: '', password: '' })
+  const [errors, setErrors]   = useState({})
+  const [loading, setLoading] = useState(false)
 
-	React.useEffect(()=>{
-		login && router.push('/quiz_settings')
-	},[login])
+  const validate = () => {
+    const e = {}
+    if (!form.username.trim()) e.username = 'Username is required'
+    if (!form.password)        e.password = 'Password is required'
+    return e
+  }
 
-	React.useEffect(()=>{
-		Cookies.remove('token')
-	},[])
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: value }))
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }))
+  }
 
-	React.useEffect(()=>{
-		setLoader(false)
-	},[message])
+  const handleSubmit = async () => {
+    const e = validate()
+    if (Object.keys(e).length) { setErrors(e); return }
 
-	React.useEffect(()=>{
-			setLoader(false)
-	return ()=>setLoader(true)
-},[])
+    setLoading(true)
+    try {
+      const res = await axios.post(`${endpoint}login/`, form)
+      const data = res.data
 
+      if (data.status) {
+        // Save token to cookie — postData() reads Cookies.get('token') automatically
+        Cookies.set('token', data.token, { expires: 7 })
+axios.defaults.headers.common['Authorization'] = `JWT ${data.token}`
+setUser(data.user)
 
-	return(
-		<div class="container">
-		<div class="row justify-content-center">
+        // Update global user in AppContext
+       // setUser(data.user)
+       const check = await postData('checkuser')
+setUser(check.user || null)
 
-			<div class="col-md-6 col-sm">
-				<div class="row my-4">
-					<div class="col color-p sz-30 bold"> Login </div>
-				</div>
-				
-				{message &&
-				<div class="row py-4">
-					<div class="col text-danger sz-18"><div class="alert alert-danger">{message}</div></div>
-				</div>
-				}
+        router.push('/home')
+      } else {
+        setAlert(data.msg || 'Login failed.')
+      }
+    } catch (err) {
+      const status = err.response?.status
+      const msg    = err.response?.data?.msg
 
-				<div class="row align-items-center py-3">
-					<div class="col-12 sz-18 pb-4"> Username </div>
-					<div class="col"> <input ref={username} class="form-control sz-18 p-3" /> </div>
-				</div>
-				<div class="row align-items-center py-3">
-					<div class="col-12 pb-4 sz-18"> Password </div>
-					<div class="col"> <input type='password' class="form-control sz-18 p-3" ref={password} /> </div>
-				</div>
-				<div class="row py-4">
-					<div class="col"> <button onClick={()=>validateInput()} class="color-bg-p no-border rounded-4 w-100 color-white color-bg-s-hover sz-20 p-2 py-3"> Log-In </button></div>
-				</div>
-				<div class="row border-top">
-				<div class="col center p-2 py3">
-				<Link href="/account/signup" class="no-decoration sz-16 "> Sign Up </Link> 
-				</div>
-				</div>
+      if (status === 401) {
+        setErrors({ password: 'Invalid username or password' })
+      } else {
+        setAlert(msg || 'Something went wrong. Please try again.')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
-			</div>
-		</div>
-		</div>
-		)
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') handleSubmit()
+  }
+
+  return (
+    <div className="min-h-screen bg-bg flex items-center justify-center px-5 py-16">
+      <div className="w-full max-w-sm">
+
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/" className="font-head text-3xl font-extrabold text-txt no-underline">
+            <span className="text-accent">Q</span>uizzify
+          </Link>
+          <p className="text-muted text-sm mt-2">Welcome back — let's play</p>
+        </div>
+
+        {/* Card */}
+        <div className="bg-surface border border-border rounded-2xl px-6 py-8">
+
+          <h1 className="font-head text-xl font-bold text-txt mb-6">Log In</h1>
+
+          {/* Username */}
+          <div className="mb-4">
+            <label className="block text-xs font-semibold uppercase tracking-widest text-muted mb-2">
+              Username
+            </label>
+            <input
+              type="text"
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              placeholder="Your username"
+              className={`w-full bg-bg border rounded-xl px-4 py-3 text-txt text-sm outline-none transition-all placeholder:text-muted/50 focus:border-accent ${
+                errors.username ? 'border-danger' : 'border-border'
+              }`}
+            />
+            {errors.username && (
+              <p className="text-danger text-xs mt-1.5">{errors.username}</p>
+            )}
+          </div>
+
+          {/* Password */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-widest text-muted">
+                Password
+              </label>
+              <span className="text-accent text-xs cursor-pointer hover:underline">
+                Forgot password?
+              </span>
+            </div>
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              placeholder="Your password"
+              className={`w-full bg-bg border rounded-xl px-4 py-3 text-txt text-sm outline-none transition-all placeholder:text-muted/50 focus:border-accent ${
+                errors.password ? 'border-danger' : 'border-border'
+              }`}
+            />
+            {errors.password && (
+              <p className="text-danger text-xs mt-1.5">{errors.password}</p>
+            )}
+          </div>
+
+          {/* Submit */}
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full bg-accent text-bg font-bold text-base rounded-xl py-[14px] border-none cursor-pointer transition-opacity hover:opacity-85 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <>
+                <span className="w-4 h-4 border-2 border-bg/30 border-t-bg rounded-full animate-spin" />
+                Logging in...
+              </>
+            ) : 'Log In →'}
+          </button>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-muted text-xs">don't have an account?</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+
+          {/* Sign up link */}
+          <Link
+            href="/account/signup"
+            className="block text-center no-underline border border-border text-muted font-semibold text-sm rounded-xl py-3 transition-all hover:border-accent hover:text-accent"
+          >
+            Create Account
+          </Link>
+
+        </div>
+
+      </div>
+    </div>
+  )
 }
+ 
