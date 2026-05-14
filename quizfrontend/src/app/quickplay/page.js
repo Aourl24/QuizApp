@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { apiGet } from '../endpoints.js'
 import { useApp } from '../appContext.js'
-
+import { Suspense } from 'react'
 /**
  * src/app/quickplay/page.js
  * Instructions/settings screen before the game starts.
  * Fetches game info including total_marks from the backend.
  */
 
-export default function QuickplaySetup() {
+function QuickplaySetup() {
   const router       = useRouter()
   const searchParams = useSearchParams()
   const gameId       = searchParams.get('game')
@@ -199,5 +199,18 @@ export default function QuickplaySetup() {
 
       </div>
     </div>
+  )
+}
+
+
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-accent/20 border-t-accent rounded-full animate-spin" />
+      </div>
+    }>
+      <QuickplaySetup />
+    </Suspense>
   )
 }

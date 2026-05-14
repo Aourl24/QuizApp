@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { QuizBox, QuizBoxContext, CountDown, Quiz } from '../../components.js'
 import { apiGet, apiPost } from '../../endpoints.js'
-
+import { Suspense } from 'react'
 /**
  * src/app/quickplay/game/page.js
  *
@@ -179,11 +179,17 @@ function Main() {
     </div>
   )
 }
-
 export default function App() {
   return (
-    <Quiz>
-      <Main />
-    </Quiz>
+    <Suspense fallback={
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-accent/20 border-t-accent rounded-full animate-spin" />
+      </div>
+    }>
+      <Quiz>
+        <Main />
+      </Quiz>
+    </Suspense>
   )
 }
+

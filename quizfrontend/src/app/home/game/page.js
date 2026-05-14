@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import { endpoint , getData} from '../../endpoints.js'
-
+import {Suspense} from 'react'
 /**
  * GAME SELECTION PAGE — Shows games for selected mode
  * 
@@ -17,7 +17,7 @@ import { endpoint , getData} from '../../endpoints.js'
  * 6. Handle guest access errors from backend
  */
 
-export default function GameSelection() {
+ function GameSelection() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const modeId = searchParams.get('mode')
@@ -331,5 +331,17 @@ function GameSelectionSkeleton() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-accent/20 border-t-accent rounded-full animate-spin" />
+      </div>
+    }>
+      <GameSelection />
+    </Suspense>
   )
 }
