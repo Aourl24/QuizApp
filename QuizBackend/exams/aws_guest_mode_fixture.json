@@ -1,0 +1,1124 @@
+[
+  {
+    "model": "question.gamemode",
+    "pk": 2,
+    "fields": {
+      "name": "AWS Guest Quick Quiz",
+      "slug": "aws-guest-quiz",
+      "instructions": "A quick 20-question quiz for guests. No login required. All questions are single-answer. Score as many points as you can!",
+      "icon": "fas fa-user-clock",
+      "color": "#8b5cf6",
+      "score": 5,
+      "time": 20,
+      "order": 2,
+      "is_active": true,
+      "is_guest_allowed": true,
+      "verified_profile": false
+    }
+  },
+  {
+    "model": "question.game",
+    "pk": 5,
+    "fields": {
+      "title": "AWS Cloud Quick Challenge (Guest)",
+      "slug": "aws-guest-challenge",
+      "description": "20 easy single-answer questions to test your AWS knowledge. No account needed!",
+      "creator": null,
+      "host": null,
+      "mode": 2,
+      "category": 3,
+      "time_per_question": 60,
+      "difficulty": "easy",
+      "public": true,
+      "active": true,
+      "multiplayer": false,
+      "max_players": 1,
+      "code": null,
+      "play_count": 0,
+      "likes": 0,
+      "avg_score": 0.0,
+      "created_at": "2026-05-14T00:00:00Z",
+      "updated_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 241,
+    "fields": {
+      "level": 1,
+      "body": "Which of the following is an example of horizontal scaling in the AWS Cloud?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 1,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1027,
+    "fields": {
+      "question": 241,
+      "body": "Replacing an existing EC2 instance with a larger, more powerful one.",
+      "answer": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1028,
+    "fields": {
+      "question": 241,
+      "body": "Increasing the compute capacity of a single EC2 instance to address the growing demands of an application.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1029,
+    "fields": {
+      "question": 241,
+      "body": "Adding more RAM capacity to an EC2 instance.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1030,
+    "fields": {
+      "question": 241,
+      "body": "Adding more EC2 instances of the same size to handle an increase in traffic.",
+      "answer": true,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 242,
+    "fields": {
+      "level": 1,
+      "body": "Which of the following can be described as a global content delivery network (CDN) service?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 2,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1031,
+    "fields": {
+      "question": 242,
+      "body": "AWS VPN.",
+      "answer": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1032,
+    "fields": {
+      "question": 242,
+      "body": "AWS Direct Connect.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1033,
+    "fields": {
+      "question": 242,
+      "body": "AWS Regions.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1034,
+    "fields": {
+      "question": 242,
+      "body": "Amazon CloudFront.",
+      "answer": true,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 243,
+    "fields": {
+      "level": 1,
+      "body": "You have AWS Basic support, and you have discovered that some AWS resources are being used maliciously, and those resources could potentially compromise your data. What should you do?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 3,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1035,
+    "fields": {
+      "question": 243,
+      "body": "Contact the AWS Customer Service team.",
+      "answer": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1036,
+    "fields": {
+      "question": 243,
+      "body": "Contact the AWS Abuse team.",
+      "answer": true,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1037,
+    "fields": {
+      "question": 243,
+      "body": "Contact the AWS Concierge team.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1038,
+    "fields": {
+      "question": 243,
+      "body": "Contact the AWS Security team.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 244,
+    "fields": {
+      "level": 1,
+      "body": "A company is migrating a web application to AWS. The application’s compute capacity is continually utilized throughout the year. Which of the below options offers the company the most cost-effective solution?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 4,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1039,
+    "fields": {
+      "question": 244,
+      "body": "On-demand Instances.",
+      "answer": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1040,
+    "fields": {
+      "question": 244,
+      "body": "Dedicated Hosts.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1041,
+    "fields": {
+      "question": 244,
+      "body": "Spot Instances.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1042,
+    "fields": {
+      "question": 244,
+      "body": "Reserved Instances.",
+      "answer": true,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 245,
+    "fields": {
+      "level": 1,
+      "body": "What is the AWS Compute service that executes code only when triggered by events?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 5,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1043,
+    "fields": {
+      "question": 245,
+      "body": "AWS Lambda.",
+      "answer": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1044,
+    "fields": {
+      "question": 245,
+      "body": "Amazon CloudWatch.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1045,
+    "fields": {
+      "question": 245,
+      "body": "AWS Transit Gateway.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1046,
+    "fields": {
+      "question": 245,
+      "body": "Amazon EC2.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 246,
+    "fields": {
+      "level": 1,
+      "body": "What is the AWS tool that can help a company visualize their AWS spending in the last few months?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 6,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1047,
+    "fields": {
+      "question": 246,
+      "body": "AWS Cost Explorer.",
+      "answer": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1048,
+    "fields": {
+      "question": 246,
+      "body": "AWS Pricing Calculator.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1049,
+    "fields": {
+      "question": 246,
+      "body": "AWS Budgets.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1050,
+    "fields": {
+      "question": 246,
+      "body": "AWS Consolidated Billing.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 247,
+    "fields": {
+      "level": 1,
+      "body": "What is the AWS database service that allows you to upload data structured in key-value format?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 7,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1051,
+    "fields": {
+      "question": 247,
+      "body": "Amazon DynamoDB.",
+      "answer": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1052,
+    "fields": {
+      "question": 247,
+      "body": "Amazon Aurora.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1053,
+    "fields": {
+      "question": 247,
+      "body": "Amazon Redshift.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1054,
+    "fields": {
+      "question": 247,
+      "body": "Amazon RDS.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 248,
+    "fields": {
+      "level": 1,
+      "body": "Which S3 storage class is best for data with unpredictable access patterns?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 8,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1055,
+    "fields": {
+      "question": 248,
+      "body": "Amazon S3 Intelligent-Tiering.",
+      "answer": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1056,
+    "fields": {
+      "question": 248,
+      "body": "Amazon S3 Glacier Flexible Retrieval.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1057,
+    "fields": {
+      "question": 248,
+      "body": "Amazon S3 Standard.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1058,
+    "fields": {
+      "question": 248,
+      "body": "Amazon S3 Standard-Infrequent Access.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 249,
+    "fields": {
+      "level": 1,
+      "body": "Your company is designing a new application that will store and retrieve photos and videos. Which of the following services should you recommend as the underlying storage mechanism?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 9,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1059,
+    "fields": {
+      "question": 249,
+      "body": "Amazon EBS.",
+      "answer": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1060,
+    "fields": {
+      "question": 249,
+      "body": "Amazon SQS.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1061,
+    "fields": {
+      "question": 249,
+      "body": "Amazon S3.",
+      "answer": true,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1062,
+    "fields": {
+      "question": 249,
+      "body": "Amazon Instance store.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 250,
+    "fields": {
+      "level": 1,
+      "body": "Which AWS Service provides the current status of all AWS Services in all AWS Regions?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 10,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1063,
+    "fields": {
+      "question": 250,
+      "body": "AWS Service Health Dashboard.",
+      "answer": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1064,
+    "fields": {
+      "question": 250,
+      "body": "AWS Management Console.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1065,
+    "fields": {
+      "question": 250,
+      "body": "Amazon CloudWatch.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1066,
+    "fields": {
+      "question": 250,
+      "body": "AWS Personal Health Dashboard.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 251,
+    "fields": {
+      "level": 1,
+      "body": "How can AWS customers track and avoid over-spending on underutilized reserved instances?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 11,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1067,
+    "fields": {
+      "question": 251,
+      "body": "Customers can add all AWS accounts to an AWS Organization, enable Consolidated Billing, and turn off Reserved Instance sharing.",
+      "answer": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1068,
+    "fields": {
+      "question": 251,
+      "body": "Customers can use Amazon Neptune to track and analyze their usage patterns, detect underutilized reserved instances, and then sell them on the Amazon EC2 Reserved Instance Marketplace.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1069,
+    "fields": {
+      "question": 251,
+      "body": "Customers can use the AWS Budgets service to track the reserved instances usage and set up alert notifications when their utilization drops below the threshold that they define.",
+      "answer": true,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1070,
+    "fields": {
+      "question": 251,
+      "body": "Customers can use Amazon CloudTrail to automatically check for unused reservations and get recommendations to reduce their bill.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 252,
+    "fields": {
+      "level": 1,
+      "body": "Which of the following describes the payment model that AWS makes available for customers that can commit to using Amazon EC2 over a one or 3-year term to reduce their total computing costs?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 12,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1071,
+    "fields": {
+      "question": 252,
+      "body": "Pay less as AWS grows.",
+      "answer": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1072,
+    "fields": {
+      "question": 252,
+      "body": "Pay as you go.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1073,
+    "fields": {
+      "question": 252,
+      "body": "Pay less by using more.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1074,
+    "fields": {
+      "question": 252,
+      "body": "Save when you reserve.",
+      "answer": true,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 253,
+    "fields": {
+      "level": 1,
+      "body": "Which of the following is NOT correct regarding Amazon EC2 On-demand instances?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 13,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1075,
+    "fields": {
+      "question": 253,
+      "body": "You have to pay a start-up fee when launching a new instance for the first time.",
+      "answer": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1076,
+    "fields": {
+      "question": 253,
+      "body": "The on-demand instances follow the AWS pay-as-you-go pricing model.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1077,
+    "fields": {
+      "question": 253,
+      "body": "With on-demand instances, no longer-term commitments or upfront payments are needed.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1078,
+    "fields": {
+      "question": 253,
+      "body": "When using on-demand Linux instances, you are charged per second based on an hourly rate.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 254,
+    "fields": {
+      "level": 1,
+      "body": "Which of the following helps a customer view the Amazon EC2 billing activity for the past month?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 14,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1079,
+    "fields": {
+      "question": 254,
+      "body": "AWS Budgets.",
+      "answer": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1080,
+    "fields": {
+      "question": 254,
+      "body": "AWS Pricing Calculator.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1081,
+    "fields": {
+      "question": 254,
+      "body": "AWS Systems Manager.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1082,
+    "fields": {
+      "question": 254,
+      "body": "AWS Cost & Usage Reports.",
+      "answer": true,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 255,
+    "fields": {
+      "level": 1,
+      "body": "Which of the following is NOT a characteristic of Amazon Elastic Compute Cloud (Amazon EC2)?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 15,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1083,
+    "fields": {
+      "question": 255,
+      "body": "Amazon EC2 is considered a Serverless Web Service.",
+      "answer": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1084,
+    "fields": {
+      "question": 255,
+      "body": "Amazon EC2 eliminates the need to invest in hardware upfront.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1085,
+    "fields": {
+      "question": 255,
+      "body": "Amazon EC2 can launch as many or as few virtual servers as needed.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1086,
+    "fields": {
+      "question": 255,
+      "body": "Amazon EC2 offers scalable computing.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 256,
+    "fields": {
+      "level": 1,
+      "body": "Which AWS service can be used to send promotional text messages (SMS) to more than 200 countries worldwide?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 16,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1087,
+    "fields": {
+      "question": 256,
+      "body": "Amazon Simple Email Service (Amazon SES).",
+      "answer": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1088,
+    "fields": {
+      "question": 256,
+      "body": "Amazon Simple Storage Service (Amazon S3).",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1089,
+    "fields": {
+      "question": 256,
+      "body": "Amazon Simple Notification Service (Amazon SNS).",
+      "answer": true,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1090,
+    "fields": {
+      "question": 256,
+      "body": "Amazon Simple Queue Service (Amazon SQS).",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 257,
+    "fields": {
+      "level": 1,
+      "body": "Adjusting compute capacity dynamically to reduce cost is an implementation of which AWS cloud best practice?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 17,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1091,
+    "fields": {
+      "question": 257,
+      "body": "Build security in every layer.",
+      "answer": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1092,
+    "fields": {
+      "question": 257,
+      "body": "Parallelize tasks.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1093,
+    "fields": {
+      "question": 257,
+      "body": "Implement elasticity.",
+      "answer": true,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1094,
+    "fields": {
+      "question": 257,
+      "body": "Adopt monolithic architecture.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 258,
+    "fields": {
+      "level": 1,
+      "body": "What is the AWS service that provides five times the performance of a standard MySQL database?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 18,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1095,
+    "fields": {
+      "question": 258,
+      "body": "Amazon Aurora.",
+      "answer": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1096,
+    "fields": {
+      "question": 258,
+      "body": "Amazon Redshift.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1097,
+    "fields": {
+      "question": 258,
+      "body": "Amazon DynamoDB.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1098,
+    "fields": {
+      "question": 258,
+      "body": "Amazon Neptune.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 259,
+    "fields": {
+      "level": 1,
+      "body": "How does AWS notify customers about security and privacy events pertaining to AWS services?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 19,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1099,
+    "fields": {
+      "question": 259,
+      "body": "Using the AWS ACM service.",
+      "answer": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1100,
+    "fields": {
+      "question": 259,
+      "body": "Using Security Bulletins.",
+      "answer": true,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1101,
+    "fields": {
+      "question": 259,
+      "body": "Using the AWS Management Console.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1102,
+    "fields": {
+      "question": 259,
+      "body": "Using Compliance Resources.",
+      "answer": false,
+      "order": 4
+    }
+  },
+  {
+    "model": "question.question",
+    "pk": 260,
+    "fields": {
+      "level": 1,
+      "body": "Which of the following activities may help reduce your AWS monthly costs?",
+      "explanation": "",
+      "image": "",
+      "hint": "",
+      "order": 20,
+      "mark": 1,
+      "created_at": "2026-05-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1103,
+    "fields": {
+      "question": 260,
+      "body": "Enabling Amazon EC2 Auto Scaling for all of your workloads.",
+      "answer": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1104,
+    "fields": {
+      "question": 260,
+      "body": "Using the AWS Network Load Balancer (NLB) to load balance the incoming HTTP requests.",
+      "answer": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1105,
+    "fields": {
+      "question": 260,
+      "body": "Removing all of your Cost Allocation Tags.",
+      "answer": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "question.option",
+    "pk": 1106,
+    "fields": {
+      "question": 260,
+      "body": "Deploying your AWS resources across multiple Availability Zones.",
+      "answer": false,
+      "order": 4
+    }
+  }
+]

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { endpoint , postData} from '../../endpoints.js'
+import { endpoint } from '../../endpoints.js'
 import { useApp } from '../../appContext.js'
 
 /**
@@ -54,13 +54,9 @@ export default function Login() {
       if (data.status) {
         // Save token to cookie — postData() reads Cookies.get('token') automatically
         Cookies.set('token', data.token, { expires: 7 })
-axios.defaults.headers.common['Authorization'] = `JWT ${data.token}`
-setUser(data.user)
 
         // Update global user in AppContext
-       // setUser(data.user)
-       const check = await postData('checkuser')
-setUser(check.user || null)
+        setUser(data.user)
 
         router.push('/home')
       } else {
@@ -183,4 +179,3 @@ setUser(check.user || null)
     </div>
   )
 }
- 

@@ -207,6 +207,15 @@ export function QuizBox() {
     return () => resetAudio();
   }, [active]);
 
+  // Use refs for confirm and feedbackMode — prevents stale closure bugs
+  // in event handlers and checkAnswer. Default to safe values so the
+  // modal always shows even if AppContext hasn't hydrated yet.
+  const confirmRef = useRef(confirm ?? false);
+  useEffect(() => { confirmRef.current = confirm ?? false; }, [confirm]);
+
+  const feedbackModeRef = useRef(feedbackMode ?? 'immediate');
+  useEffect(() => { feedbackModeRef.current = feedbackMode ?? 'immediate'; }, [feedbackMode]);
+
   /* ── Single-select handler ── */
   const handleSingleClick = (index, option) => {
     options.current.forEach(el => el && el.classList.remove('option-selected'));
@@ -215,8 +224,12 @@ export function QuizBox() {
     selectedId.current = option.id ?? null;
     setShowConfirm(true);
 
-    // If confirm is OFF and it's a single-select — check immediately
-    if (!confirm) selectAnswer();
+    // If confirm is OFF — check immediately without waiting for confirm button
+    if (!confirmRef.current) {
+      if (countdown.current) countdown.current.pause();
+      checkAnswer();
+      setShowConfirm(false);
+    }
   };
 
   /* ── Multi-select handler ── */
@@ -242,7 +255,6 @@ export function QuizBox() {
     const earnedMark = questionMark;
 
     if (isMultiple) {
-      // All-or-nothing: selected IDs must exactly match all correct option IDs
       const correctIds = new Set(
         currentQ.options.filter(o => o.answer === true).map(o => o.id)
       );
@@ -252,15 +264,41 @@ export function QuizBox() {
         [...selectedIds].every(id => correctIds.has(id))
       );
     } else {
-      // Single select: compare by answer boolean on the matching option
       const matchedOption = currentQ.options.find(
         o => (o.body ?? o) === selectedOption.current
       );
       isCorrect = matchedOption?.answer === true;
     }
 
-    // Show correct/wrong highlights on options (for end-only mode this is the feedback)
-    if (feedbackMode === 'end') {
+    // Update score and tracking
+    if (isCorrect) {
+      setScore(prev => prev + earnedMark);
+      setAnswerMark(2);
+      setCorrect(prev => [...prev, currentQ]);
+      if (sound && clap.current) clap.current.play();
+    } else {
+      setAnswerMark(1);
+      setWrong(prev => [...prev, currentQ]);
+      if (sound && gameover.current) gameover.current.play();
+    }
+
+    setQuestionResults(prev => [...prev, {
+      question: currentQ.body,
+      isCorrect,
+      earnedMark: isCorrect ? earnedMark : 0,
+      maxMark: earnedMark,
+    }]);
+
+    const mode = feedbackModeRef.current;
+
+    if (mode === 'immediate') {
+      // Show modal — this is the primary feedback path
+      setMessage(isCorrect
+        ? correctWords[Math.floor(Math.random() * correctWords.length)]
+        : wrongWords[Math.floor(Math.random() * wrongWords.length)]
+      );
+    } else {
+      // End-only: highlight correct/wrong on options, then auto-advance
       currentQ.options.forEach((opt, i) => {
         if (!options.current[i]) return;
         if (opt.answer) {
@@ -273,40 +311,13 @@ export function QuizBox() {
           options.current[i].classList.add('option-wrong');
         }
       });
-    }
-
-    // Record result
-    const result = {
-      question: currentQ.body,
-      isCorrect,
-      earnedMark: isCorrect ? earnedMark : 0,
-      maxMark: earnedMark,
-    };
-    setQuestionResults(prev => [...prev, result]);
-
-    if (isCorrect) {
-      setScore(prev => prev + earnedMark);
-      setAnswerMark(2);
-      setCorrect(prev => [...prev, currentQ]);
-      if (sound && clap.current) clap.current.play();
-    } else {
-      setAnswerMark(1);
-      setWrong(prev => [...prev, currentQ]);
-      if (sound && gameover.current) gameover.current.play();
-    }
-
-    if (feedbackMode === 'immediate') {
-      // Show modal with correct/wrong message
-      setMessage(isCorrect
-        ? correctWords[Math.floor(Math.random() * correctWords.length)]
-        : wrongWords[Math.floor(Math.random() * wrongWords.length)]
-      );
-    } else {
-      // End-only: no modal, auto-advance after brief delay so player sees highlights
-      setTimeout(() => changeActive(), 1200);
+      // Use ref-captured changeActive to avoid stale closure
+      const advance = changeActive;
+      setTimeout(() => advance(), 1200);
     }
   };
 
+  // Called by the Confirm button only
   const selectAnswer = () => {
     if (isMultiple && multiSelected.current.size === 0) return;
     if (!isMultiple && !selectedOption.current) return;
@@ -628,28 +639,41 @@ export function CountDown({ number }) {
     countdown, active, data, setAnswerMark, sound, changeActive,
     feedbackMode,
   } = useContext(QuizBoxContext);
+
   const [countDown, setCountDown] = useState(number || 20);
+  // Guard ref — prevents timeout logic firing more than once per question
+  const hasTimedOut = useRef(false);
+
+  // Reset everything when question changes
+  useEffect(() => {
+    setCountDown(number || 20);
+    hasTimedOut.current = false;  // allow timeout on the new question
+  }, [active, number]);
 
   useEffect(() => {
     if (!data || data.length === 0) return;
-    const timer = setInterval(() => setCountDown(c => c - 1), 1000);
+
+    // Stop ticking if message is showing (modal open) or already timed out
+    if (message || hasTimedOut.current) return;
+
     if (countDown <= 0) {
+      // Mark as timed out immediately so this block never runs twice
+      hasTimedOut.current = true;
       resetAudio();
       if (sound && gameover.current) gameover.current.play();
       setAnswerMark(3);
       setWrong(prev => [...prev, data[active]]);
-      clearInterval(timer);
       if (feedbackMode === 'immediate') {
         setMessage('Time Out');
       } else {
-        setTimeout(() => changeActive(), 1000);
+        setTimeout(() => changeActive(), 1200);
       }
+      return;
     }
-    if (message) { clearInterval(timer); if (countdown.current) countdown.current.currentTime = 0; }
+
+    const timer = setInterval(() => setCountDown(c => c - 1), 1000);
     return () => clearInterval(timer);
   }, [countDown, message, data]);
-
-  useEffect(() => { setCountDown(number || 20); }, [active, number]);
 
   return (
     <span className={`inline-flex items-center justify-center w-11 h-11 rounded-full border-2 border-danger text-danger font-head text-lg font-bold transition-all ${countDown <= 5 ? 'bg-danger/10 animate-pulse-ring' : ''}`}>

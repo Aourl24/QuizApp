@@ -17,12 +17,11 @@ import Cookies from 'js-cookie'
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  const [user, setUser]           = useState(null);
-  const [alert, setAlert]         = useState(null);
-  const [loader, setLoader]       = useState(true);
-  const [confirm, setConfirm]     = useState(false);
-  const [sound, setSound]         = useState(false);
-  const [feedbackMode, setFeedbackMode] = useState('immediate'); // 'immediate' | 'end'
+  const [user, setUser]       = useState(null);
+  const [alert, setAlert]     = useState(null);
+  const [loader, setLoader]   = useState(true);
+  const [confirm, setConfirm] = useState(false);
+  const [sound, setSound]     = useState(false);
 
   // On app load: set JWT header + check login — runs ONCE only
   useEffect(() => {
@@ -53,7 +52,6 @@ export function AppProvider({ children }) {
       loader, setLoader,
       confirm, setConfirm,
       sound, setSound,
-      feedbackMode, setFeedbackMode,
     }}>
 
       {/* Global loader overlay */}
