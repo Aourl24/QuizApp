@@ -1,8 +1,8 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-const api_host = '127.0.0.1:8000'
-//const api_host = 'quizzify.pythonanywhere.com'
+//const api_host = '127.0.0.1:8000'
+const api_host = 'quizzify.pythonanywhere.com'
 
 export const endpoint    = `http://${api_host}/`
 export const endpath     = endpoint.trim().replace(/\/$/, '')
