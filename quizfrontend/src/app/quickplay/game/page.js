@@ -3,65 +3,62 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { QuizBox, QuizBoxContext, CountDown, Quiz } from '../../components.js'
 import { apiGet, apiPost } from '../../endpoints.js'
-import Cookies from 'js-cookie'
 
 /**
- * QUICKPLAY GAME PAGE
+ * src/app/quickplay/game/page.js
  *
- * FIXES:
- * 1. Single fetch only — QuizBox no longer fetches, this page owns all data fetching
- * 2. saveScore uses Cookies.get('token') + 'JWT' prefix (not localStorage + 'Bearer')
- * 3. Stale closure fix on pagination — uses a ref to track current page
- * 4. setData replaces on first load, appends on subsequent pages
- * 5. Sound/confirm settings wired from QuizBoxContext (which reads from AppContext)
+ * - No batchanswers/ call needed — answer field is already in OptionPlayerSerializer
+ * - Per-question marks: totalPossible calculated from question.mark values
+ * - modeScore set as fallback for questions with null mark
  */
 
 function Main() {
   const {
-    data, setData, setGame, setLoader, setScorePercent,
+    data, setData, setGame, setLoader,
+    setModeScore,                          // replaces setScorePercent
     setBatch, setNextBatch, setHasNextPage,
     active, score, correct, wrong,
     end, user, setMessage,
-    confirm, setConfirm, sound, setSound,
+    getQuestionMark,
   } = React.useContext(QuizBoxContext)
 
-  const searchParams  = useSearchParams()
-  const gameId        = searchParams.get('game')
+  const searchParams = useSearchParams()
+  const gameId       = searchParams.get('game')
 
-  const [gameInfo, setGameInfo]       = useState(null)
-  const [loading, setLoading]         = useState(true)
-  const [error, setError]             = useState(null)
+  const [gameInfo, setGameInfo]         = useState(null)
+  const [loading, setLoading]           = useState(true)
+  const [error, setError]               = useState(null)
   const [quizComplete, setQuizComplete] = useState(false)
+  const [totalMarks, setTotalMarks]     = useState(null)
 
-  // Use a ref for currentPage to avoid stale closures in the pagination effect
   const currentPageRef = useRef(1)
   const isFetchingRef  = useRef(false)
 
-  // Initial fetch on mount
   useEffect(() => {
     if (!gameId) { setError('No game selected'); setLoading(false); return; }
     fetchQuestions(1, true)
   }, [gameId])
 
   const fetchQuestions = async (page, isFirst = false) => {
-    if (isFetchingRef.current) return   // prevent concurrent fetches
+    if (isFetchingRef.current) return
     isFetchingRef.current = true
 
     try {
       setLoading(true)
       const result = await apiGet(`getgame/${gameId}/${page}/`)
-
       if (result.error) { setError(result.error); return; }
 
-      // Set game info once
       if (result.game && !gameInfo) {
         setGameInfo(result.game)
         setGame(result.game)
-        setScorePercent(result.game.mode?.score || 10)
+        setModeScore(result.game.mode?.score || 10)
+        // total_marks from backend — always accurate
+        if (result.game.total_marks != null) {
+          setTotalMarks(result.game.total_marks)
+        }
       }
 
       if (result.questions?.length > 0) {
-        // Replace on first page, append on subsequent
         setData(prev => isFirst ? result.questions : [...prev, ...result.questions])
         setHasNextPage(result.has_next || false)
         setNextBatch(result.next_page_number || null)
@@ -81,14 +78,9 @@ function Main() {
     }
   }
 
-  // Pagination — load next page when 3 questions from the end
+  // Prefetch next page 3 questions before the end
   useEffect(() => {
-    if (
-      data.length > 0 &&
-      active >= data.length - 3 &&
-      !isFetchingRef.current
-    ) {
-      // Check hasNextPage from context (set by fetchQuestions)
+    if (data.length > 0 && active >= data.length - 3 && !isFetchingRef.current) {
       fetchQuestions(currentPageRef.current + 1, false)
     }
   }, [active, data.length])
@@ -99,14 +91,14 @@ function Main() {
     setQuizComplete(true)
 
     if (user?.id) {
-      const totalPossible = data.length * (gameInfo?.mode?.score || 10)
+      // totalPossible: sum of each question's actual mark
+      const totalPossible = data.reduce((sum, q) => sum + getQuestionMark(q), 0)
       saveScore(score, totalPossible, correct.length, wrong.length)
     }
   }, [end])
 
   const saveScore = async (finalScore, totalPossible, correctCount, wrongCount) => {
     try {
-      // FIX: use apiPost which reads cookie + sends JWT header correctly
       const result = await apiPost('completegame/', {
         player:         user.id,
         score:          finalScore,
@@ -152,24 +144,19 @@ function Main() {
       <div className="sticky top-0 z-50 bg-bg/90 backdrop-blur-md border-b border-border px-5 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
-              🎮
-            </div>
+            <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">🎮</div>
             <div>
-              <div className="font-head text-sm font-bold text-txt">
-                {gameInfo?.title || 'Quiz'}
-              </div>
-              <div className="text-xs text-muted">
-                Question {active + 1} of {data.length}
-              </div>
+              <div className="font-head text-sm font-bold text-txt">{gameInfo?.title || 'Quiz'}</div>
+              <div className="text-xs text-muted">Question {active + 1} of {data.length}</div>
             </div>
           </div>
-
           <div className="flex items-center gap-4">
             <CountDown number={timeLimit} />
             <div className="text-right">
               <div className="font-head text-lg font-bold text-accent">{score}</div>
-              <div className="text-[10px] text-muted">pts</div>
+              <div className="text-[10px] text-muted">
+                {totalMarks != null ? `/ ${totalMarks} pts` : 'pts'}
+              </div>
             </div>
           </div>
         </div>
@@ -185,7 +172,6 @@ function Main() {
         </div>
       </div>
 
-      {/* Quiz content — QuizBox reads data from context, no fetch */}
       <div className="max-w-2xl mx-auto px-5 py-6">
         <QuizBox />
       </div>

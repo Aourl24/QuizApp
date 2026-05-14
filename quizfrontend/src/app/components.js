@@ -1,19 +1,5 @@
 "use client";
 
-/**
- * components.js — Quiz components
- *
- * FIXES:
- * 1. Quiz provider no longer calls checkuser — AppContext handles that once
- * 2. Quiz reads user/alert/loader/confirm/sound FROM AppContext via useApp()
- *    instead of duplicating that state
- * 3. QuizBox no longer fetches questions — the game page handles fetching
- *    and passes questions via the data context directly
- * 4. restartQuiz duplicate removed from context value
- * 5. Header now uses useApp() instead of missing AuthContext
- * 6. fetchData removed from QuizBox (game page owns data fetching)
- */
-
 import React, { createContext, useState, useRef, useEffect, useContext } from "react";
 import Link from "next/link";
 import { useApp } from "./appContext.js";
@@ -22,28 +8,35 @@ export const QuizBoxContext = createContext();
 
 /* ─── Quiz (provider) ──────────────────────────────────────────────────────── */
 export function Quiz({ children }) {
-  // Read shared app state from AppContext — no duplication
-  const { user, setUser, alert, setAlert, loader, setLoader, confirm, setConfirm, sound, setSound } = useApp()
+  const {
+    user, setUser, alert, setAlert, loader, setLoader,
+    confirm, setConfirm, sound, setSound,
+    feedbackMode, setFeedbackMode,          // 'immediate' | 'end'
+  } = useApp()
 
-  // Game-specific state only
-  const [game, setGame]               = useState();
-  const [data, setData]               = useState([]);
-  const [active, setActive]           = useState(0);
-  const [error, setError]             = useState(false);
-  const [message, setMessage]         = useState();
-  const [score, setScore]             = useState(0);
-  const [scorePercent, setScorePercent] = useState(10);
-  const [correct, setCorrect]         = useState([]);
-  const [wrong, setWrong]             = useState([]);
+  // Game-specific state
+  const [game, setGame]                   = useState();
+  const [data, setData]                   = useState([]);
+  const [active, setActive]               = useState(0);
+  const [error, setError]                 = useState(false);
+  const [message, setMessage]             = useState();
+  const [score, setScore]                 = useState(0);
+  const [modeScore, setModeScore]         = useState(10);  // fallback from game mode
+  const [correct, setCorrect]             = useState([]);
+  const [wrong, setWrong]                 = useState([]);
   const [buttonMessage, setButtonMessage] = useState("Next Question");
-  const [batch, setBatch]             = useState();
-  const [nextBatch, setNextBatch]     = useState();
-  const [end, setEnd]                 = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const [mark, setMark]               = useState(0);
-  const [hasNextPage, setHasNextPage] = useState(false);
+  const [batch, setBatch]                 = useState();
+  const [nextBatch, setNextBatch]         = useState();
+  const [end, setEnd]                     = useState(false);
+  const [showResults, setShowResults]     = useState(false);
+  const [answerMark, setAnswerMark]       = useState(0);  // 1=wrong 2=correct 3=timeout
+  const [hasNextPage, setHasNextPage]     = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [status, setStatus]           = useState(true);
+  const [status, setStatus]               = useState(true);
+  const [totalPossible, setTotalPossible] = useState(0);
+
+  // End-only feedback: store per-question results without showing modal
+  const [questionResults, setQuestionResults] = useState([]);
 
   const countdown = useRef();
   const clap      = useRef();
@@ -63,6 +56,17 @@ export function Quiz({ children }) {
     });
   };
 
+  // Get mark value for a question — uses question.mark if set, else modeScore
+  const getQuestionMark = (question) => question?.mark ?? modeScore;
+
+  // Track total possible score as questions load
+  useEffect(() => {
+    if (data.length > 0) {
+      const total = data.reduce((sum, q) => sum + getQuestionMark(q), 0);
+      setTotalPossible(total);
+    }
+  }, [data, modeScore]);
+
   const gameOver = () => {
     setShowResults(true);
     setMessage("Quiz Complete!");
@@ -76,7 +80,7 @@ export function Quiz({ children }) {
     }
     if (active === data.length - 1) {
       if (hasNextPage && nextBatch) {
-        setMessage("Loading more questions...");
+        setMessage();
       } else {
         gameOver();
       }
@@ -101,6 +105,9 @@ export function Quiz({ children }) {
     setNextBatch();
     setQuizSubmitted(false);
     setData([]);
+    setTotalPossible(0);
+    setQuestionResults([]);
+    setAnswerMark(0);
   };
 
   // Auto-update button label
@@ -114,21 +121,22 @@ export function Quiz({ children }) {
 
   return (
     <QuizBoxContext.Provider value={{
-      // App-wide (passed through from AppContext)
+      // From AppContext
       user, setUser,
       alert, setAlert,
       loader, setLoader,
       confirm, setConfirm,
       sound, setSound,
+      feedbackMode, setFeedbackMode,
 
-      // Game-specific
+      // Game state
       active, setActive,
       data, setData,
       game, setGame,
       error, setError,
       message, setMessage,
       score, setScore,
-      scorePercent, setScorePercent,
+      modeScore, setModeScore,
       correct, setCorrect,
       wrong, setWrong,
       buttonMessage, setButtonMessage,
@@ -136,16 +144,19 @@ export function Quiz({ children }) {
       nextBatch, setNextBatch,
       end, setEnd,
       showResults, setShowResults,
-      mark, setMark,
+      answerMark, setAnswerMark,
       hasNextPage, setHasNextPage,
       quizSubmitted, setQuizSubmitted,
       status, setStatus,
+      totalPossible, setTotalPossible,
+      questionResults, setQuestionResults,
 
       // Methods
       gameOver,
       changeActive,
       restartQuiz,
       resetAudio,
+      getQuestionMark,
 
       // Audio refs
       countdown, clap, boo, gameover,
@@ -157,78 +168,153 @@ export function Quiz({ children }) {
 }
 
 /* ─── QuizBox ──────────────────────────────────────────────────────────────── */
-// QuizBox no longer fetches — the game page feeds data via setData in context.
-// QuizBox only handles rendering questions and checking answers.
 export function QuizBox() {
-  const options         = useRef([]);
-  const selectedOption  = useRef();
-  const correctWords    = ["Nailed it!", "Spot on!", "On Point!", "Legit!", "Boom"];
-  const wrongWords      = ["Nah, Fam!", "Uh-Oh!", "Swing n Miss!", "Whoops", "So close!"];
-  const [showSelect, setShowSelect] = useState(false);
+  const multiSelected  = useRef(new Set()); // for multi-select: Set of selected option IDs
+  const options        = useRef([]);
+  const selectedOption = useRef(null);      // single-select: option body string
+  const selectedId     = useRef(null);      // single-select: option id
 
-  // FIX: read confirm/sound from useApp() directly — guaranteed to match
-  // what the user set on the Instructions page (AppContext persists across navigation)
-  const { confirm, sound } = useApp();
+  const correctWords = ["Nailed it!", "Spot on!", "On Point!", "Legit!", "Boom"];
+  const wrongWords   = ["Nah, Fam!", "Uh-Oh!", "Swing n Miss!", "Whoops", "So close!"];
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [multiCount, setMultiCount]   = useState(0); // track selection count for re-render
+
+  // Read directly from AppContext — guaranteed to match what user set in settings
+  const { confirm, sound, feedbackMode } = useApp();
 
   const {
     active, data, countdown, setMessage, resetAudio,
     setWrong, gameover, setCorrect, clap,
-    setScore, scorePercent, setMark,
-    error,
+    setScore, setAnswerMark, getQuestionMark,
+    questionResults, setQuestionResults,
+    changeActive,
   } = useContext(QuizBoxContext);
 
-  // Clear selected option on question change
+  const currentQ       = data[active];
+  const isMultiple     = currentQ?.has_multiple_answers === true;
+  const correctCount   = currentQ?.correct_answer_count ?? 1;
+  const questionMark   = getQuestionMark(currentQ);
+
+  // Reset on question change
   useEffect(() => {
-    options.current.forEach(el => el && el.classList.remove('option-selected'));
-    setShowSelect(false);
+    options.current.forEach(el => el && el.classList.remove('option-selected', 'option-correct', 'option-wrong'));
+    setShowConfirm(false);
     selectedOption.current = null;
+    selectedId.current = null;
+    multiSelected.current = new Set();
+    setMultiCount(0);
     return () => resetAudio();
   }, [active]);
 
-  const markChoose = (index, option) => {
-    options.current.forEach(el => { if (el) el.classList.remove("option-selected"); });
+  /* ── Single-select handler ── */
+  const handleSingleClick = (index, option) => {
+    options.current.forEach(el => el && el.classList.remove('option-selected'));
     if (options.current[index]) options.current[index].classList.add('option-selected');
-    setShowSelect(true);
-    // Store the comparable value — works for both plain strings and {id, body} objects
-    selectedOption.current = option?.body ?? option;
+    selectedOption.current = option.body ?? option;
+    selectedId.current = option.id ?? null;
+    setShowConfirm(true);
+
+    // If confirm is OFF and it's a single-select — check immediately
+    if (!confirm) selectAnswer();
   };
 
+  /* ── Multi-select handler ── */
+  const handleMultiClick = (index, option) => {
+    const id = option.id;
+    if (multiSelected.current.has(id)) {
+      multiSelected.current.delete(id);
+      if (options.current[index]) options.current[index].classList.remove('option-selected');
+    } else {
+      multiSelected.current.add(id);
+      if (options.current[index]) options.current[index].classList.add('option-selected');
+    }
+    setMultiCount(multiSelected.current.size); // trigger re-render for button state
+    setShowConfirm(multiSelected.current.size > 0);
+  };
 
+  /* ── Check answer logic ── */
   const checkAnswer = () => {
-    if (!selectedOption.current) return;
+    if (!currentQ) return;
     resetAudio();
-    const currentQuestion = data[active];
-const correctOption = data[active].options.find(o => o.answer === true)
-const isCorrect = selectedOption.current === correctOption?.body
-    // const isCorrect = selectedOption.current === correctOption?.body
-    console.log('Selected:', selectedOption.current)
-  console.log('Answer:', currentQuestion.answer)
-  console.log('Options:', currentQuestion.options)
-  console.log('Match:', selectedOption.current === currentQuestion.answer)
-  
-    // const isCorrect = selectedOption.current === currentQuestion.answer;
+
+    let isCorrect = false;
+    const earnedMark = questionMark;
+
+    if (isMultiple) {
+      // All-or-nothing: selected IDs must exactly match all correct option IDs
+      const correctIds = new Set(
+        currentQ.options.filter(o => o.answer === true).map(o => o.id)
+      );
+      const selectedIds = multiSelected.current;
+      isCorrect = (
+        selectedIds.size === correctIds.size &&
+        [...selectedIds].every(id => correctIds.has(id))
+      );
+    } else {
+      // Single select: compare by answer boolean on the matching option
+      const matchedOption = currentQ.options.find(
+        o => (o.body ?? o) === selectedOption.current
+      );
+      isCorrect = matchedOption?.answer === true;
+    }
+
+    // Show correct/wrong highlights on options (for end-only mode this is the feedback)
+    if (feedbackMode === 'end') {
+      currentQ.options.forEach((opt, i) => {
+        if (!options.current[i]) return;
+        if (opt.answer) {
+          options.current[i].classList.add('option-correct');
+        } else if (
+          isMultiple
+            ? multiSelected.current.has(opt.id)
+            : (opt.body ?? opt) === selectedOption.current
+        ) {
+          options.current[i].classList.add('option-wrong');
+        }
+      });
+    }
+
+    // Record result
+    const result = {
+      question: currentQ.body,
+      isCorrect,
+      earnedMark: isCorrect ? earnedMark : 0,
+      maxMark: earnedMark,
+    };
+    setQuestionResults(prev => [...prev, result]);
 
     if (isCorrect) {
-      setScore(prev => prev + scorePercent);
-      setMark(2);
-      setMessage(correctWords[Math.floor(Math.random() * correctWords.length)]);
-      setCorrect(prev => [...prev, currentQuestion]);
+      setScore(prev => prev + earnedMark);
+      setAnswerMark(2);
+      setCorrect(prev => [...prev, currentQ]);
       if (sound && clap.current) clap.current.play();
     } else {
-      setMark(1);
-      setMessage(wrongWords[Math.floor(Math.random() * wrongWords.length)]);
-      setWrong(prev => [...prev, currentQuestion]);
+      setAnswerMark(1);
+      setWrong(prev => [...prev, currentQ]);
       if (sound && gameover.current) gameover.current.play();
+    }
+
+    if (feedbackMode === 'immediate') {
+      // Show modal with correct/wrong message
+      setMessage(isCorrect
+        ? correctWords[Math.floor(Math.random() * correctWords.length)]
+        : wrongWords[Math.floor(Math.random() * wrongWords.length)]
+      );
+    } else {
+      // End-only: no modal, auto-advance after brief delay so player sees highlights
+      setTimeout(() => changeActive(), 1200);
     }
   };
 
   const selectAnswer = () => {
+    if (isMultiple && multiSelected.current.size === 0) return;
+    if (!isMultiple && !selectedOption.current) return;
     if (countdown.current) countdown.current.pause();
     checkAnswer();
-    setShowSelect(false);
+    setShowConfirm(false);
   };
 
-  // Loading state — data not ready yet
   if (!data || data.length === 0) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
@@ -238,44 +324,89 @@ const isCorrect = selectedOption.current === correctOption?.body
     );
   }
 
-  const currentQ = data[active];
+  const allSelected = isMultiple
+    ? multiCount === correctCount
+    : showConfirm;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
-      {currentQ && (
-        <>
-          {/* Question card */}
-          <div className="bg-surface border border-border rounded-xl px-6 py-7 font-head text-xl font-semibold leading-relaxed text-txt mb-5">
-            {currentQ.body}
-          </div>
 
-          {/* Options */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {currentQ.options?.map((option, i) => (
-              <div
-                key={i}
-                ref={el => (options.current[i] = el)}
-                onClick={() => { markChoose(i, option); if (!confirm) selectAnswer(); }}
-                className="bg-surface border-2 border-border rounded-xl px-4 py-[18px] text-[0.95rem] text-txt cursor-pointer select-none relative transition-all duration-150 hover:border-accent hover:bg-surface2 active:scale-[0.98]"
-              >
-                {option.body ?? option}
-              </div>
-            ))}
-          </div>
+      {/* Question card */}
+      <div className="bg-surface border border-border rounded-xl px-6 py-7 mb-5">
 
-          {/* Confirm button — only when confirm mode is on */}
-          {showSelect && confirm && (
-            <button
-              onClick={selectAnswer}
-              className="mt-4 w-full bg-accent text-bg font-bold text-base rounded-xl py-[14px] px-5 cursor-pointer border-none transition-opacity hover:opacity-80 active:scale-[0.97]"
-            >
-              Confirm Answer
-            </button>
+        {/* Top meta row: marks + multi-select hint */}
+        <div className="flex items-center justify-between mb-4">
+          {/* Mark badge */}
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-accent bg-accent/10 border border-accent/20 rounded-full px-3 py-1">
+            ⚡ {questionMark} {questionMark === 1 ? 'Point' : 'Points'}
+          </span>
+
+          {/* Multi-select instruction */}
+          {isMultiple && (
+            <span className="text-xs font-semibold text-warn bg-warn/10 border border-warn/20 rounded-full px-3 py-1">
+              Select {correctCount} answers ({multiCount}/{correctCount})
+            </span>
           )}
-        </>
+        </div>
+
+        {/* Question body */}
+        <p className="font-head text-xl font-semibold leading-relaxed text-txt">
+          {currentQ?.body}
+        </p>
+
+        {/* Hint */}
+        {currentQ?.hint && (
+          <p className="text-muted text-xs mt-3 italic">💡 {currentQ.hint}</p>
+        )}
+      </div>
+
+      {/* Options */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {currentQ?.options?.map((option, i) => (
+          <div
+            key={option.id ?? i}
+            ref={el => (options.current[i] = el)}
+            onClick={() => isMultiple
+              ? handleMultiClick(i, option)
+              : handleSingleClick(i, option)
+            }
+            className="bg-surface border-2 border-border rounded-xl px-4 py-[18px] text-[0.95rem] text-txt cursor-pointer select-none relative transition-all duration-150 hover:border-accent hover:bg-surface2 active:scale-[0.98]"
+          >
+            {/* Multi-select checkbox indicator */}
+            {isMultiple && (
+              <span className={`absolute top-3 right-3 w-4 h-4 rounded border-2 flex items-center justify-center text-[10px] font-bold transition-all ${
+                multiSelected.current.has(option.id)
+                  ? 'bg-accent border-accent text-bg'
+                  : 'border-border'
+              }`}>
+                {multiSelected.current.has(option.id) ? '✓' : ''}
+              </span>
+            )}
+            {option.body ?? option}
+          </div>
+        ))}
+      </div>
+
+      {/* Confirm button */}
+      {/* Always shown for multi-select, shown based on confirm setting for single */}
+      {(isMultiple || (confirm && showConfirm)) && (
+        <button
+          onClick={selectAnswer}
+          disabled={isMultiple ? multiCount === 0 : !showConfirm}
+          className={`mt-4 w-full font-bold text-base rounded-xl py-[14px] px-5 border-none transition-all active:scale-[0.97] ${
+            allSelected
+              ? 'bg-accent text-bg cursor-pointer hover:opacity-80'
+              : 'bg-surface2 text-muted cursor-not-allowed opacity-50'
+          }`}
+        >
+          {isMultiple
+            ? `Submit ${multiCount}/${correctCount} Selected`
+            : 'Confirm Answer'
+          }
+        </button>
       )}
 
-      {/* option-selected can't be Tailwind (classList toggling at runtime) */}
+      {/* Runtime CSS for option states — can't use Tailwind for classList toggling */}
       <style>{`
         .option-selected {
           border-color: #b8ff57 !important;
@@ -283,12 +414,17 @@ const isCorrect = selectedOption.current === correctOption?.body
           color: #b8ff57 !important;
           font-weight: 600;
         }
-        .option-selected::before {
-          content: '✓';
-          position: absolute;
-          top: 10px; right: 12px;
-          font-size: 0.8rem;
-          color: #b8ff57;
+        .option-correct {
+          border-color: #b8ff57 !important;
+          background: rgba(184,255,87,0.12) !important;
+          color: #b8ff57 !important;
+          font-weight: 600;
+        }
+        .option-wrong {
+          border-color: #ff5757 !important;
+          background: rgba(255,87,87,0.10) !important;
+          color: #ff5757 !important;
+          font-weight: 600;
         }
       `}</style>
     </div>
@@ -310,14 +446,14 @@ function Message() {
   );
 }
 
-/* ─── ScoreBoard ───────────────────────────────────────────────────────────── */
+/* ─── ScoreBoard (immediate feedback modal) ────────────────────────────────── */
 function ScoreBoard() {
-  const { message, changeActive, score, buttonMessage, mark } = useContext(QuizBoxContext);
+  const { message, changeActive, score, buttonMessage, answerMark } = useContext(QuizBoxContext);
 
   const icon =
-    mark === 1 ? <span className="block text-5xl text-danger mb-2">✗</span>
-    : mark === 2 ? <span className="block text-5xl text-accent mb-2">✓</span>
-    : mark === 3 ? <span className="block text-5xl text-warn mb-2">⏱</span>
+    answerMark === 1 ? <span className="block text-5xl text-danger mb-2">✗</span>
+    : answerMark === 2 ? <span className="block text-5xl text-accent mb-2">✓</span>
+    : answerMark === 3 ? <span className="block text-5xl text-warn mb-2">⏱</span>
     : null;
 
   return (
@@ -340,10 +476,8 @@ function ScoreBoard() {
 
 /* ─── ResultsBoard ─────────────────────────────────────────────────────────── */
 function ResultsBoard() {
-  const { score, data, correct, wrong, changeActive } = useContext(QuizBoxContext);
-
-  const totalPossible = data.length * (data[0]?.score || 10);
-  const percentage    = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
+  const { score, totalPossible, correct, wrong, changeActive, questionResults } = useContext(QuizBoxContext);
+  const percentage = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
 
   const getGrade = () => {
     if (percentage >= 90) return { label: "Outstanding!", color: "text-accent", emoji: "🏆" };
@@ -351,38 +485,43 @@ function ResultsBoard() {
     if (percentage >= 50) return { label: "Good Effort",  color: "text-warn",   emoji: "👍" };
     return                       { label: "Keep Practicing", color: "text-danger", emoji: "💪" };
   };
-
   const grade = getGrade();
 
   return (
     <>
       <div className="text-5xl mb-3">{grade.emoji}</div>
       <div className={`font-head text-2xl font-bold ${grade.color} mb-1`}>{grade.label}</div>
-      <p className="text-muted text-sm mb-6">Quiz Complete</p>
+      <p className="text-muted text-sm mb-5">Quiz Complete</p>
 
       {/* Score circle */}
-      <div className="relative w-32 h-32 mx-auto mb-6">
+      <div className="relative w-28 h-28 mx-auto mb-5">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
           <path className="text-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
-          <path className={percentage >= 50 ? "text-accent" : "text-danger"} strokeDasharray={`${percentage}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+          <path
+            className={percentage >= 50 ? "text-accent" : "text-danger"}
+            strokeDasharray={`${percentage}, 100`}
+            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+            fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"
+          />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-head text-3xl font-extrabold text-txt">{percentage}%</span>
+          <span className="font-head text-2xl font-extrabold text-txt">{percentage}%</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-3 gap-2 mb-5">
         <div className="bg-surface2 rounded-xl p-3">
-          <div className="text-xs text-muted uppercase tracking-wider">Score</div>
-          <div className="font-head text-xl font-bold text-accent">{score}</div>
+          <div className="text-[10px] text-muted uppercase tracking-wider">Score</div>
+          <div className="font-head text-lg font-bold text-accent">{score}</div>
+          <div className="text-[10px] text-muted">/ {totalPossible}</div>
         </div>
         <div className="bg-surface2 rounded-xl p-3">
-          <div className="text-xs text-muted uppercase tracking-wider">Correct</div>
-          <div className="font-head text-xl font-bold text-accent">{correct.length}</div>
+          <div className="text-[10px] text-muted uppercase tracking-wider">Correct</div>
+          <div className="font-head text-lg font-bold text-accent">{correct.length}</div>
         </div>
         <div className="bg-surface2 rounded-xl p-3">
-          <div className="text-xs text-muted uppercase tracking-wider">Wrong</div>
-          <div className="font-head text-xl font-bold text-danger">{wrong.length}</div>
+          <div className="text-[10px] text-muted uppercase tracking-wider">Wrong</div>
+          <div className="font-head text-lg font-bold text-danger">{wrong.length}</div>
         </div>
       </div>
 
@@ -390,7 +529,7 @@ function ResultsBoard() {
         onClick={changeActive}
         className="w-full bg-accent text-bg font-bold text-base rounded-xl py-[14px] px-5 cursor-pointer border-none transition-opacity hover:opacity-80 active:scale-[0.97]"
       >
-        Continue →
+        View Full Results →
       </button>
     </>
   );
@@ -398,11 +537,8 @@ function ResultsBoard() {
 
 /* ─── EndBoard ─────────────────────────────────────────────────────────────── */
 function EndBoard() {
-  const { user, score, data, correct, wrong, restartQuiz } = useContext(QuizBoxContext);
-
-  const totalPossible = data.length * (data[0]?.score || 10);
-  const percentage    = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
-
+  const { user, score, totalPossible, correct, wrong, restartQuiz, questionResults } = useContext(QuizBoxContext);
+  const percentage = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
   const handleRetry = () => { restartQuiz(); window.location.reload(); };
 
   return (
@@ -410,35 +546,33 @@ function EndBoard() {
       <div className="text-4xl mb-3">🏁</div>
       <div className="font-head text-2xl font-extrabold text-txt mb-2">Game Over</div>
 
-      <div className="bg-surface2 rounded-xl px-6 py-5 my-5 w-full">
+      <div className="bg-surface2 rounded-xl px-5 py-4 my-4 w-full">
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs uppercase tracking-widest text-muted font-bold">Final Score</span>
-          <span className="font-head text-3xl font-extrabold text-accent">{score}</span>
+          <span className="font-head text-2xl font-extrabold text-accent">{score} / {totalPossible}</span>
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-3">
           <span className="text-xs uppercase tracking-widest text-muted font-bold">Accuracy</span>
-          <span className={`font-head text-xl font-bold ${percentage >= 50 ? 'text-accent' : 'text-danger'}`}>
-            {percentage}%
-          </span>
+          <span className={`font-head text-lg font-bold ${percentage >= 50 ? 'text-accent' : 'text-danger'}`}>{percentage}%</span>
         </div>
-        <div className="w-full h-2 bg-border rounded-full mt-3 overflow-hidden">
-          <div className={`h-full rounded-full ${percentage >= 50 ? 'bg-accent' : 'bg-danger'}`} style={{ width: `${percentage}%` }} />
+        <div className="w-full h-2 bg-border rounded-full overflow-hidden">
+          <div className={`h-full rounded-full transition-all ${percentage >= 50 ? 'bg-accent' : 'bg-danger'}`} style={{ width: `${percentage}%` }} />
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-5">
-        <div className="text-center">
-          <div className="text-2xl text-accent">✓ {correct.length}</div>
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="text-center bg-surface2 rounded-xl p-3">
+          <div className="text-xl text-accent font-bold">{correct.length}</div>
           <div className="text-xs text-muted">Correct</div>
         </div>
-        <div className="text-center">
-          <div className="text-2xl text-danger">✗ {wrong.length}</div>
+        <div className="text-center bg-surface2 rounded-xl p-3">
+          <div className="text-xl text-danger font-bold">{wrong.length}</div>
           <div className="text-xs text-muted">Wrong</div>
         </div>
       </div>
 
       <div className="flex flex-col gap-[10px]">
-        <button onClick={handleRetry} className="block w-full px-5 py-[13px] rounded-xl bg-accent text-bg font-bold text-[0.95rem] text-center transition-opacity hover:opacity-85 border-none cursor-pointer">
+        <button onClick={handleRetry} className="w-full px-5 py-[13px] rounded-xl bg-accent text-bg font-bold text-[0.95rem] border-none cursor-pointer transition-opacity hover:opacity-85">
           ↻ Play Again
         </button>
         <Link href="/" className="block px-5 py-[13px] rounded-xl border border-border text-muted font-semibold text-[0.95rem] no-underline text-center transition-all hover:border-accent hover:text-accent">
@@ -489,7 +623,11 @@ export const MissedOut = ({ number }) => {
 
 /* ─── CountDown ────────────────────────────────────────────────────────────── */
 export function CountDown({ number }) {
-  const { gameover, setWrong, setMessage, resetAudio, message, countdown, active, data, setMark, sound } = useContext(QuizBoxContext);
+  const {
+    gameover, setWrong, setMessage, resetAudio, message,
+    countdown, active, data, setAnswerMark, sound, changeActive,
+    feedbackMode,
+  } = useContext(QuizBoxContext);
   const [countDown, setCountDown] = useState(number || 20);
 
   useEffect(() => {
@@ -498,10 +636,14 @@ export function CountDown({ number }) {
     if (countDown <= 0) {
       resetAudio();
       if (sound && gameover.current) gameover.current.play();
-      setMark(3);
-      setMessage('Time Out');
+      setAnswerMark(3);
       setWrong(prev => [...prev, data[active]]);
       clearInterval(timer);
+      if (feedbackMode === 'immediate') {
+        setMessage('Time Out');
+      } else {
+        setTimeout(() => changeActive(), 1000);
+      }
     }
     if (message) { clearInterval(timer); if (countdown.current) countdown.current.currentTime = 0; }
     return () => clearInterval(timer);
@@ -518,7 +660,7 @@ export function CountDown({ number }) {
 
 /* ─── Header ───────────────────────────────────────────────────────────────── */
 export const Header = () => {
-  const { user } = useApp();  // FIX: was useContext(AuthContext) which doesn't exist
+  const { user } = useApp();
   return (
     <header className="sticky top-0 z-[100] flex items-center justify-between px-6 py-[14px] bg-bg/85 backdrop-blur-md border-b border-border">
       <Link href="/" className="font-head text-2xl font-extrabold text-txt no-underline">
@@ -540,10 +682,8 @@ export const Header = () => {
 };
 
 /* ─── Instructions ─────────────────────────────────────────────────────────── */
-// FIX: reads from useApp() directly — works without needing <Quiz> wrapper
-// confirm/sound live in AppContext so they persist across page navigation
 export function Instructions(props) {
-  const { confirm, sound, setConfirm, setSound } = useApp();
+  const { confirm, sound, setConfirm, setSound, feedbackMode, setFeedbackMode } = useApp();
 
   const ToggleBtn = ({ isActive, onClick, label }) => (
     <button
@@ -562,34 +702,64 @@ export function Instructions(props) {
         <i className={props.icon}></i>
         {props.name}
       </div>
+
       <div className="bg-surface border border-border rounded-xl px-5 py-[18px] mb-[14px]">
         <div className="text-[0.75rem] uppercase tracking-widest text-muted font-bold mb-1.5">⏱ Time per question</div>
         <div className="text-txt font-medium">{props.time} seconds</div>
       </div>
+
       <div className="bg-surface border border-border rounded-xl px-5 py-[18px] mb-[14px]">
         <div className="text-[0.75rem] uppercase tracking-widest text-muted font-bold mb-1.5">★ Points per question</div>
-        <div className="text-txt font-medium">{props.score} points</div>
+        <div className="text-txt font-medium">{props.score} points (may vary by difficulty)</div>
       </div>
+
       <div className="bg-surface border border-border rounded-xl px-5 py-[18px] mb-[14px]">
         <div className="text-[0.75rem] uppercase tracking-widest text-muted font-bold mb-4">⚙ Settings</div>
-        <div className="flex flex-col gap-[14px]">
+        <div className="flex flex-col gap-4">
+
+          {/* Confirm answer */}
           <div className="flex items-center justify-between gap-3">
-            <span className="text-txt">Confirm answer</span>
+            <div>
+              <div className="text-sm font-semibold text-txt">Confirm Answer</div>
+              <div className="text-xs text-muted">Show submit button before checking</div>
+            </div>
             <div className="flex gap-1.5">
               <ToggleBtn isActive={confirm}  onClick={() => setConfirm(true)}  label="Yes" />
               <ToggleBtn isActive={!confirm} onClick={() => setConfirm(false)} label="No"  />
             </div>
           </div>
+
+          {/* Feedback mode */}
           <div className="flex items-center justify-between gap-3">
-            <span className="text-txt">Sound effects</span>
+            <div>
+              <div className="text-sm font-semibold text-txt">Feedback</div>
+              <div className="text-xs text-muted">When to show correct/wrong</div>
+            </div>
+            <div className="flex gap-1.5">
+              <ToggleBtn isActive={feedbackMode === 'immediate'} onClick={() => setFeedbackMode('immediate')} label="Instant" />
+              <ToggleBtn isActive={feedbackMode === 'end'}       onClick={() => setFeedbackMode('end')}       label="End" />
+            </div>
+          </div>
+
+          {/* Sound */}
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-semibold text-txt">Sound Effects</div>
+              <div className="text-xs text-muted">Play sounds on answers</div>
+            </div>
             <div className="flex gap-1.5">
               <ToggleBtn isActive={sound}  onClick={() => setSound(true)}  label="On"  />
               <ToggleBtn isActive={!sound} onClick={() => setSound(false)} label="Off" />
             </div>
           </div>
+
         </div>
       </div>
-      <Link href={{ pathname: "quickplay/game", query: props }} className="block text-center no-underline bg-accent text-bg font-bold text-[1.05rem] px-5 py-4 rounded-xl transition-opacity hover:opacity-85 active:scale-[0.98] mt-2">
+
+      <Link
+        href={{ pathname: "quickplay/game", query: props }}
+        className="block text-center no-underline bg-accent text-bg font-bold text-[1.05rem] px-5 py-4 rounded-xl transition-opacity hover:opacity-85 active:scale-[0.98] mt-2"
+      >
         Start Game →
       </Link>
     </div>

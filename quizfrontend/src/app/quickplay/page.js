@@ -5,11 +5,9 @@ import { apiGet } from '../endpoints.js'
 import { useApp } from '../appContext.js'
 
 /**
- * src/app/quickplay/page.js — Game instructions/setup screen
- *
- * FIX: No longer wraps with <Quiz> — Instructions reads confirm/sound
- * directly from useApp() (AppContext), so no QuizBoxContext needed here.
- * Settings set here persist into the game page automatically via AppContext.
+ * src/app/quickplay/page.js
+ * Instructions/settings screen before the game starts.
+ * Fetches game info including total_marks from the backend.
  */
 
 export default function QuickplaySetup() {
@@ -17,8 +15,7 @@ export default function QuickplaySetup() {
   const searchParams = useSearchParams()
   const gameId       = searchParams.get('game')
 
-  // Settings read directly from AppContext
-  const { confirm, setConfirm, sound, setSound } = useApp()
+  const { confirm, setConfirm, sound, setSound, feedbackMode, setFeedbackMode } = useApp()
 
   const [gameData, setGameData] = useState(null)
   const [loading, setLoading]   = useState(true)
@@ -27,8 +24,14 @@ export default function QuickplaySetup() {
   useEffect(() => {
     if (!gameId) { setError('No game selected'); setLoading(false); return; }
 
-    apiGet(`game/${gameId}/`)
-      .then(data => { setGameData(data); })
+    // Endpoint is game/<slug>/ but we have the ID from query params.
+    // getgame/<id>/1/ returns game info via GameListSerializer on page 1
+    // We use that instead of game/<slug>/ since we only have the ID here.
+    apiGet(`getgame/${gameId}/1/`)
+      .then(res => {
+        if (res.game) setGameData(res.game)
+        else setError('Game not found')
+      })
       .catch(() => setError('Failed to load game'))
       .finally(() => setLoading(false))
   }, [gameId])
@@ -65,16 +68,24 @@ export default function QuickplaySetup() {
         <div className="text-center">
           <div className="text-4xl mb-3">⚠️</div>
           <p className="text-danger font-semibold">{error}</p>
-          <button
-            onClick={() => router.push('/home/game')}
-            className="mt-4 text-accent hover:underline bg-transparent border-none cursor-pointer"
-          >
+          <button onClick={() => router.push('/home/game')} className="mt-4 text-accent hover:underline bg-transparent border-none cursor-pointer">
             ← Back to Games
           </button>
         </div>
       </div>
     )
   }
+
+  const modeScore    = gameData?.mode?.score || 10
+  const timeLimit    = gameData?.time_per_question || gameData?.mode?.time || 20
+  const questionCount = gameData?.question_count || 0
+  const totalMarks   = gameData?.total_marks ?? (questionCount * modeScore)
+
+  const difficultyColor = {
+    easy:   'text-accent bg-accent/10 border-accent/20',
+    medium: 'text-warn bg-warn/10 border-warn/20',
+    hard:   'text-danger bg-danger/10 border-danger/20',
+  }[gameData?.difficulty] || 'text-muted bg-surface2 border-border'
 
   return (
     <div className="min-h-screen bg-bg px-5 py-12">
@@ -93,61 +104,51 @@ export default function QuickplaySetup() {
           <div className="w-16 h-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-3xl mx-auto mb-4">
             {gameData?.mode?.icon ? <i className={gameData.mode.icon} /> : <span>🎮</span>}
           </div>
-          <h1 className="font-head text-2xl font-extrabold text-txt">
-            {gameData?.title || 'Quiz'}
-          </h1>
-          <p className="text-muted text-sm mt-2">{gameData?.mode?.name || 'Quick Play'}</p>
+          <h1 className="font-head text-2xl font-extrabold text-txt">{gameData?.title || 'Quiz'}</h1>
+          <p className="text-muted text-sm mt-1">{gameData?.mode?.name || 'Quick Play'}</p>
+          {gameData?.difficulty && (
+            <span className={`inline-block mt-2 text-xs font-bold uppercase tracking-widest border rounded-full px-3 py-1 capitalize ${difficultyColor}`}>
+              {gameData.difficulty}
+            </span>
+          )}
         </div>
 
-        {/* How to play */}
-        <div className="bg-surface border border-border rounded-2xl p-6 mb-4">
-          <h2 className="font-head text-lg font-bold text-txt mb-4">How to Play</h2>
-          <div className="flex flex-col gap-4">
+        {/* Stats row — total marks prominent here */}
+        <div className="grid grid-cols-3 gap-3 mb-5">
 
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent text-lg shrink-0">⏱</div>
-              <div>
-                <div className="text-sm font-semibold text-txt">Time Limit</div>
-                <div className="text-xs text-muted">
-                  {gameData?.time_per_question || gameData?.mode?.time || 20} seconds per question
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent text-lg shrink-0">⚡</div>
-              <div>
-                <div className="text-sm font-semibold text-txt">Points</div>
-                <div className="text-xs text-muted">
-                  {gameData?.mode?.score || 10} points per correct answer
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent text-lg shrink-0">❓</div>
-              <div>
-                <div className="text-sm font-semibold text-txt">Questions</div>
-                <div className="text-xs text-muted">
-                  {gameData?.question_count || 'Multiple'} questions
-                </div>
-              </div>
-            </div>
-
-            {gameData?.difficulty && (
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent text-lg shrink-0">📊</div>
-                <div>
-                  <div className="text-sm font-semibold text-txt">Difficulty</div>
-                  <div className="text-xs text-muted capitalize">{gameData.difficulty}</div>
-                </div>
-              </div>
-            )}
-
+          <div className="bg-surface border border-border rounded-xl p-4 text-center">
+            <div className="text-xl mb-1">❓</div>
+            <div className="font-head text-xl font-bold text-txt">{questionCount}</div>
+            <div className="text-xs text-muted">Questions</div>
           </div>
+
+          <div className="bg-surface border border-border rounded-xl p-4 text-center">
+            <div className="text-xl mb-1">⏱</div>
+            <div className="font-head text-xl font-bold text-txt">{timeLimit}s</div>
+            <div className="text-xs text-muted">Per Question</div>
+          </div>
+
+          {/* Total marks — the one you asked for */}
+          <div className="bg-accent/10 border border-accent/25 rounded-xl p-4 text-center">
+            <div className="text-xl mb-1">⚡</div>
+            <div className="font-head text-xl font-bold text-accent">{totalMarks}</div>
+            <div className="text-xs text-muted">Total Marks</div>
+          </div>
+
         </div>
 
-        {/* Settings — wired to AppContext, persists into game page */}
+        {/* Mark breakdown note */}
+        <div className="bg-surface border border-border rounded-xl px-5 py-4 mb-4 flex items-start gap-3">
+          <span className="text-accent mt-0.5">ℹ</span>
+          <p className="text-muted text-sm leading-relaxed">
+            Each question carries its own mark value based on difficulty.
+            Multi-answer questions use an all-or-nothing grading system.
+            The maximum achievable score for this quiz is{' '}
+            <span className="text-accent font-bold">{totalMarks} points</span>.
+          </p>
+        </div>
+
+        {/* Settings */}
         <div className="bg-surface border border-border rounded-2xl p-6 mb-6">
           <h2 className="font-head text-lg font-bold text-txt mb-4">⚙ Settings</h2>
           <div className="flex flex-col gap-4">
@@ -155,7 +156,7 @@ export default function QuickplaySetup() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="text-sm font-semibold text-txt">Confirm Answer</div>
-                <div className="text-xs text-muted">Show a submit button before checking</div>
+                <div className="text-xs text-muted">Show submit button before checking</div>
               </div>
               <div className="flex gap-1.5">
                 <ToggleBtn isActive={confirm}  onClick={() => setConfirm(true)}  label="Yes" />
@@ -165,8 +166,19 @@ export default function QuickplaySetup() {
 
             <div className="flex items-center justify-between gap-3">
               <div>
+                <div className="text-sm font-semibold text-txt">Feedback</div>
+                <div className="text-xs text-muted">When to show correct/wrong</div>
+              </div>
+              <div className="flex gap-1.5">
+                <ToggleBtn isActive={feedbackMode === 'immediate'} onClick={() => setFeedbackMode('immediate')} label="Instant" />
+                <ToggleBtn isActive={feedbackMode === 'end'}       onClick={() => setFeedbackMode('end')}       label="End"     />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-3">
+              <div>
                 <div className="text-sm font-semibold text-txt">Sound Effects</div>
-                <div className="text-xs text-muted">Play sounds on correct/wrong answers</div>
+                <div className="text-xs text-muted">Play sounds on answers</div>
               </div>
               <div className="flex gap-1.5">
                 <ToggleBtn isActive={sound}  onClick={() => setSound(true)}  label="On"  />
@@ -182,7 +194,7 @@ export default function QuickplaySetup() {
           onClick={handleStart}
           className="w-full bg-accent text-bg font-bold text-lg rounded-xl py-4 px-6 border-none cursor-pointer transition-opacity hover:opacity-80 active:scale-[0.98]"
         >
-          Start Game →
+          Start Game → {totalMarks} pts available
         </button>
 
       </div>

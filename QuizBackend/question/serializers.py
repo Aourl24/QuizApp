@@ -11,14 +11,12 @@ from random import shuffle
 # ─────────────────────────────────────────────────────────────
 
 class UserSerializer(serializers.ModelSerializer):
-    """Basic user info for public display."""
     class Meta:
         model = User
         fields = ["id", "username"]
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    """Extended user info for authenticated views."""
     class Meta:
         model = User
         fields = ["id", "username", "email", "first_name", "last_name", "date_joined"]
@@ -30,10 +28,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
 # ─────────────────────────────────────────────────────────────
 
 class ProfileSerializer(serializers.ModelSerializer):
-    """Full profile with user nested. Used for leaderboards and profiles."""
     user = UserSerializer(read_only=True)
-    # avatar_url = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Profile
         fields = [
@@ -43,36 +39,30 @@ class ProfileSerializer(serializers.ModelSerializer):
             "joined_at", "last_active"
         ]
         read_only_fields = ["joined_at", "last_active"]
-    
+
     def get_avatar_url(self, obj):
-        if obj.avatar:
-            return obj.avatar.url
-        return None
+        return obj.avatar.url if obj.avatar else None
 
 
 class ProfileMinimalSerializer(serializers.ModelSerializer):
-    """Minimal profile for nested display (e.g., in leaderboards)."""
     username = serializers.CharField(source="user.username", read_only=True)
-    
+
     class Meta:
         model = Profile
         fields = ["id", "username", "total_points"]
-    
+
     def get_avatar_url(self, obj):
-        if obj.avatar:
-            return obj.avatar.url
-        return None
+        return obj.avatar.url if obj.avatar else None
 
 
 class LeaderboardSerializer(serializers.ModelSerializer):
-    """Optimized for leaderboard display."""
     username = serializers.CharField(source="user.username", read_only=True)
     rank = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Profile
         fields = ["rank", "username", "total_points", "total_games_played", "longest_streak"]
-    
+
     def get_rank(self, obj):
         return getattr(obj, 'rank', None)
 
@@ -94,73 +84,80 @@ class LevelSerializer(serializers.ModelSerializer):
 
 
 # ─────────────────────────────────────────────────────────────
-# OPTIONS (Player-safe vs Admin)
+# OPTIONS
 # ─────────────────────────────────────────────────────────────
 
 class OptionPlayerSerializer(serializers.ModelSerializer):
-    """Hides correct answer — used when sending questions to players."""
+    """
+    Sent to players — includes answer boolean.
+    Note: answer is already exposed here, so frontend can check locally.
+    """
     class Meta:
         model = Option
-        fields = ["id", "body", "order","answer"]
+        fields = ["id", "body", "order", "answer"]
 
 
 class OptionAdminSerializer(serializers.ModelSerializer):
-    """Shows correct answer — used for creators/admins."""
     class Meta:
         model = Option
         fields = ["id", "body", "answer", "order"]
 
 
 # ─────────────────────────────────────────────────────────────
-# QUESTIONS (Player-safe vs Admin)
+# QUESTIONS
 # ─────────────────────────────────────────────────────────────
 
 class QuestionPlayerSerializer(serializers.ModelSerializer):
     """
     Questions sent to players during quiz.
-    - Shuffles options
-    - Hides correct answer
-    - Includes hint if available
+    - Shuffles options randomly
+    - Exposes mark for per-question point display
+    - Exposes has_multiple_answers so frontend knows to use multi-select UI
+    - Exposes correct_answer_count so frontend knows exactly how many to select
     """
     level = LevelSerializer(read_only=True)
     options = serializers.SerializerMethodField()
-    
+    has_multiple_answers = serializers.BooleanField(read_only=True)
+    correct_answer_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Question
-        fields = ["id", "body", "options", "hint", "level", "order"]
-    
+        fields = [
+            "id", "body", "options", "hint",
+            "level", "order",
+            "mark",                  # per-question points (null = use mode default)
+            "has_multiple_answers",  # bool — triggers multi-select UI
+            "correct_answer_count",  # int — how many options to select
+        ]
+
     def get_options(self, obj):
         options = list(obj.options.all())
         shuffle(options)
         return OptionPlayerSerializer(options, many=True).data
 
+    def get_correct_answer_count(self, obj):
+        return obj.correct_options.count()
+
 
 class QuestionAdminSerializer(serializers.ModelSerializer):
-    """
-    Questions for creators/admins.
-    - Shows correct answer(s)
-    - Includes explanation
-    - Includes all options with answers
-    """
     level = LevelSerializer(read_only=True)
     options = OptionAdminSerializer(many=True, source="options.all", read_only=True)
     correct_answers = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Question
         fields = [
             "id", "body", "options", "correct_answers",
             "explanation", "hint", "image", "level", "order",
-            "created_at"
+            "mark", "created_at"
         ]
-    
+
     def get_correct_answers(self, obj):
         correct = obj.options.filter(answer=True)
         return OptionAdminSerializer(correct, many=True).data
 
 
 class QuestionMinimalSerializer(serializers.ModelSerializer):
-    """Minimal question for lists."""
     class Meta:
         model = Question
         fields = ["id", "body", "order"]
@@ -173,7 +170,7 @@ class QuestionMinimalSerializer(serializers.ModelSerializer):
 class GameModeSerializer(serializers.ModelSerializer):
     locked = serializers.SerializerMethodField()
     guest_accessible = serializers.BooleanField(source="is_guest_allowed", read_only=True)
-    
+
     class Meta:
         model = GameMode
         fields = [
@@ -181,7 +178,7 @@ class GameModeSerializer(serializers.ModelSerializer):
             "score", "time", "order", "is_active", "is_guest_allowed",
             "verified_profile", "locked", "guest_accessible"
         ]
-    
+
     def get_locked(self, obj):
         profile_id = self.context.get("profile_id") if self.context else None
         return obj.is_locked(profile_id)
@@ -192,33 +189,45 @@ class GameModeSerializer(serializers.ModelSerializer):
 # ─────────────────────────────────────────────────────────────
 
 class GameListSerializer(serializers.ModelSerializer):
-    """For game lists (browse, search)."""
     mode = GameModeSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     creator_username = serializers.CharField(source="creator.user.username", read_only=True)
     question_count = serializers.SerializerMethodField()
-    
+    total_marks = serializers.SerializerMethodField()
+
     class Meta:
         model = Game
         fields = [
             "id", "title", "slug", "description", "mode", "category",
             "creator_username", "difficulty", "public", "multiplayer",
             "max_players", "play_count", "likes", "avg_score",
-            "question_count", "created_at"
+            "question_count", "total_marks", "created_at"
         ]
-    
+
     def get_question_count(self, obj):
         return obj.questions.count()
 
+    def get_total_marks(self, obj):
+        """
+        Sum of each question's mark value.
+        Falls back to the game mode's default score for questions with null mark.
+        Always accurate — recalculated at query time, never stale.
+        """
+        mode_score = obj.mode.score if obj.mode else 10
+        return sum(
+            q.mark if q.mark is not None else mode_score
+            for q in obj.questions.all()
+        )
+
 
 class GameDetailSerializer(serializers.ModelSerializer):
-    """For game detail page."""
     mode = GameModeSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     creator = ProfileMinimalSerializer(read_only=True)
     questions = QuestionPlayerSerializer(many=True, read_only=True)
     question_count = serializers.SerializerMethodField()
-    
+    total_marks = serializers.SerializerMethodField()
+
     class Meta:
         model = Game
         fields = [
@@ -226,35 +235,40 @@ class GameDetailSerializer(serializers.ModelSerializer):
             "creator", "time_per_question", "difficulty",
             "public", "multiplayer", "max_players",
             "play_count", "likes", "avg_score",
-            "questions", "question_count",
+            "questions", "question_count", "total_marks",
             "created_at", "updated_at"
         ]
-    
+
     def get_question_count(self, obj):
         return obj.questions.count()
 
+    def get_total_marks(self, obj):
+        mode_score = obj.mode.score if obj.mode else 10
+        return sum(
+            q.mark if q.mark is not None else mode_score
+            for q in obj.questions.all()
+        )
+
 
 class GameAdminSerializer(serializers.ModelSerializer):
-    """For creators/admins — shows everything including code."""
     mode = GameModeSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     creator = ProfileSerializer(read_only=True)
     questions = QuestionAdminSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = Game
         fields = "__all__"
 
 
 # ─────────────────────────────────────────────────────────────
-# POINTS (Leaderboard Records)
+# POINTS
 # ─────────────────────────────────────────────────────────────
 
 class PointsSerializer(serializers.ModelSerializer):
-    """Individual game score record."""
     player = ProfileMinimalSerializer(read_only=True)
     game_title = serializers.CharField(source="game.title", read_only=True)
-    
+
     class Meta:
         model = Points
         fields = [
@@ -264,15 +278,14 @@ class PointsSerializer(serializers.ModelSerializer):
 
 
 # ─────────────────────────────────────────────────────────────
-# GAME ATTEMPT (History)
+# GAME ATTEMPT
 # ─────────────────────────────────────────────────────────────
 
 class GameAttemptSerializer(serializers.ModelSerializer):
-    """Detailed game attempt for history."""
     game_title = serializers.CharField(source="game.title", read_only=True)
     game_slug = serializers.CharField(source="game.slug", read_only=True)
     mode_name = serializers.CharField(source="game.mode.name", read_only=True)
-    
+
     class Meta:
         model = GameAttempt
         fields = [
@@ -312,7 +325,7 @@ class BadgeSerializer(serializers.ModelSerializer):
 
 class PlayerBadgeSerializer(serializers.ModelSerializer):
     badge = BadgeSerializer(read_only=True)
-    
+
     class Meta:
         model = PlayerBadge
         fields = ["badge", "earned_at"]

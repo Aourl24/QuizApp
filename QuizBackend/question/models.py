@@ -267,6 +267,7 @@ class Question(models.Model):
     order = models.PositiveIntegerField(default=0)
     
     created_at = models.DateTimeField(auto_now_add=True)
+    mark = models.IntegerField(null=True,blank=True)
 
     class Meta:
         ordering = ['order', 'id']
