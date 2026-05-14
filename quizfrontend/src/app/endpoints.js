@@ -4,7 +4,7 @@ import Cookies from 'js-cookie'
 //const api_host = '127.0.0.1:8000'
 const api_host = 'quizzify.pythonanywhere.com'
 
-export const endpoint    = `http://${api_host}/`
+export const endpoint    = `https://${api_host}/`
 export const endpath     = endpoint.trim().replace(/\/$/, '')
 export const wsEndpoint  = `ws:/${api_host}/quizroom/`
 
